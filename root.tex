@@ -1,0 +1,233 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out if you need a4paper
+
+%\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4 paper
+
+\IEEEoverridecommandlockouts                              % This command is only needed if 
+                                                          % you want to use the \thanks command
+
+\overrideIEEEmargins                                      % Needed to meet printer requirements.
+
+%In case you encounter the following error:
+%Error 1010 The PDF file may be corrupt (unable to open PDF file) OR
+%Error 1000 An error occurred while parsing a contents stream. Unable to analyze the PDF file.
+%This is a known problem with pdfLaTeX conversion filter. The file cannot be opened with acrobat reader
+%Please use one of the alternatives below to circumvent this error by uncommenting one or the other
+%\pdfobjcompresslevel=0
+%\pdfminorversion=4
+
+% See the \addtolength command later in the file to balance the column lengths
+% on the last page of the document
+
+% The following packages can be found on http:\\www.ctan.org
+%\usepackage{graphics} % for pdf, bitmapped graphics files
+%\usepackage{epsfig} % for postscript graphics files
+%\usepackage{mathptmx} % assumes new font selection scheme installed
+%\usepackage{times} % assumes new font selection scheme installed
+%\usepackage{amsmath} % assumes amsmath package installed
+%\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{subfigure}
+\usepackage{multirow}
+\usepackage{pbox}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+%\usepackage{algpseudocode}
+\usepackage{bm}
+\usepackage{url}
+\newcommand\NB[1]{$\spadesuit$\footnote{NB: #1}}
+\newcommand\RP[1]{$\clubsuit$\footnote{RP: #1}}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\N}{\mathbb{N}}
+
+\newtheorem{problem}{Problem}
+\newtheorem{lemma}{Lemma}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\title{\LARGE \bf
+Teleop Command/Imitation Learning/Regression (in progress)
+}
+
+
+\author{Rahul Peddi and Nicola Bezzo%
+\thanks{Rahul Peddi and Nicola Bezzo are with the Department of Systems and Information Engineering and the Charles L. Brown Department of Electrical and Computer Engineering, University of Virginia, Charlottesville, VA 22904, USA. Email: {\tt \{rp3cy, nb6be\}@virginia.edu}}}
+
+
+\begin{document}
+
+
+
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+
+
+\end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+
+\section{Related Work}
+
+
+\section{Problem Formulation}
+In this work, we are interested in finding a framework for a UAV to learn autonomous flight from demonstration and adapt online this flight in order to accurately follow any given trajectory within certain bounds. In addition, we are interested in finding a method to correct for any error we may discover during run-time.
+
+Formally, the problem we investigate in this work can be stated as:
+
+\textbf{Problem 1: \textit{Learning to Fly from Demonstration of Training Samples}}: A human pilot flies the UAV for $m$ different trials, recording the data for each flight. Using the trials, we aim to:
+\begin{enumerate}
+    \item build a model based on the data given in the training sets, where the inputs are distance travelled $d_i$ and time taken to travel that distance, $t_i$, where $i = 1,\ldots,m$ and $m$ is the number of trials.
+    \item evaluate the accuracy of this model, and identify boundary conditions for model effectiveness, $[d_\min d_\max]$ and $[t_\min t_\max]$.
+    \item generate open-loop autonomous control input, $\mathbf{x}_a$, to send to the system given a new user-set distance and time, $d_u$ and $t_u$
+\end{enumerate}
+
+In addition to developing the open-loop control input, $\mathbf{x}_a$, we are also interested in developing a method to correct the input during run-time. Formally, this can be states as:
+
+\textbf{Problem 2: \textit{Correcting for error in-flight}}: In the event that error occurs when testing the generated autonomous input $\mathbf{x}_a$, we find a method to
+\begin{enumerate}
+    \item adjust the remaining portion of the control input, $\mathbf{x}_a' \in \R^{1\times(T-t)}$, using a PI controller to obtain a closed-loop input  $\mathbf{x}_c$  -
+\end{enumerate}
+
+
+
+\section{System Dynamics}
+
+
+\section{Approach}
+    Block Diagram and Explanation*
+
+\subsection{Regression Model Training}
+In order to build the appropriate model for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. The inputs of the training phase are $\{d_i,t_i,\mathbf{x_i}\}$, where $i=1,\ldots,m$, $d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{x_i}$ is the string of teleoperation commands given the by the pilot. In addition to the inputs given by the pilot, we are also interested in two entities \begin{itemize}
+    \item The integral of the string of teleoperation commands, $g_i = \int_0^{t_i}\mathbf{x_i}$
+    \item The steady-state teleoperation command, $\bar{x}_i \in \mathbf{x_i}$
+\end{itemize}
+The steady-state command and integral are necessary portions of the analysis because of the directly proportional relationship between teleop commands and system velocity. The steady-state command, in this case, provides information about the pilot's average in-flight velocity. The integral, meanwhile, describes the area under the string of commands. Because the teleop commands are proportional to velocity, this area value gives important information about the distance traveled, as position is the integral of velocity over time.
+
+The offline training data is applied to a thin-plate spline surface fit to describe the relationship between training inputs and integral and average velocity. The general form of a thin-plate spline equation is 
+\begin{equation}
+    f(x,y) = a_1 + a_xx + a_yy + \sum_{i=1}^mw_iU(||(x_i,y_i)-(x,y)||)
+\end{equation}
+
+where $a_1,a_x,\text{and}~a_y$ are scalar coefficients, $w_i$ is a coefficient that corresponds to each specific trial, subject to the following condition: \begin{equation}
+\sum_{i=1}^mw_i=\sum_{i=1}^mw_ix_i=\sum_{i=1}^mw_iy_i=0
+\end{equation}
+and the function $U$ is of the form
+\begin{equation}
+  U(r) = r^2\log{r} 
+\end{equation}
+
+Given the corresponding $z_i$ for each $(x_i,y_i)$ pair, we are able to solve the following linear system to obtain the coefficients $w_i,\ldots,w_m$ and $a_1,a_x,a_y$,
+
+\begin{equation}
+    \begin{bmatrix}
+    K&P\\
+    P^T& \mathbf{0}
+    \end{bmatrix}
+    \begin{bmatrix}
+    \mathbf{w}\\
+    \mathbf{a}
+    \end{bmatrix} = 
+    \begin{bmatrix}
+    \mathbf{z}\\
+    \mathbf{o}
+    \end{bmatrix}
+\end{equation}
+
+where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, $P_i* = (1,x_i,y_i)$, $\mathbf{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\mathbf{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\mathbf{w} \in \mathbb{R}^{m\times1}$ and $\mathbf{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\mathbf{a}$ is the column vector with elements $a1,ax,a_y$.
+
+Given the general framework for performing the thin-plate spline, we develop two separate relationships for our specific application:
+\begin{equation} \label{eq:integralfit}
+    g_i = f(d_i,t_i)
+\end{equation}
+\begin{equation} \label{eq:ssvelfit}
+    \bar{x}_i = h(d_i,t_i)
+\end{equation}
+
+With equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, we are able to obtain an estimated integral and steady-state command, $g_u$ and $\bar{x}_u$, for any given desired distance and time,
+
+\begin{equation}
+g_u = f(d_u,t_u)
+\end{equation}
+\begin{equation}
+\bar{x}_u = h(d_u,t_u)
+\end{equation}
+
+where $d_u$ and $t_u$ are the user-set desired distance and time, respectively.
+
+\subsection{Autonomous Behaviour Generation}
+
+In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{x}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands.
+
+From the training set of $m$ samples, we select the trial that has the closest integral, $g_i$, to the estimated integral $g_u$. This is done by forming an error vector, $\mathbf{e}\in\R^{1\times m}$, where each element is defined by
+\begin{equation}
+ e_i = \vert a_i-a_u \vert , ~i\in \{1,\ldots,m\}
+\end{equation}
+ The lowest error is then found and is paired with the appropriate pre-trained sample, $\mathbf{x}^*$,
+
+\begin{equation}
+\mathbf{x}^* = \mathbf{x}_i \in \mathbf{x}\vert e_i = \min_e(\mathbf{e})
+\end{equation}
+
+This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing bicubic interpolation to resize the vector $\mathbf{x}^*$. Bicubic interpolation is selected here, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity. The general form of a bicubic interpolation equation is 
+\begin{equation}
+    p(x) = \sum_{i=0}^3a_ix^i
+\end{equation}
+Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify the intermediate points between each value in $\mathbf{x}^*$.
+
+\subsection{Online Adaptation of Generated Commands}
+
+\subsection{Trajectory Decomposition}
+
+
+\section{Experiments}
+
+
+\section{Conclusions}
+
+\section{Acknowledgement}
+
+
+\addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
+                                  % on the last page of the document manually. It shortens
+                                  % the textheight of the last page by a suitable amount.
+                                  % This command does not take effect until the next page
+                                  % so it should come on the page before the last. Make
+                                  % sure that you do not shorten the textheight too much.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%References are important to the reader; therefore, each citation must be complete and correct. If at all possible, references should be commonly available publications.
+
+
+
+\begin{thebibliography}{99}
+
+\bibitem{c1} G. O. Young, �Synthetic structure of industrial plastics (Book style with paper title and editor),� 	in Plastics, 2nd ed. vol. 3, J. Peters, Ed.  New York: McGraw-Hill, 1964, pp. 15�64.
+\bibitem{c2} W.-K. Chen, Linear Networks and Systems (Book style).	Belmont, CA: Wadsworth, 1993, pp. 123�135.
+\bibitem{c3} H. Poor, An Introduction to Signal Detection and Estimation.   New York: Springer-Verlag, 1985, ch. 4.
+
+
+\end{thebibliography}
+
+
+
+
+\end{document}
