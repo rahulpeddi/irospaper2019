@@ -33,7 +33,7 @@
 \usepackage{epstopdf}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{subfigure}
+%\usepackage{subfigure}
 \usepackage{multirow}
 \usepackage{pbox}
 \usepackage{algorithm}
@@ -95,7 +95,7 @@ Formally, the problem we investigate in this work can be stated as:
 \textbf{Problem 1: \textit{Learning to Fly from Demonstration of Training Samples}}: A human pilot flies the UAV for $m$ different trials, recording the data for each flight. Using the trials, we aim to:
 \begin{enumerate}
     \item build a model based on the data given in the training sets, where the inputs are distance travelled $d_i$ and time taken to travel that distance, $t_i$, where $i = 1,\ldots,m$ and $m$ is the number of trials.
-    \item evaluate the accuracy of this model, and identify boundary conditions for model effectiveness, $[d_\min d_\max]$ and $[t_\min t_\max]$.
+    \item evaluate the accuracy of this model, and identify boundary conditions for model effectiveness, $[d_{\min} d_{\max}]$ and $[t_{\min} t_{\max}]$.
     \item generate open-loop autonomous control input, $\mathbf{x}_a$, to send to the system given a new user-set distance and time, $d_u$ and $t_u$
 \end{enumerate}
 
