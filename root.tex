@@ -83,43 +83,44 @@ Teleop Command/Imitation Learning/Regression (in progress)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
-
 \section{Related Work}
 
 
 \section{Problem Formulation}
-In this work, we are interested in finding a framework for a UAV to learn autonomous flight from demonstration and adapt online this flight in order to accurately follow any given trajectory within certain bounds. In addition, we are interested in finding a method to correct for any error we may discover during run-time.
+In this work, we are interested in finding a policy that enables autonomous UAV navigation over a user-defined trajectory.
 
 Formally, the problem we investigate in this work can be stated as:
 
-\textbf{Problem 1: \textit{Learning to Fly from Demonstration of Training Samples}}: A human pilot flies the UAV for $m$ different trials, recording the data for each flight. Using the trials, we aim to:
+\textbf{Problem 1: \textit{Demonstration-based autonomous control generation}}: A UAV has the objective to navigate over a certain trajectory. Trajectories are defined by a series of goal locations and times at which the goals are reached. Given $m$ flight demonstrations, find a policy to
 \begin{enumerate}
-    \item build a model based on the data given in the training sets, where the inputs are distance travelled $d_i$ and time taken to travel that distance, $t_i$, where $i = 1,\ldots,m$ and $m$ is the number of trials.
-    \item evaluate the accuracy of this model, and identify boundary conditions for model effectiveness, $[d_{\min} d_{\max}]$ and $[t_{\min} t_{\max}]$.
-    \item generate open-loop autonomous control input, $\mathbf{x}_a$, to send to the system given a new user-set distance and time, $d_u$ and $t_u$
+    \item process and analyze the data in the training sets.%, where the inputs are distance travelled $d_i$ and time taken to travel that distance, $t_i$, where $i = 1,\ldots,m$ and $m$ is the number of trials.
+    \item identify boundaries for user trajectories such that $d_{\min} \leq d_u \leq d_{\max}$ and $t_{\min} \leq t_u \leq t_{\max}$, where $d_u$ and $t_u$ denote user-set targets, or possibly waypoints within a trajectory, for the UAV.
+    \item generate autonomous commands, $\mathbf{x}_a$.
+    \item correct autonomous commands during run-time $\mathbf{x}_c$, subject to a constraint that UAV should stay within a certain distance of the user-set trajectory:
+    \begin{equation}
+        ||\mathbf{p}(t)-\mathbf{p}_r(t)|| \leq \delta,~\forall t \in [0,T]
+    \end{equation}
+    where $\mathbf{p}_r(t)$ is the reference position at time $t$, where $T$ represents an overall time horizon for the trajectory, and $\delta$ is a threshold for allowable deviation.
+    
 \end{enumerate}
-
-In addition to developing the open-loop control input, $\mathbf{x}_a$, we are also interested in developing a method to correct the input during run-time. Formally, this can be states as:
-
-\textbf{Problem 2: \textit{Correcting for error in-flight}}: In the event that error occurs when testing the generated autonomous input $\mathbf{x}_a$, we find a method to
-\begin{enumerate}
-    \item adjust the remaining portion of the control input, $\mathbf{x}_a' \in \R^{1\times(T-t)}$, using a PI controller to obtain a closed-loop input  $\mathbf{x}_c$
-\end{enumerate}
-
 
 
 \section{System Dynamics}
+The type of UAV in question is modeled using a $12^{\text{th}}$ order state vector. 
 
 
 \section{Approach}
-    Block Diagram and Explanation*
+In our approach, we leverage the data from multiple demonstrations to build a regression model that enables identification of an appropriate integral, $g_u$, and average velocity, $\bar{x}_u$ given a user-set distance, $d_u$, and time, $t_u$. With the appropriate integral and average velocity, the demonstrated command string with the closest integral, $g_i$, to the fitted integral, $g_u$, is resized to match the user-set time, $t_u$ and fitted average velocity, $\bar{x}_u$, to obtain the autonomous command string $\mathbf{x}_a$. This command is sent to the physical UAV for implementation, where the on-board computer collects data regarding the error between actual position, $\mathbf{p}(t)$, and the expected position, $\mathbf{p}_r(t)$ is determined based on the trajectory. This error is reduced by using a proportional controller on the input $\mathbf{x}_a$ to obtain the adjusted input commands, $\mathbf{x}_c$.
 
-\subsection{Regression Model Training}
-In order to build the appropriate model for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. The inputs of the training phase are $\{d_i,t_i,\mathbf{x_i}\}$, where $i=1,\ldots,m$, $d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{x_i}$ is the string of teleoperation commands given the by the pilot. In addition to the inputs given by the pilot, we are also interested in two entities \begin{itemize}
+
+    *Block Diagram*
+
+\subsection{Regression Based Training and Evaluation}
+In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{x_i}\}$, where $i=1,\ldots,m$, $d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{x_i}$ is the string of teleoperation commands given the by the pilot. In addition to the inputs given by the pilot, we are also interested in two entities \begin{itemize}
     \item The integral of the string of teleoperation commands, $g_i = \int_0^{t_i}\mathbf{x_i}$
     \item The steady-state teleoperation command, $\bar{x}_i \in \mathbf{x_i}$
 \end{itemize}
-The steady-state command and integral are necessary portions of the analysis because of the directly proportional relationship between teleop commands and system velocity. The steady-state command, in this case, provides information about the pilot's average in-flight velocity. The integral, meanwhile, describes the area under the string of commands. Because the teleop commands are proportional to velocity, this area value gives important information about the distance traveled, as position is the integral of velocity over time.
+The steady-state command and integral are necessary portions of the analysis because of the directly proportional relationship between teleop commands and system velocity. The steady-state command, in this case, provides information about the pilot's average in-flight velocity, and is obtained by taking the mean of all entries in $\mathbf{x_i}$. The integral, meanwhile, describes the area under the string of commands. Because the teleop commands are proportional to velocity, this area value gives important information about the distance traveled, as position is the integral of velocity over time.
 
 The offline training data is applied to a thin-plate spline surface fit to describe the relationship between training inputs and integral and average velocity. The general form of a thin-plate spline equation is 
 \begin{equation}
@@ -151,7 +152,7 @@ Given the corresponding $z_i$ for each $(x_i,y_i)$ pair, we are able to solve th
     \end{bmatrix}
 \end{equation}
 
-where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, $P_i* = (1,x_i,y_i)$, $\mathbf{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\mathbf{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\mathbf{w} \in \mathbb{R}^{m\times1}$ and $\mathbf{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\mathbf{a}$ is the column vector with elements $a1,ax,a_y$.
+where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, $P_i* = (1,x_i,y_i)$, $\mathbf{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\mathbf{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\mathbf{w} \in \mathbb{R}^{m\times1}$ and $\mathbf{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\mathbf{a}$ is the column vector with elements $a_1,a_x,a_y$.
 
 Given the general framework for performing the thin-plate spline, we develop two separate relationships for our specific application:
 \begin{equation} \label{eq:integralfit}
@@ -172,6 +173,9 @@ g_u = f(d_u,t_u)
 
 where $d_u$ and $t_u$ are the user-set desired distance and time, respectively.
 
+While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases. In order to quantify this, we use the standard error. The standard error is a 
+
+
 \subsection{Autonomous Behaviour Generation}
 
 In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{x}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands.
@@ -186,13 +190,24 @@ From the training set of $m$ samples, we select the trial that has the closest i
 \mathbf{x}^* = \mathbf{x}_i \in \mathbf{x}\vert e_i = \min_e(\mathbf{e})
 \end{equation}
 
-This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing bicubic interpolation to resize the vector $\mathbf{x}^*$. Bicubic interpolation is selected here, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity. The general form of a bicubic interpolation equation is 
+This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing bicubic interpolation to resize the vector $\mathbf{x}^*$. Bicubic interpolation is the chosen method for resizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity. The general form of a bicubic interpolation equation is 
 \begin{equation}
     p(x) = \sum_{i=0}^3a_ix^i
 \end{equation}
-Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify the intermediate points between each value in $\mathbf{x}^*$.
+
+where $x$ is an entry in vector $\mathbf{x}^*$ and $a$ represents the coefficients of the function at each point. Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify the intermediate points between each value in $\mathbf{x}^*$. After resizing, we obtain the time adjusted input vector $\mathbf{x}'$. 
+
+The next step is to adjust the input vector such that the system reaches the user-set goal $d_u$. This is done by leveraging the average velocity information, that is, $\bar{x}_u$. Because distance is a function of average velocity and time, the scale time-adjusted vector $\mathbf{x}'$ is scaled such that its mean is equivalent to $\bar{x}_u$. We then obtain
+\begin{equation}
+\mathbf{x}_a = \mathbf{x}'\bigg(\frac{\bar{x}_u}{\bar{x}'}\bigg)
+\end{equation}
+
+The input $\mathbf{x}_a$is then sent to the UAV to reach the goals set by the users.
+
 
 \subsection{Online Adaptation of Generated Commands}
+
+The commands generated in the previous section are generated and sent to the UAV prior to any testing or evaluation. Therefore, 
 
 \subsection{Trajectory Decomposition}
 
