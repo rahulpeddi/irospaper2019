@@ -154,26 +154,36 @@ Given the corresponding $z_i$ for each $(x_i,y_i)$ pair, we are able to solve th
 
 where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, $P_i* = (1,x_i,y_i)$, $\mathbf{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\mathbf{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\mathbf{w} \in \mathbb{R}^{m\times1}$ and $\mathbf{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\mathbf{a}$ is the column vector with elements $a_1,a_x,a_y$.
 
-Given the general framework for performing the thin-plate spline, we develop two separate relationships for our specific application:
+Given the general framework for performing the thin-plate spline, we develop two separate relationships for our specific application: $g_i = f(d_i,t_i)$ and $\bar{x}_i = h(d_i,t_i)$
+With the functions we have obtained, we are able to find an estimated integral and steady-state command, $g_u$ and $\bar{x}_u$, for any given desired distance and time,
+
 \begin{equation} \label{eq:integralfit}
-    g_i = f(d_i,t_i)
-\end{equation}
-\begin{equation} \label{eq:ssvelfit}
-    \bar{x}_i = h(d_i,t_i)
-\end{equation}
-
-With equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, we are able to obtain an estimated integral and steady-state command, $g_u$ and $\bar{x}_u$, for any given desired distance and time,
-
-\begin{equation}
 g_u = f(d_u,t_u)
 \end{equation}
-\begin{equation}
+\begin{equation} \label{eq:ssvelfit}
 \bar{x}_u = h(d_u,t_u)
 \end{equation}
 
 where $d_u$ and $t_u$ are the user-set desired distance and time, respectively.
 
-While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases. In order to quantify this, we use the standard error. The standard error is a 
+While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases. In order to quantify this, we leverage the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression with known values:
+\begin{equation} \label{eq:stderr}
+    \sigma_{est} \approx \frac{s}{\sqrt{m}}
+\end{equation}
+
+where $s$ is the sample standard deviation of all of the points in the training set and $m$ is the number of training samples. In \eqref{eq:stderr}, an increased sample standard deviation results in . The standard error, $\sigma_{est}$, is then used to set the bounds for each training data point, for example:
+\begin{align}
+    \beta_{\min} = \hat{\beta} - \sigma_{est} \nonumber \\
+    \beta_{\max} = \hat{\beta} + \sigma_{est}
+\end{align}
+where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for parameter $\hat{\beta}$.
+
+In our case, there are two parameters we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two parameters as statistically independent, to obtain a generic interval for each point in the training set, denoted $[d_{i\min},d_{i\max}]$ and $[t_{i\min},t_{i\max}]$, where $i=1,\ldots,m$. Because we are ultimately interested in using the distance and time values together as input pairs, we then obtain a maximum Euclidean distance from each of the training data points using:
+
+\begin{equation}
+    \Delta_i = \sqrt{(\sigma_{d_{est}})^2+(\sigma_{t_{est}})^2}
+\end{equation}
+Using the maximum distance for each point $\Delta_i$, we are able the generate intervals around each point, where the data is within the standard error of the estimate.
 
 
 \subsection{Autonomous Behaviour Generation}
@@ -202,12 +212,12 @@ The next step is to adjust the input vector such that the system reaches the use
 \mathbf{x}_a = \mathbf{x}'\bigg(\frac{\bar{x}_u}{\bar{x}'}\bigg)
 \end{equation}
 
-The input $\mathbf{x}_a$is then sent to the UAV to reach the goals set by the users.
+The input $\mathbf{x}_a$ is then sent to the UAV to reach the goals set by the users.
 
 
 \subsection{Online Adaptation of Generated Commands}
 
-The commands generated in the previous section are generated and sent to the UAV prior to any testing or evaluation. Therefore, 
+The commands generated in the previous section are generated and sent to the UAV prior to any testing or evaluation. Therefore, we propose a method to correct for any error that may occur during evaluation.
 
 \subsection{Trajectory Decomposition}
 
