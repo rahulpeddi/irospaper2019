@@ -166,17 +166,24 @@ g_u = f(d_u,t_u)
 
 where $d_u$ and $t_u$ are the user-set desired distance and time, respectively.
 
-While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases. In order to quantify this, we leverage the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression with known values:
+While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases [CITE]. In order to quantify this, we leverage the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression with known values:
 \begin{equation} \label{eq:stderr}
     \sigma_{est} \approx \frac{s}{\sqrt{m}}
 \end{equation}
-
-where $s$ is the sample standard deviation of all of the points in the training set and $m$ is the number of training samples. In \eqref{eq:stderr}, an increased sample standard deviation results in . The standard error, $\sigma_{est}$, is then used to set the bounds for each training data point, for example:
+where $s$ is the sample standard deviation of all of the points in the training set and $m$ is the number of training samples. The standard error, $\sigma_{est}$, is then used to determine the t-statistic for different test values. The t-statistic is defined as the ratio of departure of a test point from a known point to its standard error and is defined as
+\begin{equation} \label{eq:tstat}
+t_{\hat{\beta}} = \frac{|\hat{\beta}-\bar{\beta}|}{\sigma_{est}}    
+\end{equation}
+where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest known point. In equation \eqref{eq:tstat}, if $t_{\hat{\beta}} \geq 1$, that means that the test point $\hat{\beta}$ propagates an error higher than the standard error. As a result, it is desirable to have $t_{\hat{\beta}} < 1$. Using a certain set-point for the t-statistic, the maximum allowable departure from known points is obtained:
+\begin{equation}
+    \sigma_{est}t_{\hat{\beta}} = |\hat{\beta}-\bar{\beta}|
+\end{equation}
+The appropriate departure is used to set the bounds for each training data point, for example:
 \begin{align}
-    \beta_{\min} = \hat{\beta} - \sigma_{est} \nonumber \\
-    \beta_{\max} = \hat{\beta} + \sigma_{est}
+    \hat{\beta}_{\min} = \bar{\beta} - \sigma_{est}t_{\hat{\beta}} \nonumber \\
+    \hat{\beta}_{\max} = \bar{\beta} + \sigma_{est}t_{\hat{\beta}}
 \end{align}
-where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for parameter $\hat{\beta}$.
+where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for known parameter $\bar{\beta}$.
 
 In our case, there are two parameters we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two parameters as statistically independent, to obtain a generic interval for each point in the training set, denoted $[d_{i\min},d_{i\max}]$ and $[t_{i\min},t_{i\max}]$, where $i=1,\ldots,m$. Because we are ultimately interested in using the distance and time values together as input pairs, we then obtain a maximum Euclidean distance from each of the training data points using:
 
@@ -192,7 +199,7 @@ In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{x
 
 From the training set of $m$ samples, we select the trial that has the closest integral, $g_i$, to the estimated integral $g_u$. This is done by forming an error vector, $\mathbf{e}\in\R^{1\times m}$, where each element is defined by
 \begin{equation}
- e_i = \vert a_i-a_u \vert , ~i\in \{1,\ldots,m\}
+ e_i = \vert g_i-g_u \vert , ~i\in \{1,\ldots,m\}
 \end{equation}
  The lowest error is then found and is paired with the appropriate pre-trained sample, $\mathbf{x}^*$,
 
