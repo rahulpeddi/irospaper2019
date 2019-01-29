@@ -91,7 +91,7 @@ In this work, we are interested in finding a policy that enables autonomous UAV 
 
 Formally, the problem we investigate in this work can be stated as:
 
-\textbf{Problem 1: \textit{Demonstration-based autonomous control generation}}: A UAV has the objective to navigate over a certain trajectory. Trajectories are defined by a series of goal locations and times at which the goals are reached. Given $m$ flight demonstrations, find a policy to
+\NB{problem is still not good. What is the problem that you are trying to solve??? It's not processing and analyzing data!} \textbf{Problem 1: \textit{Demonstration-based autonomous control generation}}: A UAV has the objective to navigate over a certain trajectory. Trajectories are defined by a series of goal locations and times at which the goals are reached. Given $m$ flight demonstrations, find a policy to
 \begin{enumerate}
     \item process and analyze the data in the training sets.%, where the inputs are distance travelled $d_i$ and time taken to travel that distance, $t_i$, where $i = 1,\ldots,m$ and $m$ is the number of trials.
     \item identify boundaries for user trajectories such that $d_{\min} \leq d_u \leq d_{\max}$ and $t_{\min} \leq t_u \leq t_{\max}$, where $d_u$ and $t_u$ denote user-set targets, or possibly waypoints within a trajectory, for the UAV.
@@ -106,23 +106,24 @@ Formally, the problem we investigate in this work can be stated as:
 
 
 \section{System Dynamics}
-The type of UAV in question is modeled using a $12^{\text{th}}$ order state vector. 
+The type of UAV in question is modeled using a $12^{\text{th}}$ order state vector. \NB{what's the point of this section? What are you trying to demonstrate here?} 
 
 
 \section{Approach}
-In our approach, we leverage the data from multiple demonstrations to build a regression model that enables identification of an appropriate integral, $g_u$, and average velocity, $\bar{x}_u$ given a user-set distance, $d_u$, and time, $t_u$. With the appropriate integral and average velocity, the demonstrated command string with the closest integral, $g_i$, to the fitted integral, $g_u$, is resized to match the user-set time, $t_u$ and fitted average velocity, $\bar{x}_u$, to obtain the autonomous command string $\mathbf{x}_a$. This command is sent to the physical UAV for implementation, where the on-board computer collects data regarding the error between actual position, $\mathbf{p}(t)$, and the expected position, $\mathbf{p}_r(t)$ is determined based on the trajectory. This error is reduced by using a proportional controller on the input $\mathbf{x}_a$ to obtain the adjusted input commands, $\mathbf{x}_c$.
-
+In our approach, we leverage the data from multiple demonstrations to build a regression model that enables identification of an appropriate integral, $g_u$ \NB{why? You cannot state this without first explaining what is this integral}, and average velocity, $\bar{x}_u$ given a user-set distance, $d_u$, and time, $t_u$. With the appropriate integral and average velocity, the demonstrated command string with the closest integral, $g_i$, to the fitted integral, $g_u$, is resized to match the user-set time, $t_u$ and fitted average velocity, $\bar{x}_u$, to obtain the autonomous command string $\mathbf{x}_a$. This command is sent to the physical UAV for implementation, where the on-board computer \NB{?? on board computer collect data about position?} collects data regarding the error between actual position, $\mathbf{p}(t)$, and the expected position, $\mathbf{p}_r(t)$ is determined based on the trajectory. This error is reduced by using a proportional controller on the input $\mathbf{x}_a$ to obtain the adjusted input commands, $\mathbf{x}_c$.
+\NB{Rewrite}
 
     *Block Diagram*
 
 \subsection{Regression Based Training and Evaluation}
-In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{x_i}\}$, where $i=1,\ldots,m$, $d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{x_i}$ is the string of teleoperation commands given the by the pilot. In addition to the inputs given by the pilot, we are also interested in two entities \begin{itemize}
+In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{x_i}\}$ \NB{explain how and what you are assuming here. A reader will be confused on how and what you are doing. The reader was nto present during experiments}, where $i=1,\ldots,m$, $d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{x_i}$ is the string of teleoperation commands given the by the pilot. In addition to the inputs given by the pilot, we are also interested in two entities \NB{mention first why the integral and the ss teleop}
+\begin{itemize}
     \item The integral of the string of teleoperation commands, $g_i = \int_0^{t_i}\mathbf{x_i}$
     \item The steady-state teleoperation command, $\bar{x}_i \in \mathbf{x_i}$
 \end{itemize}
-The steady-state command and integral are necessary portions of the analysis because of the directly proportional relationship between teleop commands and system velocity. The steady-state command, in this case, provides information about the pilot's average in-flight velocity, and is obtained by taking the mean of all entries in $\mathbf{x_i}$. The integral, meanwhile, describes the area under the string of commands. Because the teleop commands are proportional to velocity, this area value gives important information about the distance traveled, as position is the integral of velocity over time.
+The steady-state command and integral are necessary portions of the analysis because of the directly proportional relationship between teleop commands and system velocity \NB{why?}. The steady-state command, in this case, provides information about the pilot's average in-flight velocity, and is obtained by taking the mean of all entries in $\mathbf{x_i}$. The integral, meanwhile, describes the area under the string of commands. Because the teleop commands are proportional to velocity, this area value gives important information about the distance traveled, as position is the integral of velocity over time.
 
-The offline training data is applied to a thin-plate spline surface fit to describe the relationship between training inputs and integral and average velocity. The general form of a thin-plate spline equation is 
+The offline training data is applied to a thin-plate spline surface fit to describe the relationship between training inputs and integral and average velocity \NB{why?}. The general form of a thin-plate spline equation is 
 \begin{equation}
     f(x,y) = a_1 + a_xx + a_yy + \sum_{i=1}^mw_iU(||(x_i,y_i)-(x,y)||)
 \end{equation}
@@ -154,7 +155,7 @@ Given the corresponding $z_i$ for each $(x_i,y_i)$ pair, we are able to solve th
 
 where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, $P_i* = (1,x_i,y_i)$, $\mathbf{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\mathbf{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\mathbf{w} \in \mathbb{R}^{m\times1}$ and $\mathbf{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\mathbf{a}$ is the column vector with elements $a_1,a_x,a_y$.
 
-Given the general framework for performing the thin-plate spline, we develop two separate relationships for our specific application: $g_i = f(d_i,t_i)$ and $\bar{x}_i = h(d_i,t_i)$
+Given the general framework for performing the thin-plate spline, we develop two separate relationships for our specific application: $g_i = f(d_i,t_i)$ and $\bar{x}_i = h(d_i,t_i)$ \NB{how did you get these relations? }
 With the functions we have obtained, we are able to find an estimated integral and steady-state command, $g_u$ and $\bar{x}_u$, for any given desired distance and time,
 
 \begin{equation} \label{eq:integralfit}
@@ -166,12 +167,12 @@ g_u = f(d_u,t_u)
 
 where $d_u$ and $t_u$ are the user-set desired distance and time, respectively.
 
-While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases. In order to quantify this, we leverage the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression with known values:
+While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases \NB{why?}. In order to quantify this, we leverage the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression with known values:
 \begin{equation} \label{eq:stderr}
     \sigma_{est} \approx \frac{s}{\sqrt{m}}
 \end{equation}
 
-where $s$ is the sample standard deviation of all of the points in the training set and $m$ is the number of training samples. In \eqref{eq:stderr}, an increased sample standard deviation results in . The standard error, $\sigma_{est}$, is then used to set the bounds for each training data point, for example:
+where $s$ is the sample standard deviation of all of the points in the training set and $m$ is the number of training samples. In \eqref{eq:stderr}, an increased sample standard deviation results in \NB{???}. The standard error, $\sigma_{est}$, is then used to set the bounds for each training data point, for example:
 \begin{align}
     \beta_{\min} = \hat{\beta} - \sigma_{est} \nonumber \\
     \beta_{\max} = \hat{\beta} + \sigma_{est}
@@ -183,14 +184,14 @@ In our case, there are two parameters we are primarily concerned about for predi
 \begin{equation}
     \Delta_i = \sqrt{(\sigma_{d_{est}})^2+(\sigma_{t_{est}})^2}
 \end{equation}
-Using the maximum distance for each point $\Delta_i$, we are able the generate intervals around each point, where the data is within the standard error of the estimate.
+Using the maximum distance for each point $\Delta_i$, we are able the generate intervals around each point, where the data is within the standard error of the estimate \NB{really confusing and not sure about correctness and why this works}.
 
 
 \subsection{Autonomous Behaviour Generation}
 
 In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{x}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands.
 
-From the training set of $m$ samples, we select the trial that has the closest integral, $g_i$, to the estimated integral $g_u$. This is done by forming an error vector, $\mathbf{e}\in\R^{1\times m}$, where each element is defined by
+From the training set of $m$ samples, we select the trial that has the closest integral, $g_i$, to the estimated integral $g_u$. This is done by forming an error vector, $\mathbf{e}\in\R^{1\times m}$, where each element is defined by \NB{what is ai and au?}
 \begin{equation}
  e_i = \vert a_i-a_u \vert , ~i\in \{1,\ldots,m\}
 \end{equation}
@@ -214,7 +215,7 @@ The next step is to adjust the input vector such that the system reaches the use
 
 The input $\mathbf{x}_a$ is then sent to the UAV to reach the goals set by the users.
 
-
+\NB{this section needs to be rewritten...it's confusing}
 \subsection{Online Adaptation of Generated Commands}
 
 The commands generated in the previous section are generated and sent to the UAV prior to any testing or evaluation. Therefore, we propose a method to correct for any error that may occur during evaluation.
