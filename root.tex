@@ -91,29 +91,58 @@ In this work, we are interested in finding a policy that enables autonomous UAV 
 
 Formally, the problem we investigate in this work can be stated as:
 
-\NB{problem is still not good. What is the problem that you are trying to solve? It's not processing and analyzing data!} \textbf{Problem 1: \textit{Demonstration-based autonomous control generation}}: A UAV has the objective to navigate over a certain trajectory. Trajectories are defined by a series of goal locations and times at which the goals are reached. Given $m$ flight demonstrations, find a policy to
+%\NB{problem is still not good. What is the problem that you are trying to solve? It's not processing and analyzing data!}
+\textbf{Problem 1: \textit{Demonstration-based autonomous control generation}}: A UAV has the objective to navigate a certain trajectory, $\mathbf{p}_r(t),~ t \in [0,T]$, which consists of target location goals, $\mathbf{g}$, and target times, $\tau \in [0,t]$, at which each of the goals should be reached. Given $m$ human-piloted flight demonstrations, the aim is to find a policy that enables autonomous flight to track the trajectory such that the following liveness and promptness requirements are met:
 \begin{enumerate}
-    \item process and analyze the data in the training sets.%, where the inputs are distance travelled $d_i$ and time taken to travel that distance, $t_i$, where $i = 1,\ldots,m$ and $m$ is the number of trials.
-    \item identify boundaries for user trajectories such that $d_{\min} \leq d_u \leq d_{\max}$ and $t_{\min} \leq t_u \leq t_{\max}$, where $d_u$ and $t_u$ denote user-set targets, or possibly waypoints within a trajectory, for the UAV.
-    \item generate autonomous commands, $\mathbf{x}_a$.
-    \item correct autonomous commands during run-time $\mathbf{x}_c$, subject to a constraint that UAV should stay within a certain distance of the user-set trajectory:
+    \item  Liveness: The UAV should always stay within a certain distance of the pre-defined trajectory:
     \begin{equation}
-        ||\mathbf{p}(t)-\mathbf{p}_r(t)|| \leq \delta,~\forall t \in [0,T]
+        ||\mathbf{p}(t)-\mathbf{p}_r(t)|| \leq \delta_d,~\forall t \in [0,T]
     \end{equation}
     where $\mathbf{p}_r(t)$ is the reference position at time $t$, where $T$ represents an overall time horizon for the trajectory, and $\delta$ is a threshold for allowable deviation.
+    \item  Promptness: The UAV should always reach the target locations within a certain threshold of the target time for that goal:
+    \begin{equation}
+        ||\mathbf{t}(t)-\mathbf{t}_r(t)|| \leq \delta_t,~\forall t \in [0,T]
+    \end{equation}
+    where $\mathbf{p}_r(t)$ is the reference position at time $t$, where $T$ represents an overall time horizon for the trajectory, and $\delta$ is a threshold for allowable deviation. 
     
 \end{enumerate}
 
 
 \section{System Dynamics}
-The type of UAV in question is modeled using a $12^{\text{th}}$ order state vector (in progress). \NB{what's the point of this section? What are you trying to demonstrate here?} 
+The type of UAV in question is modeled using a $12^{\text{th}}$ order state vector:
+\begin{equation}
+    \mathbf{q} = 
+    \begin{bmatrix}
+    \mathbf{p}_q^\intercal & \phi & \theta & \psi & v_x & v_y & v_z & \omega_x & \omega_y & \omega_z
+    \end{bmatrix}^\intercal \nonumber
+\end{equation} %\NB{what's the point of this section? What are you trying to demonstrate here?} 
+where $\bm{p}_q=[x \; y \; z]^{\mathsf{T}}$ is the world frame position, $v_{x}$, $v_{y}$ and $v_z$ are the world frame velocities, $\phi$, $\theta$ and $\psi$ are the roll, pitch and yaw Euler angles and $\omega_{x}$, $\omega_{y}$ and $\omega_{z}$ are the body frame angular velocities.
+
+The dynamics of the quadrotor are then described as follows:
+\begin{equation}
+	\begin{aligned}
+	%\begin{bmatrix}\dot{x} \\ \dot{y} \\ \dot{z} \end{bmatrix} &= \begin{bmatrix}v_x \\ v_y \\ v_z\end{bmatrix}\\
+	\dot{\bm{p}_q}^{\mathsf{T}} &= \begin{bmatrix}v_x & v_y & v_z\end{bmatrix}\\
+	\begin{bmatrix}\dot{v}_x \\ \dot{v}_y \\ \dot{v}_z\end{bmatrix} &= \begin{bmatrix}0 \\ 0 \\ -g \end{bmatrix} + \frac{1}{m} \begin{bmatrix}\cos\phi \cos\psi \sin\theta + \sin\phi \sin\psi \\ \cos\phi \sin\theta \sin\psi - \cos\psi \sin\phi \\ \cos\theta \cos\phi \end{bmatrix} u_1\\
+	%\end{align*}
+	%\begin{align*}
+	\begin{bmatrix}\dot{\phi} \\ \dot{\theta} \\ \dot{\psi}\end{bmatrix} &= \begin{bmatrix}1 & \sin\phi \tan\theta & \cos\phi \tan\theta\\ 0 & \cos\phi & -\sin\phi \\ 0 & \sin\phi \sec\theta & \cos\phi \sec\theta \end{bmatrix} \begin{bmatrix}\omega_{x} \\ \omega_{y} \\ \omega_{z} \end{bmatrix}\\
+	\begin{bmatrix}\dot{\omega}_{x} \\ \dot{\omega}_{y} \\ \dot{\omega}_{z}\end{bmatrix} &= \begin{bmatrix}\frac{I_{yy} - I_{zz}}{I_{xx}} \omega_{y}\omega_{z}\\ \frac{I_{zz} - I_{xx}}{I_{yy}} \omega_{x}\omega_{z} \\ \frac{I_{xx} - I_{yy}}{I_{zz}} \omega_{x}\omega_{y} \end{bmatrix} +  \begin{bmatrix}\frac{1}{I_{xx}} & 0 & 0\\ 0 & \frac{1}{I_{yy}} & 0\\ 0 & 0 & \frac{1}{I_{zz}}\end{bmatrix} \begin{bmatrix}u_{2} \\ u_{3} \\ u_{4} \end{bmatrix}
+	\end{aligned}
+	\label{eq:quadrotor_dynamics} \nonumber
+\end{equation}
+
+In the human piloted demonstrations, the user is controlling $u_2$, $u_3$, and $u_4$, which correspond to the desired roll, pitch, and yaw angles. In this work, we are interested in learning from commands send by the human pilot to the UAV. For the purpose of this work, we assume that we are able to collect all information sent from the pilot to the UAV during demonstrations. We are also able to get the world frame position $\mathbf{p}(t)$ of the UAV using a motion capture system. 
 
 
-\section{Approach}
+
+
+\section{Methodology}
 In our approach, we leverage the data from multiple demonstrations to build a regression model that enables identification of an appropriate integral, $g_u$, and average velocity, $\bar{x}_u$ given a user-set distance, $d_u$, and time, $t_u$. With the appropriate integral and average velocity, the demonstrated command string with the closest integral, $g_i$, to the fitted integral, $g_u$, is resized to match the user-set time, $t_u$ and fitted average velocity, $\bar{x}_u$, to obtain the autonomous command string $\mathbf{x}_a$. This command is sent to the physical UAV for implementation, where the on-board computer collects data regarding the error between actual position, $\mathbf{p}(t)$, and the expected position, $\mathbf{p}_r(t)$ is determined based on the trajectory. This error is reduced by using a proportional controller on the input $\mathbf{x}_a$ to obtain the adjusted input commands, $\mathbf{x}_c$.
 
-
     *Block Diagram*
+
+\subsection{Trajectory Decomposition}
 
 \subsection{Regression Based Training and Evaluation}
 In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{x_i}\}$, where $i=1,\ldots,m$, $d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{x_i}$ is the string of teleoperation commands given the by the pilot. In addition to the inputs given by the pilot, we are also interested in two entities \begin{itemize}
@@ -225,8 +254,6 @@ The input $\mathbf{x}_a$ is then sent to the UAV to reach the goals set by the u
 \subsection{Online Adaptation of Generated Commands}
 
 The commands generated in the previous section are generated and sent to the UAV prior to any testing or evaluation. Therefore, we propose a method to correct for any error that may occur during evaluation.
-
-\subsection{Trajectory Decomposition}
 
 
 \section{Experiments}
