@@ -91,7 +91,7 @@ In this work, we are interested in finding a policy that enables autonomous UAV 
 Formally, the problem we investigate in this work can be stated as:
 
 %\NB{problem is still not good. What is the problem that you are trying to solve? It's not processing and analyzing data!}
-\textbf{Problem 1: \textit{Demonstration-based autonomous control generation}}: A UAV has the objective to visit a set of one or more goals, $\mathbf{g_r}$, at a set of target times, $\mathbf{t_r} \in [0,T]$. Given $m$ human-piloted flight demonstrations, the aim is to find a policy that enables autonomous flight to generate and track a trajectory $\mathbf{p_r}(t),~ t \in [0,T]$ that visits the target goals $\mathbf{g}$ at target times, $\mathbf{t}$ such that the following liveness and promptness requirements are met:
+\textbf{Problem 1: \textit{Demonstration-based autonomous control generation}}: A UAV has the objective to visit a set of $n$ goals, $\mathbf{g}\in\mathbb{R}^{1\times n}$, at a set of $n$ target times, $\mathbf{t} \in\mathbb{R}^{1\times n}$. Given $m$ human-piloted flight demonstrations, the aim is to find a policy that enables autonomous flight to generate and track a trajectory $\mathbf{p_r}(t),~ t \in [0,T]$ that visits the target goals $\mathbf{g}_i$ at the respective target times, $\mathbf{t}_i$, such that the following liveness and promptness requirements are met:
 \begin{enumerate}
     \item  Liveness: The UAV should always stay within a certain distance of the generated trajectory:
     \begin{equation}
@@ -100,8 +100,8 @@ Formally, the problem we investigate in this work can be stated as:
     where $\mathbf{p_r}(t)$ is the reference position at time $t$, where $T$ represents an overall time horizon for the trajectory, and $\delta_d$ is a threshold for allowable deviation.
     \item  Promptness: The UAV should always reach the target locations within a certain threshold of the target time for that goal:
     \begin{align}
-        \tau = t\in[0,T]|\mathbf{p}(t)-\mathbf{g_r} \nonumber \\
-        |\tau- \mathbf{t}_r| \leq \delta_t
+        \tau = t\in[0,T]|\mathbf{p}(t)-\mathbf{g}_i \leq \delta_d \nonumber \\
+        |\tau- \mathbf{t}_i| \leq \delta_t,~i=1,\ldots,n
     \end{align}
     where $\tau$ is a time at which the liveness condition is met for a specific goal and $\delta_t$ is the allowable deviation in time from the target.
 \end{enumerate}
@@ -235,7 +235,7 @@ In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{x
 
 From the training set of $m$ samples, we select the trial that has the closest integral, $g_i$, to the estimated integral $g_u$. This is done by forming an error vector, $\mathbf{e}\in\R^{1\times m}$, where each element is defined by
 \begin{equation}
- e_i = \vert g_i-g_u \vert , ~i\in \{1,\ldots,m\}
+ e_i = \vert g_i-g_u \vert , ~i= \{1,\ldots,m\}
 \end{equation}
  The lowest error is then found and is paired with the appropriate pre-trained sample, $\mathbf{x}^*$,
 
