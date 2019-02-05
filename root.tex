@@ -55,6 +55,8 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
 
+\begin{document}
+
 \title{\LARGE \bf
 Teleop Command/Imitation Learning/Regression (in progress)
 }
@@ -62,9 +64,6 @@ Teleop Command/Imitation Learning/Regression (in progress)
 
 \author{Rahul Peddi and Nicola Bezzo%
 \thanks{Rahul Peddi and Nicola Bezzo are with the Department of Systems and Information Engineering and the Charles L. Brown Department of Electrical and Computer Engineering, University of Virginia, Charlottesville, VA 22904, USA. Email: {\tt \{rp3cy, nb6be\}@virginia.edu}}}
-
-
-\begin{document}
 
 
 
@@ -136,6 +135,14 @@ In the human piloted demonstrations, the user is controlling $u_2$, $u_3$, and $
 
 In this work, we are interested in learning from commands send by the human pilot to the UAV. We assume that we are able to collect all information sent from the pilot to the UAV during demonstrations. During run-time, we are also able to get the world frame position $\mathbf{p}(t)$ of the UAV using a motion capture system.
 
+Through observation of a single demonstrated trial, we are able to identify important commands sent to the system. An example of this is shown below:
+
+\begin{figure}[h]
+    \includegraphics[width=0.48\textwidth]{images/sampleintegral.png}
+    \caption{A sample of a single demonstrated flight}
+    \label{fig:sampleintegral}
+\end{figure}
+In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration. The pilot flies the UAV forward over a distance of approximately $3$ meters. The command string, in this case, corresponds to a pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in in the negative $y$-direction. Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the total area under the string of commands, or the integral. Because the pitch is proportional to the linear velocity in the $y$-direction, we theorize that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled. Lastly, we are interested in the "average" command sent to the system.
 
 \section{Methodology}
 In our approach, we leverage the data from multiple demonstrations to build a regression model that enables identification of an appropriate integral, $g_u$, and average teleoperation command, $\bar{x}_u$ given a user-set distance, $d_u$, and time, $t_u$. With the appropriate integral and average velocity, the demonstrated command string with the closest integral, $g_i$, to the fitted integral, $g_u$, is resized to match the user-set time, $t_u$ and fitted average velocity, $\bar{x}_u$, to obtain the autonomous command string $\mathbf{x}_a$. This command is sent to the physical UAV for implementation, where the on-board computer collects data regarding the error between actual position, $\mathbf{p}(t)$, and the expected position, $\mathbf{p}_r(t)$ is determined based on the trajectory. This error is reduced by using a proportional controller on the input $\mathbf{x}_a$ to obtain the adjusted input commands, $\mathbf{x}_c$.
