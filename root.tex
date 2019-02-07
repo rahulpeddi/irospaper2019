@@ -288,7 +288,7 @@ The proportional gain, $k_p(t)$, is automatically tuned based loosely off the Zi
 \begin{equation}
     k_p(t+1) = k_p(t) + \bigg(\frac{\mathbf{p_r}(t)}{\mathbf{p}(t)}\bigg)\bigg(\frac{1}{t_u}\bigg)
 \end{equation}
-where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. Not adjusting in this manner would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command.
+where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. The main reason each subsequent command is being adjusted is because our liveness constraint is defined as the difference between positions at 
 
 
 
