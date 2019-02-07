@@ -245,7 +245,7 @@ From the training set of $m$ samples, we select the trial that has the closest i
 \mathbf{x}^* = \mathbf{x}_i \in \mathbf{x}\vert e_i = \min_e(\mathbf{e})
 \end{equation}
 
-This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing bicubic interpolation to re-size the vector $\mathbf{x}^*$. Interpolation methods to re-size vectors are used so that important information is not lost and features are kept the same. This method is often used for re-sizing complex images, and has shown effectiveness in . Bicubic interpolation is the chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity. The general form of a bicubic interpolation equation is 
+This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing bicubic interpolation to re-size the vector $\mathbf{x}^*$. Interpolation methods are used so that important features in a vector are not lost. These methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss [CITE]. Bicubic interpolation is the chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity. The general form of a bicubic interpolation equation is 
 
 \begin{equation}
     p(x) = \sum_{i=0}^3a_ix^i
