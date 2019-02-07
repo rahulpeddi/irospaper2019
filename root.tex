@@ -91,14 +91,14 @@ In this work, we are interested in finding a policy that enables autonomous UAV 
 Formally, the problem we investigate in this work can be stated as:
 
 %\NB{problem is still not good. What is the problem that you are trying to solve? It's not processing and analyzing data!}
-\textbf{Problem 1: \textit{Demonstration-based autonomous control generation}}: A UAV has the objective to visit a set of $n$ goals, $\mathbf{g}\in\mathbb{R}^{n}$, at a set of $n$ target times, $\mathbf{t} \in\mathbb{R}^{n}$. Given $m$ human-piloted flight demonstrations, the aim is to find a policy that enables autonomous flight to generate and track a trajectory $\mathbf{p_r}(t),~ t \in [0,T]$ that visits the target goals $\mathbf{g}_i$ at the respective target times, $\mathbf{t}_i$, such that the following liveness and promptness requirements are met:
+\textbf{Problem 1: \textit{Demonstration-based autonomous control generation}}: A UAV has the objective to visit a set of $n$ goals, $\mathbf{g}\in\mathbb{R}^{n}$, at a set of $n$ target times, $\mathbf{t} \in\mathbb{R}^{n}$. Given $m$ human-piloted flight demonstrations, the aim is to find a policy that enables autonomous flight to generate and track a trajectory $\mathbf{p_r}(t),~ t \in [0,T]$ that visits the target goals $\mathbf{g}_i$ at the respective target times, $\mathbf{t}_i$, such that the following liveness requirements are met:
 \begin{enumerate}
-    \item  Liveness: The UAV should always stay within a certain distance of the generated trajectory:
+    \item  Position: The UAV should always stay within a certain distance of the generated trajectory:
     \begin{equation}
         ||\mathbf{p}(t)-\mathbf{p_r}(t)|| \leq \delta_d,~\forall t \in [0,T]
     \end{equation}
     where $\mathbf{p_r}(t)$ is the reference position at time $t$, where $T$ represents an overall time horizon for the trajectory, and $\delta_d$ is a threshold for allowable deviation.
-    \item  Promptness: The UAV should always reach the target locations within a certain threshold of the target time for that goal:
+    \item  Time: The UAV should always reach the target locations within a certain threshold of the target time for that goal:
     \begin{align}
         \tau = t\in[0,T]|\mathbf{p}(t)-\mathbf{g}_i \leq \delta_d \nonumber \\
         |\tau- \mathbf{t}_i| \leq \delta_t,~i=1,\ldots,n
@@ -245,20 +245,20 @@ From the training set of $m$ samples, we select the trial that has the closest i
 \mathbf{x}^* = \mathbf{x}_i \in \mathbf{x}\vert e_i = \min_e(\mathbf{e})
 \end{equation}
 
-This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing bicubic interpolation to re-size the vector $\mathbf{x}^*$. Interpolation methods are used so that important features in a vector are not lost. These methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss [CITE]. Bicubic interpolation is the chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity. The general form of a bicubic interpolation equation is 
+This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing vector interpolation to re-size $\mathbf{x}^*$, such that important features in the optimal command vector are not lost. These methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss [CITE]. Bicubic interpolation is our chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity [CITE]. The general form of a bicubic interpolation equation is 
 
-\begin{equation}
+\begin{equation} \label{eq:bicinter}
     p(x) = \sum_{i=0}^3a_ix^i
 \end{equation}
 
-where $x$ is an entry in vector $\mathbf{x}^*$ and $a$ represents the coefficients of the function at each point. Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify the intermediate points between each value in $\mathbf{x}^*$. After resizing, we obtain the time adjusted input vector $\mathbf{x}'$. The time-adjusted command vector is obtained in this manner 
+where $x$ is an entry in vector $\mathbf{x}^*$ and $a$ represents the coefficients of the function at each point. Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\mathbf{x}^*$. After resizing, we obtain the time adjusted input vector $\mathbf{x}'$.
 
 The next step is to adjust the input vector such that the system reaches the user-set goal $d_u$. This is done by leveraging the average velocity information, that is, $\bar{x}_u$. Because distance is a function of average velocity and time, the scale time-adjusted vector $\mathbf{x}'$ is scaled such that its mean is equivalent to $\bar{x}_u$. We then obtain
-\begin{equation}
+\begin{equation} \label{eq:imgscale}
 \mathbf{x}_a = \mathbf{x}'\bigg(\frac{\bar{x}_u}{\bar{x}'}\bigg)
 \end{equation}
 
-The input $\mathbf{x}_a$ is then sent to the UAV to reach the goals set by the users. In Fig.\ref{fig:gensample}, we show visually the steps of command generation. In Fig.\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.\ref{fig:sampleintegral}. This flight travelled approximately $4.4$ seconds for $3$ meters. For testing purposes, our use input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same. 
+In Fig.\ref{fig:gensample}, we show visually the steps of command generation. In Fig.\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.\ref{fig:sampleintegral}. This flight travelled approximately $4.4$ seconds for $3$ meters. For testing purposes, our use input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same, which is a verification of feature retention using bicubic interpolation from \eqref{eq:bicinter}. If the vector were just stretched without using an interpolation method, we would expect slight variation in the mean, which could damage the integrity of the final step, shown in Fig.\ref{fig:fullyadj}, which is obtained using \eqref{eq:imgscale}. At this point we have obtained the autonomous command string $\mathbf{x}_a$, which is then sent to the UAV to reach the goals set by the user.
 
 
 \begin{figure}[h]
@@ -268,7 +268,6 @@ The input $\mathbf{x}_a$ is then sent to the UAV to reach the goals set by the u
     \subfigure[Final Commands \label{fig:fullyadj}]{\includegraphics[width=0.3\linewidth]{images/fullyadj.png}}
 	\caption{Command Generation Process}
 	\label{fig:gensample}
-	\vspace{-15pt}
 \end{figure}
 
 \subsection{Online Adaptation of Generated Commands}
@@ -319,9 +318,7 @@ where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such th
 
 \begin{thebibliography}{99}
 
-\bibitem{c1} G. O. Young, �Synthetic structure of industrial plastics (Book style with paper title and editor),� 	in Plastics, 2nd ed. vol. 3, J. Peters, Ed.  New York: McGraw-Hill, 1964, pp. 15�64.
-\bibitem{c2} W.-K. Chen, Linear Networks and Systems (Book style).	Belmont, CA: Wadsworth, 1993, pp. 123�135.
-\bibitem{c3} H. Poor, An Introduction to Signal Detection and Estimation.   New York: Springer-Verlag, 1985, ch. 4.
+\bibitem{c1} G. O. Young,
 
 
 \end{thebibliography}
