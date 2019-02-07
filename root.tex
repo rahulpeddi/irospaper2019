@@ -81,7 +81,7 @@ Teleop Command/Imitation Learning/Regression (in progress)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
-
+Unmanned Aerial Vehicles have become more widespread for both civilian and military applications in the recent years. T
 \section{Related Work}
 
 
@@ -149,7 +149,9 @@ In our approach, we leverage the data from multiple demonstrations to build a re
 
     *Block Diagram*
 
-\subsection{Trajectory Decomposition}
+\subsection{Trajectory Generation and Decomposition}
+In this section, we examine the target goals and times, $\mathbf{g}$ and $\mathbf{t}$
+
 
 \subsection{Regression Based Training and Evaluation}
 In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{x_i}\}$, where $i=1,\ldots,m$, $d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{x_i}$ is the string of teleoperation commands given the by the pilot. In addition to the inputs given by the pilot, we are also interested in two entities \begin{itemize}
@@ -274,10 +276,14 @@ The commands generated in the previous section are generated and sent to the UAV
 The error $\xi(t)$ is attributed to the most recent command $\mathbf{x}_a(t)$, and a proportional controller is used to adjust the following command $\mathbf{x}_a(t+1)$ to obtain the closed-loop command $\mathbf{x}_c(t+1)$ as follows
 
 \begin{equation}
-    \mathbf{x}_c(t+1) = \mathbf{x}_a(t+1) + k_p\xi(t)
+    \mathbf{x}_c(t+1) = \mathbf{x}_a(t+1) + k_p(t)\xi(t)
 \end{equation}
 
-The proportional gain, $k_p$, is automatically tuned using the ratio of reference position to actual position. 
+The proportional gain, $k_p(t)$, is automatically tuned based loosely off the Ziegler-Nichols method [CITE] where the proportional gain is increased until there is stable and consistent oscillation in the output, which in our case, is the position error, $\xi(t)$. In order to set the interval of gain increase each iteration, we leverage the ratio of reference position to actual position:
+\begin{equation}
+    k_p(t+1) = k_p(t) + \bigg(\frac{\mathbf{p_r}(t)}{\mathbf{p}(t)}\bigg)\bigg(\frac{1}{t_u}\bigg)
+\end{equation}
+where $t_u$ refers to the user-set time and is used to account for iteration time.
 
 
 
