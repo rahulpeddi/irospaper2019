@@ -33,7 +33,7 @@
 \usepackage{epstopdf}
 \usepackage{amsmath}
 \usepackage{amssymb}
-%\usepackage{subfigure}
+\usepackage{subfigure}
 \usepackage{multirow}
 \usepackage{pbox}
 \usepackage{algorithm}
@@ -257,12 +257,17 @@ The next step is to adjust the input vector such that the system reaches the use
 \mathbf{x}_a = \mathbf{x}'\bigg(\frac{\bar{x}_u}{\bar{x}'}\bigg)
 \end{equation}
 
-The input $\mathbf{x}_a$ is then sent to the UAV to reach the goals set by the users.
+The input $\mathbf{x}_a$ is then sent to the UAV to reach the goals set by the users. In Fig.\ref{fig:gensample}, we show visually the steps of command generation. In Fig.\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.\ref{fig:sampleintegral}. This flight travelled approximately $4.4$ seconds for $3$ meters. For testing purposes, our use input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same
+
 
 \begin{figure}[h]
-    \includegraphics[width=0.48\textwidth]{images/resizesample.png}
-    \caption{A sample of the string generation process}
-    \label{fig:resizesample}
+	\centering
+	\subfigure[Original String \label{fig:ogstring}]{\includegraphics[width=0.3\linewidth]{images/ogstring.png}}
+	\subfigure[Time Adjustment \label{fig:timeadj}]{\includegraphics[width=0.3\linewidth]{images/timeadj.png}}
+    \subfigure[Final Commands \label{fig:fullyadj}]{\includegraphics[width=0.3\linewidth]{images/fullyadj.png}}
+	\caption{Command Generation Process}
+	\label{fig:gensample}
+	\vspace{-15pt}
 \end{figure}
 
 \subsection{Online Adaptation of Generated Commands}
@@ -283,7 +288,7 @@ The proportional gain, $k_p(t)$, is automatically tuned based loosely off the Zi
 \begin{equation}
     k_p(t+1) = k_p(t) + \bigg(\frac{\mathbf{p_r}(t)}{\mathbf{p}(t)}\bigg)\bigg(\frac{1}{t_u}\bigg)
 \end{equation}
-where $t_u$ refers to the user-set time and is used to account for iteration time.
+where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. Not adjusting in this manner would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command.
 
 
 
