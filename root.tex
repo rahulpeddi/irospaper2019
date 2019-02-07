@@ -142,6 +142,7 @@ Through observation of a single demonstrated trial, we are able to identify impo
     \caption{A sample of a single demonstrated flight}
     \label{fig:sampleintegral}
 \end{figure}
+
 In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration. The pilot flies the UAV forward over a distance of approximately $3$ meters. The command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in in the negative $y$-direction. Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the total area under the string of commands, or the integral. Because the pitch is proportional to the linear velocity in the $y$-direction, we theorize that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled. Lastly, we are interested in the average command sent to the system, as indicated by the dotted line. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and heights. Making use of the average command, we are able to improve precision in the process of generating autonomous commands, that must be fixed to a certain length (time) and travel a certain distance.
 
 \section{Methodology}
@@ -150,7 +151,7 @@ In our approach, we leverage the data from multiple demonstrations to build a re
     *Block Diagram*
 
 \subsection{Trajectory Generation and Decomposition}
-In this section, we examine the target goals and times, $\mathbf{g}$ and $\mathbf{t}$
+In this section, we examine the target goals and times, $\mathbf{g}$ and $\mathbf{t}$ *In progress*
 
 
 \subsection{Regression Based Training and Evaluation}
@@ -202,17 +203,31 @@ g_u = f(d_u,t_u)
 \bar{x}_u = h(d_u,t_u)
 \end{equation}
 
-where $d_u$ and $t_u$ are the user-set desired distance and time, respectively.
+where $d_u$ and $t_u$ are the user-set desired distance and time, respectively. In Figs.\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represent the two functions $g_i = f(d_i,t_i)$ and $\bar{x}_i = h(d_i,t_i)$, respectively. The points in these figures represent actual training data points, all of which fall on the surface created with the thin-plate psline.
+
+\begin{figure}[h]
+    \includegraphics[width=0.48\textwidth]{images/integs.png}
+    \caption{Integral vs Distance and Time}
+    \label{fig:integs}
+\end{figure}
+\begin{figure}[h]
+    \includegraphics[width=0.48\textwidth]{images/joycmds.png}
+    \caption{Average Teleop Command vs Distance and Time}
+    \label{fig:joys}
+\end{figure}
 
 While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases [CITE]. In order to quantify this, we leverage the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression with known values:
+
 \begin{equation} \label{eq:stderr}
     \sigma_{est} \approx \frac{s}{\sqrt{m}}
 \end{equation}
+
 where $s$ is the sample standard deviation of all of the points in the training set and $m$ is the number of training samples. The standard error, $\sigma_{est}$, is then used to determine the t-statistic for different test values. The t-statistic is defined as the ratio of departure of a test point from a known point to its standard error and is defined as
 \begin{equation} \label{eq:tstat}
 t_{\hat{\beta}} = \frac{|\hat{\beta}-\bar{\beta}|}{\sigma_{est}}    
 \end{equation}
 where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest known point. In equation \eqref{eq:tstat}, if $t_{\hat{\beta}} \geq 1$, that means that the test point $\hat{\beta}$ propagates an error higher than the standard error. As a result, it is desirable to have $t_{\hat{\beta}} < 1$. Using a certain set-point for the t-statistic, the maximum allowable departure from known points is obtained:
+
 \begin{equation}
     \sigma_{est}t_{\hat{\beta}} = |\hat{\beta}-\bar{\beta}|
 \end{equation}
@@ -228,6 +243,7 @@ In our case, there are two parameters we are primarily concerned about for predi
 \begin{equation}
     \Delta_i = \sqrt{(\sigma_{d_{est}})^2+(\sigma_{t_{est}})^2}
 \end{equation}
+
 Using the maximum distance for each point $\Delta_i$, we are able the generate intervals around each point, where the data is within the standard error of the estimate.
 
 
@@ -236,6 +252,7 @@ Using the maximum distance for each point $\Delta_i$, we are able the generate i
 In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{x}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands.
 
 From the training set of $m$ samples, we select the trial that has the closest integral, $g_i$, to the estimated integral $g_u$. This is done by forming an error vector, $\mathbf{e}\in\R^{1\times m}$, where each element is defined by
+
 \begin{equation}
  e_i = \vert g_i-g_u \vert , ~i= \{1,\ldots,m\}
 \end{equation}
@@ -254,6 +271,7 @@ This optimal pre-trained sample is then adjusted to reflect the user-set time, $
 where $x$ is an entry in vector $\mathbf{x}^*$ and $a$ represents the coefficients of the function at each point. Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\mathbf{x}^*$. After resizing, we obtain the time adjusted input vector $\mathbf{x}'$.
 
 The next step is to adjust the input vector such that the system reaches the user-set goal $d_u$. This is done by leveraging the average velocity information, that is, $\bar{x}_u$. Because distance is a function of average velocity and time, the scale time-adjusted vector $\mathbf{x}'$ is scaled such that its mean is equivalent to $\bar{x}_u$. We then obtain
+
 \begin{equation} \label{eq:imgscale}
 \mathbf{x}_a = \mathbf{x}'\bigg(\frac{\bar{x}_u}{\bar{x}'}\bigg)
 \end{equation}
