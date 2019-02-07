@@ -257,6 +257,11 @@ The next step is to adjust the input vector such that the system reaches the use
 
 The input $\mathbf{x}_a$ is then sent to the UAV to reach the goals set by the users.
 
+\begin{figure}[h]
+    \includegraphics[width=0.48\textwidth]{images/resizesample.png}
+    \caption{A sample of the string generation process}
+    \label{fig:resizesample}
+\end{figure}
 
 \subsection{Online Adaptation of Generated Commands}
 
@@ -272,7 +277,7 @@ The error $\xi(t)$ is attributed to the most recent command $\mathbf{x}_a(t)$, a
     \mathbf{x}_c(t+1) = \mathbf{x}_a(t+1) + k_p\xi(t)
 \end{equation}
 
-The proportional gain, $k_p$ is set using 
+The proportional gain, $k_p$, is automatically tuned using the ratio of reference position to actual position. 
 
 
 
