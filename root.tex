@@ -94,14 +94,14 @@ Formally, the problem we investigate in this work can be stated as:
 \textbf{Problem 1: \textit{Demonstration-based autonomous control generation}}: A UAV has the objective to visit a set of $n$ goals, $\mathbf{g}\in\mathbb{R}^{n}$, at a set of $n$ target times, $\mathbf{t} \in\mathbb{R}^{n}$. Given $m$ human-piloted flight demonstrations, the aim is to find a policy that enables autonomous flight to generate and track a trajectory $\mathbf{p_r}(t),~ t \in [0,T]$ that visits the target goals $\mathbf{g}_i$ at the respective target times, $\mathbf{t}_i$, such that the following liveness requirements are met:
 \begin{enumerate}
     \item  Position: The UAV should always stay within a certain distance of the generated trajectory:
-    \begin{equation}
+    \begin{equation} \label{eq:positlive}
         ||\mathbf{p}(t)-\mathbf{p_r}(t)|| \leq \delta_d,~\forall t \in [0,T]
     \end{equation}
     where $\mathbf{p_r}(t)$ is the reference position at time $t$, where $T$ represents an overall time horizon for the trajectory, and $\delta_d$ is a threshold for allowable deviation.
     \item  Time: The UAV should always reach the target locations within a certain threshold of the target time for that goal:
     \begin{align}
         \tau = t\in[0,T]|\mathbf{p}(t)-\mathbf{g}_i \leq \delta_d \nonumber \\
-        |\tau- \mathbf{t}_i| \leq \delta_t,~i=1,\ldots,n
+        |\tau- \mathbf{t}_i| \leq \delta_t,~i=1,\ldots,n \label{eq:time_live}
     \end{align}
     where $\tau$ is a time at which the liveness condition is met for a specific goal and $\delta_t$ is the allowable deviation in time from the target.
 \end{enumerate}
@@ -288,8 +288,7 @@ The proportional gain, $k_p(t)$, is automatically tuned based loosely off the Zi
 \begin{equation}
     k_p(t+1) = k_p(t) + \bigg(\frac{\mathbf{p_r}(t)}{\mathbf{p}(t)}\bigg)\bigg(\frac{1}{t_u}\bigg)
 \end{equation}
-where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. The main reason each subsequent command is being adjusted is because our liveness constraint is defined as the difference between positions at 
-
+where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, it would be beneficial to 
 
 
 
