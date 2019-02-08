@@ -133,7 +133,7 @@ The dynamics of the vehicle are then described as follows:
 
 In the human piloted demonstrations, the user is controlling $u_2$, $u_3$, and $u_4$, which correspond to the desired roll, pitch, and yaw angles.
 
-In this work, we are interested in learning from commands send by the human pilot to the UAV. We assume that we are able to collect all information sent from the pilot to the UAV during demonstrations. During run-time, we are also able to get the world frame position $\mathbf{p}(t)$ of the UAV using a motion capture system.
+In this work, we are interested in learning from commands sent from the human pilot to the UAV, so we assume in our training that we are able to collect all information communicated from the pilot to the UAV. During run-time, we are also able to get the world frame position $\mathbf{p}(t)$ of the UAV using a motion capture system.
 
 Through observation of a single demonstrated trial, we are able to identify important commands sent to the system. An example of this is shown below:
 
@@ -244,7 +244,15 @@ In our case, there are two parameters we are primarily concerned about for predi
     \Delta_i = \sqrt{(\sigma_{d_{est}})^2+(\sigma_{t_{est}})^2}
 \end{equation}
 
-Using the maximum distance for each point $\Delta_i$, we are able the generate intervals around each point, where the data is within the standard error of the estimate.
+Using the maximum distance for each point $\Delta_i$, we are able the generate intervals around each point, where the data is within the standard error of the estimate. Fig.\ref{fig:bounds}, contains a pictorial representation of the standard error intervals around each point. In Fig.\ref{fig:predsur}, the surface shown in Fig.\ref{fig:integs} is modified with the boundary created by the intervals. The boundary created by the intervals is simply a pictorial representation 
+
+\begin{figure}[h]
+	\centering
+	\subfigure[Prediction Bounds \label{fig:preds}]{\includegraphics[width=0.48\linewidth]{images/predictionbds.png}}
+	\subfigure[Prediction Bounds on Surface \label{fig:predsur}]{\includegraphics[width=0.48\linewidth]{images/fulpredbds.png}}
+	\caption{Prediction Intervals and Bounds}
+	\label{fig:bounds}
+\end{figure}
 
 
 \subsection{Autonomous Behaviour Generation}
