@@ -137,7 +137,7 @@ In this work, we are interested in learning from commands sent from the human pi
 
 Through observation of a single demonstrated trial, we are able to identify important commands sent to the system. An example of this is shown below:
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/sampleintegral.png}
     \caption{A sample of a single demonstrated flight}
     \label{fig:sampleintegral}
@@ -209,12 +209,12 @@ g_u = f(d_u,t_u)
 \NB{PROBLEM: training is performed starting from 0 reaching 0...on a new trajectory online how can you consider different starting velocities? Can we do some considerations on the training?}
 where $d_u$ and $t_u$ are the user-set desired distance and time, respectively. In Figs.\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represent the two functions $g_i = f(d_i,t_i)$ and $\bar{x}_i = h(d_i,t_i)$, respectively. The points in these figures represent actual training data points, all of which fall on the surface created with the thin-plate psline.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/integs.png}
     \caption{Integral vs Distance and Time}
     \label{fig:integs}
 \end{figure}
-\begin{figure}[h]
+\begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/joycmds.png}
     \caption{Average Teleop Command vs Distance and Time}
     \label{fig:joys}
@@ -250,7 +250,7 @@ In our case, there are two parameters we are primarily concerned about for predi
 
 Using the maximum distance for each point $\Delta_i$, we are able the generate intervals around each point, where the data is within the standard error of the estimate. Fig.\ref{fig:preds}, contains a pictorial representation of the standard error intervals around each point. In Fig.\ref{fig:predsur}, the surface shown in Fig.\ref{fig:integs} is modified with a conforming boundary [CITE] created by the intervals.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\subfigure[Prediction Bounds \label{fig:preds}]{\includegraphics[width=0.48\linewidth]{images/predictionbds.png}}
 	\subfigure[Prediction Bounds on Surface \label{fig:predsur}]{\includegraphics[width=0.48\linewidth]{images/fulpredbds.png}}
