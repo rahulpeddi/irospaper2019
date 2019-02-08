@@ -10,3 +10,9 @@
 *.gz
 
 *.pdf
+
+*.bbl
+
+*.blg
+
+*.pdf
