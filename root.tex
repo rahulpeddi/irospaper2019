@@ -180,15 +180,18 @@ In this section, we show how we generate trajectory based on given waypoints. We
 
 From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while enables longitudinal motion. Yaw enables rotations around the center of mass and thrust is mostly responsible for changes in height along the global $z$ coordinate. For ease of discussion in this work we do not consider yaw, as we are primarily interested in planar motion, which also implies that the height is kept constant. As a result, any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands, or commands that send the vehicle in along the global $x$ and $y$ coordinates.
 
-For our purposes, we use the minimum jerk trajectory as a starting point. Jerk is defined as the time derivative of acceleration and is often associated rapidly changing actuator forces. [CITE] The general equation for a minimum jerk trajectory is as follows:
-
+For our purposes, we use the minimum jerk trajectory as a starting point. Jerk is defined as the time derivative of acceleration and is often associated rapidly changing actuator forces. [CITE] The equation for a minimum jerk trajectory is as follows:
 
 \begin{equation}
-    \mathbf{p}*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\dddot{p},\ddot{p},\dot{p},p,t)dt =  \argmin_{p(t)}\int_0^T
+    \mathbf{p}^*(t) = c_5t^5 + c_4t^4 + c_3t^3 + c_2t^2 + c_1t + c_0 
 \end{equation}
+where $c_0,\ldots,c_5$ are constants determined using the linear system : *in progress*
+%\begin{equation}
+%    \mathbf{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\dddot{p},\ddot{p},\dot{p},p,t)dt
+%\end{equation}
+%where $p$ refers to the position of the system, $mathbf{p}^*(t)$ is the trajectory, and $T$ is the target time it should reach the next waypoint 
 
-
-
+Having obtained a minimum jerk trajectory, 
 
 \subsection{Regression Based Training and Evaluation} \label{sec:train}
 In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{J_i}\}$, where $i=1,\ldots,m$ reflects the number of demonstrations, %\NB{what is $i$?} 
