@@ -162,7 +162,7 @@ In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstrat
 
 %\NB{use the linearized model from AMR and show that a variation in u2 and u3 generate a moment which in turns create a motion. Introduce thrust}.
 
-Lastly, we are interested in the average command sent to the system, as indicated by the dotted line. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and heights. Making use of the average command, we are able to improve precision in the process of generating autonomous commands, which must be fixed to a certain length (time) and travel a certain distance. %\NB{we need to think how to pose the command better. A reviewer here can still ask why and what so special about the command.}
+Lastly, we are interested in the average command sent to the system, as indicated by the dotted line. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and heights. Making use of the average command, we are able to identify the correct height of the teleoperation commands and improve precision in the process of generating autonomous commands, which must be fixed to a certain length (time) and travel a certain distance. %\NB{we need to think how to pose the command better. A reviewer here can still ask why and what so special about the command.}
 
 \section{Methodology}
 
@@ -176,13 +176,16 @@ The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach be
 
     
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
+In this section, we show how we generate trajectory based on given waypoints. We want our vehicle to track a smooth trajectory as much as possible with linear motion, so this part of the approach is twofold: generating a smooth trajectory, given waypoints, and decomposing this trajectory into linear parts, as to be congruous with our training set, which consists of training only on linear motion, which will be discussed further in Section \ref{sec:train}.
 
-From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll allows lateral motion while pitch allows longitudinal motion. Yaw enables rotations around the center of mass and thrust is mostly responsible for changes in height along the global $z$ coordinate. For ease of discussion in this work we do not consider yaw, as we are primarily interested in planar motion, which also implies that the height is kept constant. Any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands. Our training data is limited in the sense that
+From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while enables longitudinal motion. Yaw enables rotations around the center of mass and thrust is mostly responsible for changes in height along the global $z$ coordinate. For ease of discussion in this work we do not consider yaw, as we are primarily interested in planar motion, which also implies that the height is kept constant. As a result, any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands, or commands that send the vehicle in along the global $x$ and $y$ coordinates.
 
-In this section, we examine the target goals and times, $\mathbf{g}$ and $\mathbf{t}$ *In progress*
+The smooth trajectory we generate in this work is a minimum jerk trajectory[CITE] for a series of waypoints. 
 
 
-\subsection{Regression Based Training and Evaluation}
+
+
+\subsection{Regression Based Training and Evaluation} \label{sec:train}
 In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{J_i}\}$, where $i=1,\ldots,m$ reflects the number of demonstrations, %\NB{what is $i$?} 
 $d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{J_i}$ is the sequence of user teleoperation commands. The outputs of our training phase are \begin{itemize}
     \item The integral of the string of teleoperation commands, $g_i = \int_0^{t_i}\mathbf{J_i}$
