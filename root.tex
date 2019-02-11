@@ -180,16 +180,21 @@ In this section, we show how we generate trajectory based on given waypoints. We
 
 From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while enables longitudinal motion. Yaw enables rotations around the center of mass and thrust is mostly responsible for changes in height along the global $z$ coordinate. For ease of discussion in this work we do not consider yaw, as we are primarily interested in planar motion, which also implies that the height is kept constant. As a result, any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands, or commands that send the vehicle in along the global $x$ and $y$ coordinates.
 
-The smooth trajectory we generate in this work is a minimum jerk trajectory[CITE] for a series of waypoints. 
+For our purposes, we use the minimum jerk trajectory as a starting point. Jerk is defined as the time derivative of acceleration and is often associated rapidly changing actuator forces. [CITE] The general equation for a minimum jerk trajectory is as follows:
+
+
+\begin{equation}
+    \mathbf{p}*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\dddot{p},\ddot{p},\dot{p},p,t)dt =  \argmin_{p(t)}\int_0^T
+\end{equation}
 
 
 
 
 \subsection{Regression Based Training and Evaluation} \label{sec:train}
 In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{J_i}\}$, where $i=1,\ldots,m$ reflects the number of demonstrations, %\NB{what is $i$?} 
-$d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{J_i}$ is the sequence of user teleoperation commands. The outputs of our training phase are \begin{itemize}
-    \item The integral of the string of teleoperation commands, $g_i = \int_0^{t_i}\mathbf{J_i}$
-    \item The steady-state, or average, teleoperation command, $\bar{j}_i \in \mathbf{J_i}$
+$d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{J}_i$ is the sequence of user teleoperation commands. The outputs of our training phase are \begin{itemize}
+    \item The integral of the string of teleoperation commands, $g_i = \int_0^{t_i}\mathbf{J}_i$
+    \item The steady-state, or average, teleoperation command, $\bar{j}_i \in \mathbf{J}_i$
     \item The position of the system at all times, $\mathbf{p}(t)$
 \end{itemize}
 %\NB{here it's confusing. Be careful, we are mixing input with outputs.Inout is the distance, time and sequence of commands while the output is the intgeral of the commands, the steady stae teleop, and the state, position, covered by the system}
@@ -320,34 +325,34 @@ Using the maximum distance for each point $\Delta_i$, we are able the generate i
 
 \subsection{Autonomous Behaviour Generation}
 
-In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{x}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands. A string of commands is generated for each leg of a trajectory, as described in Section \ref{sec:traj}.
+In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands. A string of commands is generated for each leg of a trajectory, as described in Section \ref{sec:traj}.
 
 From the training set of $m$ samples, we select the trial that has the closest integral, $g_i$, to the estimated integral $g_u$. This is done by forming an error vector, $\mathbf{e}\in\R^{m}$, where each element is defined by
 
 \begin{equation}
  e_i = \vert g_i-g_u \vert , ~i= \{1,\ldots,m\}
 \end{equation}
- The lowest error is then found and is paired with the appropriate pre-trained sample, $\mathbf{x}^*$,
+ The lowest error is then found and is paired with the appropriate pre-trained sample, $\mathbf{J}^*$,
 
 \begin{equation}
-\mathbf{x}^* = \mathbf{x}_i \in \mathbf{x}\vert e_i = \min_e(\mathbf{e})
+\mathbf{J}^* = \mathbf{J}_i \in \mathbf{J}\vert e_i = \min_e(\mathbf{e})
 \end{equation}
 
-This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing vector interpolation to re-size $\mathbf{x}^*$, such that important features in the optimal command vector are not lost. These methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss [CITE]. Bicubic interpolation is our chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity [CITE]. The general form of a bicubic interpolation equation is 
+This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing vector interpolation to re-size $\mathbf{J}^*$, such that important features in the optimal command vector are not lost. These methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss [CITE]. Bicubic interpolation is our chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity [CITE]. The general form of a bicubic interpolation equation is 
 
 \begin{equation} \label{eq:bicinter}
     p(x) = \sum_{i=0}^3a_ix^i
 \end{equation}
 
-where $x$ is an entry in vector $\mathbf{x}^*$ and $a$ represents the coefficients of the function at each point. Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\mathbf{x}^*$. After resizing, we obtain the time adjusted input vector $\mathbf{x}'$.
+where $x$ is an entry in vector $\mathbf{J}^*$ and $a$ represents the coefficients of the function at each point. Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\mathbf{J}^*$. After resizing, we obtain the time adjusted input vector $\mathbf{J}'$.
 
-The next step is to adjust the input vector such that the system reaches the user-set goal $d_u$. This is done by leveraging the average velocity information, that is, $\bar{x}_u$. Because distance is a function of average velocity and time, the scale time-adjusted vector $\mathbf{x}'$ is scaled such that its mean is equivalent to $\bar{x}_u$. We then obtain
+The next step is to adjust the input vector such that the system reaches the user-set goal $d_u$. This is done by leveraging the average velocity information, that is, $\bar{j}_u$. Because distance is a function of average velocity and time, the scale time-adjusted vector $\mathbf{J}'$ is scaled such that its mean is equivalent to $\bar{j}_u$. We then obtain
 
 \begin{equation} \label{eq:imgscale}
-\mathbf{x}_a = \mathbf{x}'\bigg(\frac{\bar{x}_u}{\bar{x}'}\bigg)
+\mathbf{J}_a = \mathbf{J}'\bigg(\frac{\bar{j}_u}{\bar{j}'}\bigg)
 \end{equation}
 
-In Fig.\ref{fig:gensample}, we show visually the steps of command generation. In Fig.\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.\ref{fig:sampleintegral}. This flight travelled approximately $4.4$ seconds for $3$ meters. For testing purposes, our use input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same, which is a verification of feature retention using bicubic interpolation from \eqref{eq:bicinter}. If the vector were just stretched without using an interpolation method, we would expect slight variation in the mean, which could damage the integrity of the final step, shown in Fig.\ref{fig:fullyadj}, which is obtained using \eqref{eq:imgscale}. At this point we have obtained the autonomous command string $\mathbf{x}_a$, which is then sent to the UAV to reach the goals set by the user.
+In Fig.\ref{fig:gensample}, we show visually the steps of command generation. In Fig.\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.\ref{fig:sampleintegral}. This flight travelled approximately $4.4$ seconds for $3$ meters. For testing purposes, our use input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same, which is a verification of feature retention using bicubic interpolation from \eqref{eq:bicinter}. If the vector were just stretched without using an interpolation method, we would expect slight variation in the mean, which could damage the integrity of the final step, shown in Fig.\ref{fig:fullyadj}, which is obtained using \eqref{eq:imgscale}. At this point we have obtained the autonomous command string $\mathbf{J}_a$, which is then sent to the UAV to reach the goals set by the user.
 
 
 \begin{figure}[h]
@@ -367,10 +372,10 @@ The commands generated in the previous section are generated and sent to the UAV
     \xi(t) = \mathbf{p}(t)-\mathbf{p_r}(t)
 \end{equation}
 
-The error $\xi(t)$ is attributed to the most recent command $\mathbf{x}_a(t)$, and a proportional controller is used to adjust the following command $\mathbf{x}_a(t+1)$ to obtain the closed-loop command $\mathbf{x}_c(t+1)$ as follows
+The error $\xi(t)$ is attributed to the most recent command $\mathbf{J}_a(t)$, and a proportional controller is used to adjust the following command $\mathbf{J}_a(t+1)$ to obtain the closed-loop command $\mathbf{J}_c(t+1)$ as follows
 
 \begin{equation}
-    \mathbf{x}_c(t+1) = \mathbf{x}_a(t+1) + k_p(t)\xi(t)
+    \mathbf{J}_c(t+1) = \mathbf{J}_a(t+1) + k_p(t)\xi(t)
 \end{equation}
 
 The proportional gain, $k_p(t)$, is automatically tuned based loosely off the Ziegler-Nichols method [CITE] where the proportional gain is increased until there is stable and consistent oscillation in the output, which in our case, is the position error, $\xi(t)$. In order to set the interval of gain increase each iteration, we leverage the ratio of reference position to actual position:
