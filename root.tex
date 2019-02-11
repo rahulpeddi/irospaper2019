@@ -175,24 +175,51 @@ Lastly, we are interested in the average command sent to the system, as indicate
 The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to  build a regression model that enables identification of an integral, $g_u$, and average teleoperation command, $\bar{x}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity,a new command string consisting of commands for both lateral and longitudinal locations is created, . At this stage, we have obtained the actions, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, that track trajectory $\mathbf{p}_r(t)$. Because these actions are created in open-loop, some error is possible. This error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. %\NB{in this section or before we need to stress and clarify that this approach allows us to figure out the actions for the system to follow autonomously any trajectory but we need still to close the loop. Technically is a 2 phase method:1) open loop actions and 2) corrections for closed loop}
 
     
-\subsection{Trajectory Generation and Decomposition}
+\subsection{Trajectory Generation and Decomposition} \label{sec:traj}
 
-From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll allows lateral motion while pitch allows longitudinal motion. Yaw enables rotations around the center of mass and thrust is mostly responsible for changes in height along the global $z$ coordinate. For ease of discussion in this work we do not consider consider yaw, as we are primarily interested in planar motion, which also implies that the height is kept constant. Any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands. 
+From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll allows lateral motion while pitch allows longitudinal motion. Yaw enables rotations around the center of mass and thrust is mostly responsible for changes in height along the global $z$ coordinate. For ease of discussion in this work we do not consider yaw, as we are primarily interested in planar motion, which also implies that the height is kept constant. Any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands. Our training data is limited in the sense that
 
 In this section, we examine the target goals and times, $\mathbf{g}$ and $\mathbf{t}$ *In progress*
 
 
 \subsection{Regression Based Training and Evaluation}
-In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{x_i}\}$, where $i=1,\ldots,m$, %\NB{what is $i$?} 
-$d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{x_i}$ is the sequence of user teleoperation commands. The outputs of our training phase are \begin{itemize}
-    \item The integral of the string of teleoperation commands, $g_i = \int_0^{t_i}\mathbf{x_i}$
-    \item The steady-state, or average, teleoperation command, $\bar{x}_i \in \mathbf{x_i}$
+In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{J_i}\}$, where $i=1,\ldots,m$ reflects the number of demonstrations, %\NB{what is $i$?} 
+$d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{J_i}$ is the sequence of user teleoperation commands. The outputs of our training phase are \begin{itemize}
+    \item The integral of the string of teleoperation commands, $g_i = \int_0^{t_i}\mathbf{J_i}$
+    \item The steady-state, or average, teleoperation command, $\bar{j}_i \in \mathbf{J_i}$
     \item The position of the system at all times, $\mathbf{p}(t)$
 \end{itemize}
 %\NB{here it's confusing. Be careful, we are mixing input with outputs.Inout is the distance, time and sequence of commands while the output is the intgeral of the commands, the steady stae teleop, and the state, position, covered by the system}
-The steady-state command, in this case, provides information about the pilot's average in-flight velocity, and is obtained by taking the mean of all entries in $\mathbf{x_i}$. The integral, meanwhile, describes the area under the string of commands. Because the teleop commands are proportional to velocity, this area value gives important information about the distance traveled, as position is the integral of velocity over time.
+The steady-state command, in this case, provides information about the pilot's average in-flight velocity, and is obtained by taking the mean of all entries in $\mathbf{x_i}$. The integral, meanwhile, describes the area under the string of commands, as discussed in the previous section. %Because the teleop commands are proportional to velocity, this area value gives important information about the distance traveled, as position is the integral of velocity over time.
 
-Our training data in this work consists of multiple demonstrations of a human-pilot flying forward at varying speeds for varying lengths. 
+Our training data in this work consists of multiple demonstrations of a human-pilot flying forward at varying speeds for varying distances. In Fig.\ref{fig:train}, we show the raw data received from the demonstrations. In this case, we have training samples where the pilot flies forward and then stops, meaning the initial and final velocities are both zero, which is why there are an extended periods where there is no forward motion at the ends of the trajectories.
+
+\begin{figure}[ht]
+    \includegraphics[width=0.48\textwidth]{images/training.png}
+    \caption{Training Set, Teleoperation Commands pictured left, Trajectories pictured right}
+    \label{fig:train}
+\end{figure}
+
+This data, however, would only be effective if trajectories involved stopping at each waypoint. In order to further expand the information obtained, considerations were made on the training data to include three different types of segments of commands:
+
+\begin{itemize}
+\item Trajectory Start
+\item Intermediate Motion
+\item Trajectory End
+\end{itemize}
+
+The teleoperation commands for each of these segments are pictured in Fig/\ref{fig:trainelab}.
+
+\begin{figure}[h]
+	\centering
+	\subfigure[Trajectory Start \label{fig:tstart}]{\includegraphics[width=0.3\linewidth]{images/starttrain.png}}
+	\subfigure[Int. Motion \label{fig:tint}]{\includegraphics[width=0.3\linewidth]{images/inttrain.png}}
+    \subfigure[Trajectory End \label{fig:tend}]{\includegraphics[width=0.3\linewidth]{images/endtrain.png}}
+	\caption{Training Data with Trajectory Considerations}
+	\label{fig:trainelab}
+\end{figure}
+
+Having trained on not only full strings of commands, but also on segments enables more specific command generation based on where the system is in relation to the provided trajectory. For example, if the command for the end of the trajectory needs to be generated, then the training from the trajectories in \ref{fig:tend} is used.
 
 The offline training data is applied to a thin-plate spline surface fit to describe the relationship between training inputs and integral and average velocity. The general form of a thin-plate spline equation is 
 \begin{equation}
@@ -290,7 +317,7 @@ Using the maximum distance for each point $\Delta_i$, we are able the generate i
 
 \subsection{Autonomous Behaviour Generation}
 
-In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{x}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands.
+In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{x}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands. A string of commands is generated for each leg of a trajectory, as described in Section \ref{sec:traj}.
 
 From the training set of $m$ samples, we select the trial that has the closest integral, $g_i$, to the estimated integral $g_u$. This is done by forming an error vector, $\mathbf{e}\in\R^{m}$, where each element is defined by
 
