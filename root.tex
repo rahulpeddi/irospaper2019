@@ -191,7 +191,7 @@ where $c_0,\ldots,c_5$ are constants determined using the linear system : *in pr
 %\end{equation}
 %where $p$ refers to the position of the system, $mathbf{p}^*(t)$ is the trajectory, and $T$ is the target time it should reach the next waypoint 
 
-Having obtained a minimum jerk trajectory, 
+Having obtained the smooth trajectory, 
 
 \subsection{Regression Based Training and Evaluation} \label{sec:train}
 In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{J_i}\}$, where $i=1,\ldots,m$ reflects the number of demonstrations, %\NB{what is $i$?} 
