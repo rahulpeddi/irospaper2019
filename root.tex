@@ -94,6 +94,7 @@ To this end, we propose a framework that aim the solve the following challenges:
     \item how to enable autonomous flight in aerial vehicles with minimal knowledge of vehicle dynamics
     \item how to expand the knowledge obtained from several demonstrations to follow any trajectory
 \end{itemize}
+\NB{we need to stress how different this work is in comparison with the rest of the literature on learning from demosntration}
 In order to address these challenges, our approach leverages the generalized dynamics of UAVs along with regression analysis on demonstrations and elements of control theory to generate autonomous flight and ensure that the vehicle can track any trajectory.
 
 
@@ -146,6 +147,8 @@ The dynamics of the vehicle are then described as follows:
 	\label{eq:quadrotor_dynamics} \nonumber
 \end{equation} [CITE]
 
+\NB{here we need to stress again that these parameters are hard to find online}
+\NB{here we need a model and discussion about the controller}
 %The linearized dynamics for a planar quadrotor are as follows:
 
 %\begin{equation}
@@ -183,6 +186,7 @@ Lastly, we are interested in the average command sent to the system, as indicate
     \caption{Block Diagram of Proposed Approach}
     \label{fig:blockdiagram}
 \end{figure}
+\NB{let's use power point fro the diagrams..it's blurry}
 
 The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to  build a regression model that enables identification of an integral, $g_u$, and average teleoperation command, $\bar{x}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity,a new command string consisting of commands for both lateral and longitudinal locations is created, . At this stage, we have obtained the actions, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, that track trajectory $\mathbf{p}_r(t)$. Because these actions are created in open-loop, some error is possible. This error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. %\NB{in this section or before we need to stress and clarify that this approach allows us to figure out the actions for the system to follow autonomously any trajectory but we need still to close the loop. Technically is a 2 phase method:1) open loop actions and 2) corrections for closed loop}
 
@@ -207,7 +211,7 @@ where $c_0,\ldots,c_5$ are constants determined using the linear system : *in pr
 
 %where $p$ refers to the position of the system, $mathbf{p}^*(t)$ is the trajectory, and $T$ is the target time it should reach the next waypoint 
 
-Having obtained the smooth trajectory, we are want to find the closest decomposition of said trajectory into lines. This decomposition is done by identifying the critical and inflection points of the trajectory, by taking the first and second derivatives of the trajectory $\mathbf{p}^*(t)$, and setting them equal to zero:
+Having obtained the smooth trajectory, we are want to find the closest decomposition of said trajectory into lines. This decomposition is done by identifying the critical and inflection points of the trajectory, by taking the first and second derivatives of the trajectory $\mathbf{p}^*(t)$, and setting them equal to zero: \NB{why? We can discretize the trajectory and get the x and y components}
 \begin{align}
     \frac{d}{dt}\mathbf{p}^*(t) = 0 \nonumber \\
     \frac{d^2}{d^2t}\mathbf{p}^*(t) = 0 \label{eq:critpts}
