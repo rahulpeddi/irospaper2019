@@ -146,7 +146,19 @@ The dynamics of the vehicle are then described as follows:
 	\label{eq:quadrotor_dynamics} \nonumber
 \end{equation} [CITE]
 
-In the human piloted demonstrations, the user is controlling $u_2$, $u_3$, and $u_4$, which correspond to the desired roll, pitch, and yaw angles. 
+%The linearized dynamics for a planar quadrotor are as follows:
+
+%\begin{equation}
+%    \begin{aligned}
+%    \ddot{x} &= -g\phi \\
+%    \ddot{y} &= -g\theta \\
+%    \ddot{z} &= -g + \frac{u_1}{m} \\
+%    \ddot{\phi} &= \frac{u_2}{I_{xx}} \\
+%    \ddot{\theta} &= \frac{u_3}{I_{yy}}
+%    \end{aligned}
+%\end{equation}
+
+In the human piloted demonstrations, the user is controlling $u_2$, $u_3$, and $u_4$, which correspond to the desired roll, pitch, and yaw angles. In the system dynamics, $u_1$ is the thrust provided to the system. This is not directly sent by the user, but the thrust input is adjusted when the pilot is modifying roll, pitch, and yaw. The model
 
 In this work, we are interested in learning from commands sent from the human pilot to the UAV, so we assume in our training that we are able to collect all information communicated from the pilot to the UAV. During run-time, we are also able to get the world frame position $\mathbf{p}(t)$ of the UAV using a motion capture system.
 
@@ -180,15 +192,19 @@ In this section, we show how we generate trajectory based on given waypoints. We
 
 From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while enables longitudinal motion. Yaw enables rotations around the center of mass and thrust is mostly responsible for changes in height along the global $z$ coordinate. For ease of discussion in this work we do not consider yaw, as we are primarily interested in planar motion, which also implies that the height is kept constant. As a result, any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands, or commands that send the vehicle in along the global $x$ and $y$ coordinates.
 
-For smoothing purposes, we use the minimum jerk trajectory. Jerk is defined as the time derivative of acceleration and is often associated rapidly changing actuator forces. [CITE] The equation for a minimum jerk trajectory is as follows:
+For smoothing purposes, we use the minimum jerk trajectory. Jerk is defined as the time derivative of acceleration and is often associated rapidly changing actuator forces. [CITE] The general equation for a minimum jerk trajectory is as follows:
+
+\begin{equation} \label{eq:minjerkint}
+    \mathbf{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\dddot{p},\ddot{p},\dot{p},p,t)dt
+\end{equation}
+
+Solving the equation \ref{eq:minjerkint}, we obtain the form:
 
 \begin{equation}
     \mathbf{p}^*(t) = c_5t^5 + c_4t^4 + c_3t^3 + c_2t^2 + c_1t + c_0 
 \end{equation}
 where $c_0,\ldots,c_5$ are constants determined using the linear system : *in progress*
-%\begin{equation}
-%    \mathbf{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\dddot{p},\ddot{p},\dot{p},p,t)dt
-%\end{equation}
+
 %where $p$ refers to the position of the system, $mathbf{p}^*(t)$ is the trajectory, and $T$ is the target time it should reach the next waypoint 
 
 Having obtained the smooth trajectory, we are want to find the closest decomposition of said trajectory into lines. This decomposition is done by identifying the critical and inflection points of the trajectory, by taking the first and second derivatives of the trajectory $\mathbf{p}^*(t)$, and setting them equal to zero:
