@@ -209,12 +209,22 @@ Solving \eqref{eq:minjerkint}, we obtain the form:
 \end{equation}
 where $c_0,\ldots,c_5$ are constants specific to the waypoints in the trajectory.
 
-Having obtained the smooth trajectory, we are want to decompose said trajectory into lines. This decomposition is done by discretizing the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The descritization is done using linear approximation as follows:
+Having obtained the smooth trajectory, we are want to decompose said trajectory into lines. This decomposition is done by discretizing the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear approximation as follows:
 
 \begin{equation}
-    
+    \mathbf{p}_r(t) = 
 \end{equation}
 
+Several examples of decomposed trajectories are shown in Fig.\ref{fig:trajs}. All of the trajectories shown in Fig.\ref{fig:trajs} start at the world frame origin $(0,0)$.
+
+\begin{figure}[h]
+	\centering
+	\subfigure[\label{fig:t1}]{\includegraphics[width=0.3\linewidth]{images/traj1.png}}
+	\subfigure[\label{fig:t2}]{\includegraphics[width=0.3\linewidth]{images/traj2.png}}
+    \subfigure[\label{fig:t2}]{\includegraphics[width=0.3\linewidth]{images/traj3.png}}
+	\caption{Discretized Trajectories}
+	\label{fig:trajs}
+\end{figure}
 
 \subsection{Regression Based Training and Evaluation} \label{sec:train}
 In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{J_i}\}$, where $i=1,\ldots,m$ reflects the number of demonstrations, %\NB{what is $i$?} 
