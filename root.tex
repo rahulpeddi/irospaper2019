@@ -209,7 +209,11 @@ Solving \eqref{eq:minjerkint}, we obtain the form:
 \end{equation}
 where $c_0,\ldots,c_5$ are constants specific to the waypoints in the trajectory.
 
-Having obtained the smooth trajectory, we are want to decompose said trajectory into lines. This decomposition is done by discretizing the trajectory. Each 
+Having obtained the smooth trajectory, we are want to decompose said trajectory into lines. This decomposition is done by discretizing the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The descritization is done using linear approximation as follows:
+
+\begin{equation}
+    
+\end{equation}
 
 
 \subsection{Regression Based Training and Evaluation} \label{sec:train}
