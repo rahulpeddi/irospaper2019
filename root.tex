@@ -123,7 +123,7 @@ Formally, the problem we investigate in this work can be stated as:
 \end{enumerate}
 
 
-\section{System Dynamics}
+\section{System Models}
 In this section, we discuss the dynamical system that is generally used to control a UAV, which in our case, is a quadrotor. The control architecture is shown in Fig.\ref{fig:ctrl}. The position and low-level controllers, which consist of a series of PID loops [CITE], generate the angle inputs and attitude control that follow the desired trajectory, $\mathbf{p_r}$. The attitude controller and motion dynamics generate the thrust and moment values applied by each rotor. Lastly, the quadrotor body dynamics convert these values into acceleration. The motion planner is used to get the position, which is then fed back into the position controller. In addition, this system model assumes that the quadrotor is moving at a constant z level with a zero yaw constraint. 
 
 \begin{figure}[ht]
