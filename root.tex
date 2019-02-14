@@ -124,13 +124,21 @@ Formally, the problem we investigate in this work can be stated as:
 
 
 \section{System Dynamics}
+In this section, we discuss the dynamical system that is generally used to control a UAV, which in our case, is a quadrotor. The control architecture is shown in Fig.\ref{fig:ctrl}. The position and low-level controllers, which consist of a series of PID loops [CITE], generate the angle inputs and attitude control that follow the desired trajectory, $\mathbf{p_r}$. The attitude controller and motion dynamics generate the thrust and moment values applied by each rotor. Lastly, the quadrotor body dynamics convert these values into acceleration. The motion planner is used to get the position, which is then fed back into the position controller.
+
+\begin{figure}[ht]
+    \includegraphics[width=0.48\textwidth]{images/ctrler.png}
+    \caption{UAV Control Architecture}
+    \label{fig:ctrl}
+\end{figure}
+
 The type of UAV in question is modeled using a $12^{\text{th}}$ order state vector:
 \begin{equation}
     \mathbf{q} = 
     \begin{bmatrix}
     \mathbf{p}_q^\intercal & \phi & \theta & \psi & v_x & v_y & v_z & \omega_x & \omega_y & \omega_z
     \end{bmatrix}^\intercal \nonumber
-\end{equation} %\NB{what's the point of this section? What are you trying to demonstrate here?} 
+\end{equation} 
 where $\bm{p}_q=[x \; y \; z]^{\mathsf{T}}$ is the world frame position, $v_{x}$, $v_{y}$ and $v_z$ are the world frame velocities, $\phi$, $\theta$ and $\psi$ are the roll, pitch and yaw Euler angles and $\omega_{x}$, $\omega_{y}$ and $\omega_{z}$ are the body frame angular velocities.
 
 The dynamics of the vehicle are then described as follows:
@@ -147,8 +155,8 @@ The dynamics of the vehicle are then described as follows:
 	\label{eq:quadrotor_dynamics} \nonumber
 \end{equation} [CITE]
 
-\NB{here we need to stress again that these parameters are hard to find online}
-\NB{here we need a model and discussion about the controller}
+%\NB{here we need to stress again that these parameters are hard to find online}
+%\NB{here we need a model and discussion about the controller}
 %The linearized dynamics for a planar quadrotor are as follows:
 
 %\begin{equation}
@@ -160,6 +168,10 @@ The dynamics of the vehicle are then described as follows:
 %    \ddot{\theta} &= \frac{u_3}{I_{yy}}
 %    \end{aligned}
 %\end{equation}
+
+The parameters shown, however, are difficult to identify given a different UAV, and the controller architecture shown in Fig.\ref{fig:ctrl} consists of multiple PID loops, and therefore multiple parameters that require platform-specific tuning. It is this requirement that 
+
+\subsection{Learning by Demonstration}
 
 In the human piloted demonstrations, the user is controlling $u_2$, $u_3$, and $u_4$, which correspond to the desired roll, pitch, and yaw angles. In the system dynamics, $u_1$ is the thrust provided to the system. This is not directly sent by the user, but the thrust input is adjusted when the pilot is modifying roll, pitch, and yaw. The model
 
