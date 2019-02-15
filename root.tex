@@ -124,7 +124,7 @@ Formally, the problem we investigate in this work can be stated as:
 
 
 \section{System Models}
-In this section, we discuss the dynamical system that is generally used to control a UAV, which in our case, is a quadrotor. The control architecture is shown in Fig.\ref{fig:ctrl}. The position and low-level controllers, which consist of a series of PID loops [CITE], generate the angle inputs and attitude control that follow the desired trajectory, $\mathbf{p_r}$. The attitude controller and motion dynamics generate the thrust and moment values applied by each rotor. Lastly, the quadrotor body dynamics convert these values into acceleration. The motion planner is used to get the position, which is then fed back into the position controller. In addition, this system model assumes that the quadrotor is moving at a constant z level with a zero yaw constraint. 
+In this section, we discuss the dynamical system that is generally used to control a UAV, which in our case, is a quadrotor. The control architecture is shown in Fig.\ref{fig:ctrl}. The position and low-level controllers, which consist of a series of PID loops [CITE], generate the angle inputs and attitude control that follow the desired trajectory, $\mathbf{p_r}$. The attitude controller and motion dynamics generate the thrust and moment values applied by each rotor. Lastly, the quadrotor body dynamics give the position of the system, which is then fed back into the position controller. This control architecture assumes that the quadrotor is moving at a constant z level with a zero yaw constraint, which is discussed further in 
 
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/ctrler.png}
@@ -173,8 +173,7 @@ The parameters shown, however, are difficult to identify given a different UAV, 
 
 \subsection{Learning by Demonstration}
 
-In human piloted trajectories, a user is controlling $u_2$, $u_3$, and $u_4$ from the system dynamics, which correspond to the desired roll, pitch, and yaw angles. $u_1$ is the thrust provided to the system, which is not directly sent by the user, but it is adjusted when the pilot is modifying roll, pitch, and yaw. As previously mentioned, we have a zero yaw constraint, so the pilot does not set a desired yaw. 
-
+In human piloted trajectories, a user is controlling $u_2$, $u_3$, and $u_4$ from the system dynamics, which correspond to the desired roll, pitch, and yaw angles. $u_1$ is the thrust provided to the system, which is not directly sent by the user, but it is adjusted when the pilot is modifying roll, pitch, and yaw. In our case, we have a zero-yaw constraint for ease of discussion.
 In this work, we are interested in learning from commands sent from the human pilot to the UAV, so we assume in our training that we are able to collect all information communicated from the pilot to the UAV. During run-time, we are also able to get the world frame position $\mathbf{p}(t)$ of the UAV using a motion capture system.
 
 Through observation of a single demonstrated trial, we are able to identify important commands sent to the system. An example of this is shown below:
@@ -219,11 +218,7 @@ Solving \eqref{eq:minjerkint}, we obtain the form:
 \end{equation}
 where $c_0,\ldots,c_5$ are constants specific to the waypoints in the trajectory.
 
-Having obtained the smooth trajectory, we are want to decompose said trajectory into lines. This decomposition is done using temporal discretization the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear approximation as follows:
-
-\begin{equation}
-    \mathbf{p}_r(t)
-\end{equation}
+Having obtained the smooth trajectory, we are want to decompose said trajectory into lines. This decomposition is done using temporal discretization the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over the interval $[\mathbf{p}^*(t_s), \mathbf{p}^*(t_{s+1})]$, where $t_s$ is the time at the start of a segment and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_x + \delta t$.
 
 Several examples of decomposed trajectories are shown in Fig.\ref{fig:trajs}. All of the trajectories shown in Fig.\ref{fig:trajs} start at the world frame origin $(0,0)$.
 
@@ -251,7 +246,7 @@ The steady-state command, in this case, provides information about the pilot's a
 
 \subsection{Offline Training Data}
 
-Our training data in this work consists of multiple demonstrations of a human-pilot flying forward at varying speeds for varying distances. In Fig.\ref{fig:train}, we show the raw data received from the demonstrations. In this case, we have training samples where the pilot flies forward and then stops, meaning the initial and final velocities are both zero, which is why there are an extended periods where there is no forward motion at the ends of the trajectories.
+Our training data in this work consists of multiple demonstrations of a human-pilot flying forward at varying speeds for varying distances. In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. In this case, we have training samples where the pilot flies forward and then stops, meaning the initial and final velocities are both zero, which is why there are an extended periods where there is no forward motion at the ends of the trajectories.
 
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/training.png}
@@ -261,7 +256,7 @@ Our training data in this work consists of multiple demonstrations of a human-pi
 
 This data, however, would only be effective if trajectories involved stopping at each waypoint. In order to further expand the information obtained, considerations were made on the training data to include trajectories for demonstrations where the velocity does not start and end at zero.
 
-The velocities and trajectories of the new training data is pictured in Fig\ref{fig:trainelab}.
+The velocities and trajectories of the new training data is pictured in Fig.~\ref{fig:trainelab}.
 
 \begin{figure}[h]
 	\includegraphics[width=0.48\textwidth]{images/inttrain.png}
@@ -269,7 +264,7 @@ The velocities and trajectories of the new training data is pictured in Fig\ref{
 	\label{fig:trainelab}
 \end{figure}
 
-Having trained on not only start-to-stop trajectories, but also on segments enables more specific command generation based on where the system is in relation to the provided trajectory. For example, if the command for the middle the trajectory (i.e., between two points that neither the start nor end) needs to be generated, then the training from the trajectories in \ref{fig:trainelab} is used.
+Having trained on not only start-to-stop trajectories, but also on segments enables more specific command generation based on where the system is in relation to the provided trajectory. For example, if the command for the middle the trajectory (i.e., between two points that neither the start nor end) needs to be generated, then the training from the trajectories in Fig.~\ref{fig:trainelab} is used.
 
 \subsection{Thin-Plate Spline Regression Analysis}
 
@@ -315,7 +310,7 @@ g_u = f(d_u,t_u)
 \end{equation}
 
 %\NB{PROBLEM: training is performed starting from 0 reaching 0...on a new trajectory online how can you consider different starting velocities? Can we do some considerations on the training? Look among training set, pick all primitives}
-where $d_u$ and $t_u$ are the user-set desired distance and time, respectively. In Figs.\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represent the two functions $g_i = f(d_i,t_i)$ and $\bar{j}_i = h(d_i,t_i)$, respectively. The points in these figures represent actual training data points, all of which lay on the surface created with the thin-plate spline.
+where $d_u$ and $t_u$ are the user-set desired distance and time, respectively. In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represent the two functions $g_i = f(d_i,t_i)$ and $\bar{j}_i = h(d_i,t_i)$, respectively. The points in these figures represent actual training data points, all of which lay on the surface created with the thin-plate spline.
 
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/integs.png}
@@ -350,13 +345,13 @@ The appropriate departure is used to set the bounds for each training data point
 \end{align}
 where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for known parameter $\bar{\beta}$.
 
-In our case, there are two parameters we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two parameters as statistically independent, to obtain a generic interval for each point in the training set, denoted $[d_{i\min},d_{i\max}]$ and $[t_{i\min},t_{i\max}]$, where $i=1,\ldots,m$. Because we are ultimately interested in using the distance and time values together as input pairs, we then obtain a maximum Euclidean distance from each of the training data points using:
+In our case, there are two parameters we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two parameters as statistically independent, to obtain a generic interval for each point in the training set, denoted $[d_{i\min},d_{i\max}]$ and $[t_{i\min},t_{i\max}]$, where $i=1,\ldots,m$. Because we are ultimately interested in using the distance and time values together as input pairs, we then obtain a maximum distance from each of the training data points as follows:
 
 \begin{equation}
-    \Delta_i = \sqrt{(\sigma_{d_{est}})^2+(\sigma_{t_{est}})^2}
+    \delta_i = \sqrt{(\sigma_{d_{est}})^2+(\sigma_{t_{est}})^2}
 \end{equation}
 
-Using the maximum distance for each point $\Delta_i$, we are able the generate intervals around each point, where the data is within the standard error of the estimate. Fig.\ref{fig:preds}, contains a pictorial representation of the standard error intervals around each point. In Fig.\ref{fig:predsur}, the surface shown in Fig.\ref{fig:integs} is modified with a conforming boundary [CITE] created by the intervals.
+Using the maximum distance for each point $\Delta_i$, we are able the generate intervals around each point, where the data is within the standard error of the estimate. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error intervals around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary [CITE] created by the intervals.
 
 \begin{figure}[ht]
 	\centering
@@ -365,7 +360,6 @@ Using the maximum distance for each point $\Delta_i$, we are able the generate i
 	\caption{Prediction Intervals and Bounds}
 	\label{fig:bounds}
 \end{figure}
-
 
 \subsection{Autonomous Behaviour Generation}
 
@@ -385,7 +379,7 @@ From the training set of $m$ samples, we select the trial that has the closest i
 This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing vector interpolation to re-size $\mathbf{J}^*$, such that important features in the optimal command vector are not lost. These methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss [CITE]. Bicubic interpolation is our chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity [CITE]. The general form of a bicubic interpolation equation is 
 
 \begin{equation} \label{eq:bicinter}
-    p(x) = \sum_{i=0}^3a_ij^i
+    b(x) = \sum_{i=0}^3a_ij^i
 \end{equation}
 
 where $j$ is an entry in vector $\mathbf{J}^*$ and $a$ represents the coefficients of the function at each point. Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\mathbf{J}^*$. After resizing, we obtain the time adjusted input vector $\mathbf{J}'$.
@@ -396,7 +390,7 @@ The next step is to adjust the input vector such that the system reaches the use
 \mathbf{J}_a = \mathbf{J}'\bigg(\frac{\bar{j}_u}{\bar{j}'}\bigg)
 \end{equation}
 
-In Fig.\ref{fig:gensample}, we show visually the steps of command generation. In Fig.\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.\ref{fig:sampleintegral}. This flight travelled approximately $4.4$ seconds for $3$ meters. For testing purposes, our use input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same, which is a verification of feature retention using bicubic interpolation from \eqref{eq:bicinter}. If the vector were just stretched without using an interpolation method, we would expect slight variation in the mean, which could damage the integrity of the final step, shown in Fig.\ref{fig:fullyadj}, which is obtained using \eqref{eq:imgscale}. At this point we have obtained the autonomous command string $\mathbf{J}_a$, which is then sent to the UAV to follow the trajectory $\mathbf{p_r}(t)$.
+In Fig.~\ref{fig:gensample}, we show visually the steps of command generation. In Fig.~\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.~\ref{fig:sampleintegral}. This flight travelled approximately $4.4$ seconds for $3$ meters. For testing purposes, our use input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.~\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same, which is a verification of feature retention using bicubic interpolation from \eqref{eq:bicinter}. If the vector were just stretched without using an interpolation method, we would expect slight variation in the mean, which could damage the integrity of the final step, shown in Fig.~\ref{fig:fullyadj}, which is obtained using \eqref{eq:imgscale}. At this point we have obtained the autonomous command string $\mathbf{J}_a$, which is then sent to the UAV to follow the trajectory $\mathbf{p_r}(t)$.
 
 
 \begin{figure}[h]
