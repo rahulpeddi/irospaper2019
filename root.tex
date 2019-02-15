@@ -231,7 +231,7 @@ Several examples of decomposed trajectories are shown in Fig.\ref{fig:trajs}. Al
 	\label{fig:trajs}
 \end{figure}
 
-From the discretized trajectory, we have the $x$ and $y$ components of each leg of the trajectory, which require roll and pitch commands, as discussed previously. As a result, our training 
+From the discretized trajectory, we have the $x$ and $y$ components of each leg of the trajectory, which require roll and pitch commands, as discussed previously. As a result, our training only needs to be performed on lateral and longitudinal motion. In the case that the UAV is symmetrical, it is possible to only train on movement in one direction, and use the same results for any motion of the system. In this work, we assume we are learning to enable autonomous behaviors on symmetrical UAVs, as expanding to the non-symmetrical case adds little complexity to the approach.
 
 \subsection{Regression Based Training and Evaluation} \label{sec:train}
 
