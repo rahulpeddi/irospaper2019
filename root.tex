@@ -201,7 +201,7 @@ The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach be
 
     
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
-In this section, we show how we generate trajectory based on given waypoints. We want our vehicle to track a smooth trajectory as much as possible with linear motion, so this part of the approach is twofold: generating a smooth trajectory, given waypoints, and decomposing this trajectory into linear parts, as to be congruous with our training set, which consists of training only on linear motion, which will be discussed further in Section \ref{sec:train}.
+In this section, we show how we generate trajectory based on given waypoints. We want our vehicle to track a smooth trajectory as much as possible with linear motion, so this part of the approach is twofold: generating a smooth trajectory, and decomposing this trajectory into linear parts, as to be congruous with our training set, which consists of training only on linear motion, which will be discussed further in Section \ref{sec:train}.
 
 From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while enables longitudinal motion. Yaw enables rotations around the center of mass and thrust is mostly responsible for changes in height along the global $z$ coordinate. For ease of discussion in this work we do not consider yaw, as we are primarily interested in planar motion, which also implies that the height is kept constant. As a result, any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands, or commands that send the vehicle in along the global $x$ and $y$ coordinates.
 
@@ -242,11 +242,11 @@ $d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial,
     \item The position of the system at all times, $\mathbf{p}(t)$
 \end{itemize}
 %\NB{here it's confusing. Be careful, we are mixing input with outputs.Inout is the distance, time and sequence of commands while the output is the intgeral of the commands, the steady stae teleop, and the state, position, covered by the system}
-The steady-state command, in this case, provides information about the pilot's average in-flight velocity, and is obtained by taking the mean of all entries in $\mathbf{x_i}$. The integral, meanwhile, describes the area under the string of commands, as discussed in the previous section. %Because the teleop commands are proportional to velocity, this area value gives important information about the distance traveled, as position is the integral of velocity over time.
+The steady-state command, in this case, provides information about the pilot's average in-flight velocity, and is obtained by taking the mean of all entries in $\mathbf{x_i}$. The integral, meanwhile, describes the area under the string of commands, as discussed in the previous section.
 
 \subsection{Offline Training Data}
 
-Our training data in this work consists of multiple demonstrations of a human-pilot flying forward at varying speeds for varying distances. In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. In this case, we have training samples where the pilot flies forward and then stops, meaning the initial and final velocities are both zero, which is why there are an extended periods where there is no forward motion at the ends of the trajectories.
+Our training data in this work consists of multiple demonstrations of a human-pilot flying forward at varying speeds for varying distances. In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. In this case, we have training samples where the pilot flies forward and then stops, meaning the initial and final velocities are both zero, which is why there are an extended periods where there is no forward motion at the ends of the trajectories in Fig.~\ref{fig:trajs}.
 
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/training.png}
