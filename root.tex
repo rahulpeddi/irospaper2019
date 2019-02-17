@@ -422,7 +422,7 @@ The proportional gain, $k_p(t)$, is automatically tuned based loosely off the Zi
     k_p(t+1) = k_p(t) + \frac{\xi(t)}{\mathbf{p_r}(t)}
 \end{equation}
 
-The quantity $\frac{\xi(t)}{\mathbf{p_r}(t)}$. 
+The quantity $\frac{\xi(t)}{\mathbf{p_r}(t)}$ related the current error to the desired position within the trajectory. 
 
 
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
