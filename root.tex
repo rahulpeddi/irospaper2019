@@ -87,7 +87,7 @@ Unmanned Aerial Vehicles (UAVs) have become widespread for both civilian and mil
 
 The development of dedicated platforms for such autonomous tasks can be expensive and not necessary since hundreds of off-the-shelf UAVs are available nowadays and for low cost. These platforms are usually well designed, very stable, and ready to fly out of the box but are typically restricted to teleoperation usage.
 
-Generating autonomous flight behavior - subject of this paper -  however, can be difficult since every UAV has a different dynamical model, typical not available, and reverse engineering is often not possible. Model-based approaches that include system identification, model extraction, and control design are well know procedures to deal with this issue however they are time demanding and often not precise requiring a lot of tuning and testing \NB{cite some work on model id}. Even when these approaches are successful, among similar vehicles there can be model mismatch due to manufacturing error, different usage, physical changes, or aging which can change parameters thus needing more tuning or sophisticated adaptive control architectures to guarantee safe and reliable control. 
+Generating autonomous flight behavior - subject of this paper -  however, can be difficult since every UAV has a different dynamical model, which is typically not available, and reverse engineering is often not possible. Model-based approaches that include system identification, model extraction, and control design are well know procedures to deal with this issue however they are time demanding and often not precise requiring a lot of tuning and testing \NB{cite some work on model id}. Even when these approaches are successful, among similar vehicles there can be model mismatch due to manufacturing error, different usage, physical changes, or aging which can change parameters thus needing more tuning or sophisticated adaptive control architectures to guarantee safe and reliable control. 
 %While model driven procedures are time demanding, they
 %, and knowledge of that model is required to generate autonomous flight. Extracting this model is time demanding
 
@@ -131,20 +131,23 @@ Different from other supervised learning approaches, in this work we leverage th
 \section{Related Work}
 
 
-\NB{overall outline for reference: model of quadrotor is unknown but skeleton architecture is known and the controller is u1, u2, u3 = equations. Because of how the controller is designed, we know that u2 is used to change x and u3 y. A change in u2 is equivalent to a change in the x position. The higher is this change the more motion is generated hence the area under the curve described by the commands sent to the quadrotor is related to the motion of the system and here is where the regression approach is sued. Instead of learnign the parameters that is hard we use regression to learn to fly directly by leveraging the integral and the knowledge about the system. }
+%\NB{overall outline for reference: model of quadrotor is unknown but skeleton architecture is known and the controller is u1, u2, u3 = equations. Because of how the controller is designed, we know that u2 is used to change x and u3 y. A change in u2 is equivalent to a change in the x position. The higher is this change the more motion is generated hence the area under the curve described by the commands sent to the quadrotor is related to the motion of the system and here is where the regression approach is sued. Instead of learnign the parameters that is hard we use regression to learn to fly directly by leveraging the integral and the knowledge about the system. }
 
 \section{Problem Formulation}
 In this work, we are interested in developing autonomous navigation for a UAV by leveraging knowledge about its system dynamics and controller and by leveraging a set of human-piloted demonstrations.
 %in using human-piloted demonstrations to develop a framework that enables autonomous UAV navigation over any trajectory with minimal knowledge of platform-specific dynamics.
 Formally, the problem we investigate in this work can be stated as:
 
-%\NB{problem is still not good. What is the problem that you are trying to solve? It's not processing and analyzing data!}
-\NB{in latex there is a formal way to define problems by adding begin problem and end problem...please correct} \textbf{Problem 1: \textit{Parameter-free Autonomous Control of UAVs}}: 
+\begin{problem}
+
+ \textbf{\textit{Parameter-free Autonomous Control of UAVs}}: 
 Consider a pre-trained ready to fly UAV, with known model architecture $\dot{x}=f(x,u,p)$ and control architecture $u=g(y)$ and unknown internal parameters $p$. Design a policy to generate the sequence of inputs $\mathbf{u}$ to track a given trajectory $\mathbf{p}_r(t),~ t \in [0,T]$ over a finite user defined horizon $T$. Specifically the policy should guarantee that the UAV position $\mathbf{p}(t)$ is always within a certain threshold $\delta_d$ from the generated trajectory 
  \begin{equation} \label{eq:positlive}
         ||\mathbf{p}(t)-\mathbf{p}_r(t)|| \leq \delta_d,~\forall t \in [0,T]
     \end{equation}
-    where $||\cdot||$ is the euclidean norm.
+    where $||\cdot||$ is the Euclidean norm.
+
+\end{problem}
 %    where $\mathbf{p_r}(t)$ is the reference position at time $t$, where $T$ represents an overall time horizon for the trajectory, and $\delta_d$ is a threshold for allowable deviation.
 
 
@@ -168,14 +171,20 @@ Consider a pre-trained ready to fly UAV, with known model architecture $\dot{x}=
 
 \section{System Models}
 \NB{in this section we need to show the dynamical model, and control model and architecture with teleoperation. We need to stress that everything is a gray box with known model but unknown params and that the inputs and outputs are known and used later to obtain a model for autonomous fly. We need to explain the relation between teleop and u1 u2 u3 and u4 and how increasing the joystick increase the inputs and thus the integral measures mobility in the system.}
-As hinted in the Introduction, in this work we leverage knowledge about the UAV dynamics and control architectures to extract useful information about the system to guide a regression approach for the generation of autonomous control commands for the UAV. As mentioned above, here we focus on offf-the-shelf tuned and stable quadrotors that typically are ready for teleoperation but not for autonomous flight.
+As hinted in the introduction, we use knowledge about the UAV dynamics and control architecture to extract useful information about the system to guide a regression approach for the generation of autonomous control commands for the UAV. As mentioned above, we focus on off-the-shelf tuned and stable quadrotors that typically are ready for teleoperation but not for autonomous flight. The control architecture of the off-the-shelf quadrotor is shown in Fig.~\ref{fig:otsctrl}.
 
-A quadrotor can be modeled using a $12^{\text{th}}$ order state vector:
-\NB{why q in $\mathbf{p}_q$? In the problem formulation there is not q}
+\begin{figure}[ht]
+    \includegraphics[width=0.48\textwidth]{images/teleopctrl.png}
+    \caption{Off-the-Shelf UAV Teleoperation Control Architecture}
+    \label{fig:otsctrl}
+\end{figure}
+
+The presented structure is a gray box model, where the only information known are the teleoperation inputs, indicated by $\mathbf{J}_x$ and $\mathbf{J}_y$, and the output, which is the position of the vehicle, $\mathbf{p}(t)$, over time. The low level controller usually consists of multiple PID loops [CITE], which are already developed and tuned with certain specific control gains, which can be very difficult to identify. The quadrotor body dynamics can be modeled using a $12^{\text{th}}$ order state vector as follows:
+%\NB{why q in $\mathbf{p}_q$? In the problem formulation there is not q}
 \begin{equation}
     \mathbf{q} = 
     \begin{bmatrix}
-    \mathbf{p}_q^\intercal & \phi & \theta & \psi & v_x & v_y & v_z & \omega_x & \omega_y & \omega_z
+    \mathbf{p}^\intercal & \phi & \theta & \psi & v_x & v_y & v_z & \omega_x & \omega_y & \omega_z
     \end{bmatrix}^\intercal \nonumber
 \end{equation} 
 where $\bm{p}_q=[x \; y \; z]^{\mathsf{T}}$ is the world frame position, $v_{x}$, $v_{y}$ and $v_z$ are the world frame velocities, $\phi$, $\theta$ and $\psi$ are the roll, pitch and yaw Euler angles and $\omega_{x}$, $\omega_{y}$ and $\omega_{z}$ are the body frame angular velocities.
@@ -184,7 +193,7 @@ The dynamics of the vehicle are then described as follows:
 \begin{equation}
 	\begin{aligned}
 	%\begin{bmatrix}\dot{x} \\ \dot{y} \\ \dot{z} \end{bmatrix} &= \begin{bmatrix}v_x \\ v_y \\ v_z\end{bmatrix}\\
-	\dot{\bm{p}_q}^{\mathsf{T}} &= \begin{bmatrix}v_x & v_y & v_z\end{bmatrix}\\
+	\dot{\bm{p}}^{\mathsf{T}} &= \begin{bmatrix}v_x & v_y & v_z\end{bmatrix}\\
 	\begin{bmatrix}\dot{v}_x \\ \dot{v}_y \\ \dot{v}_z\end{bmatrix} &= \begin{bmatrix}0 \\ 0 \\ -g \end{bmatrix} + \frac{1}{m} \begin{bmatrix}\cos\phi \cos\psi \sin\theta + \sin\phi \sin\psi \\ \cos\phi \sin\theta \sin\psi - \cos\psi \sin\phi \\ \cos\theta \cos\phi \end{bmatrix} u_1\\
 	%\end{align*}
 	%\begin{align*}
@@ -194,41 +203,18 @@ The dynamics of the vehicle are then described as follows:
 	\label{eq:quadrotor_dynamics} \nonumber
 \end{equation} [CITE]
 
-%\NB{here we need to stress again that these parameters are hard to find online}
-%\NB{here we need a model and discussion about the controller}
-%The linearized dynamics for a planar quadrotor are as follows:
+This dynamical model consists of many platform-specific parameters that are also difficult to identify, much like the controller gains discussed above. Moreover, these parameters often vary a lot between UAVs, and that further complicates the identification problem. The model and architecture given assume that the quadrotor is moving at a constant z level with a zero yaw constraint, and therefore, we are primarily concerned with two of the inputs, $u_2$ and $u_3$. The equations for the control inputs are as follows:
+\begin{align}
+    %u_1 &= m(g + \ddot{z}_{des} + k_{d,z}(\dot{z}_{des}  \dot{z}) + k_{p,z}(z_{des}-z)) \nonumber \\
+    u_2 &= k_{p,\phi}(\phi_c-\phi) + k_{d,\phi}(\dot{\phi}_c - \dot{\phi}) \nonumber \\
+    \phi_c &= -\frac{1}{g}(\ddot{x}_{des} + k_{d,x}(\dot{x}_{des}-\dot{x}) + k_{p,x}(x_{des}-x)) \nonumber \\
+    u_3 &= k_{p,\theta}(\theta_c-\theta) + k_{d,\theta}(\dot{\theta}_c - \dot{\theta}) \nonumber \\
+    \theta_c &= -\frac{1}{g}(\ddot{y}_{des} + k_{d,y}(\dot{y}_{des}-\dot{y}) + k_{p,y}(y_{des}-y))
+\end{align}
 
-%\begin{equation}
-%    \begin{aligned}
-%    \ddot{x} &= -g\phi \\
-%    \ddot{y} &= -g\theta \\
-%    \ddot{z} &= -g + \frac{u_1}{m} \\
-%    \ddot{\phi} &= \frac{u_2}{I_{xx}} \\
-%    \ddot{\theta} &= \frac{u_3}{I_{yy}}
-%    \end{aligned}
-%\end{equation}
-
-Fig. \ref{fig:ctrl} summarizes the overall control architecture for the quadrotor.
-%
-%In this section, we discuss the dynamical system that is generally used to control a UAV, which in our case, is a quadrotor. The control architecture is shown in Fig.\ref{fig:ctrl}. 
-The position and low-level controllers, which consist of a series of PID loops [CITE], generate the angle inputs and attitude control that follow the desired trajectory, $\mathbf{p_r}$. The attitude controller and motion dynamics generate the thrust and moment values applied by each rotor. Lastly, the quadrotor body dynamics give the position of the system, which is then fed back into the position controller. This control architecture assumes that the quadrotor is moving at a constant z level with a zero yaw constraint, which is discussed further in 
-
-\begin{figure}[ht]
-    \includegraphics[width=0.48\textwidth]{images/ctrler.png}
-    \caption{UAV Control Architecture}
-    \label{fig:ctrl}
-\end{figure}
-\NB{this figure should change to include the teleoperation control instead of the position control} \NB{we should include the inner par of the diagram into a gray box and leave outside the joystick commands and the output of the quadrotor.}
-Both model parameters and control gains shown above, however, are difficult to identify and can vary a lot from UAV to UAV. \NB{here we need to mention that the low level control is typically already developed }
-
-%, and the controller architecture shown in Fig.\ref{fig:ctrl} consists of multiple PID loops, and therefore multiple parameters that require platform-specific tuning for autonomous flight and control. It is this requirement that calls for a different method that can be used to enable autonomous flight.
-
-
-\subsection{Learning by Demonstration}
-
-\NB{this section is not good. I don't understand why it's here and not later or what's the poiint. It needs to be rewritten more carefully and more generally. What's the purpose of this section? Why is it outside the approach?} In human piloted trajectories, a user is controlling $u_2$, $u_3$, and $u_4$ from the system dynamics, which correspond to the desired roll, pitch, and yaw angles. $u_1$ is the thrust provided to the system, which is not directly sent by the user \NB{this is not true!!!}, but it is adjusted when the pilot is modifying roll, pitch, and yaw. In our case, we have a zero-yaw \NB{this is also not true} constraint for ease of discussion.
-In this work, we are interested in learning from commands \NB{this is also not true...we are not interested in learning from user. We are levergaing user teleop because it't the only thing we have and we are interested in generating commands for autonomous flight} sent from the human pilot to the UAV, so we assume in our training that we are able to collect all information communicated from the pilot to the UAV. During run-time, we are also able to get the world frame position $\mathbf{p}(t)$ of the UAV using a motion capture system. \NB{this part needs to be rewritten and generalized. We can mention later that in our case we use a MOCAP but here we just need to say that we assume that we can obtain position and velosity of the system during training as well as the commands sent to the vehicles as s result of the user teleop}
-
+In this work, we are interested in generating control inputs for autonomous flight when the only information available for training comes from human-piloted demonstrations. From the aforementioned demonstrations, we assume that we can obtain position and velocity of the system during training as well as the input commands sent to the vehicles from the user teleoperation.
+%\NB{this part needs to be rewritten and generalized. We can mention later that in our case we use a MOCAP but here we just need to say that we assume that we can obtain position and velocity of the system during training as well as the commands sent to the vehicles as a result of the user teleop}
+%\NB{this is also not true...we are not interested in learning from user. We are levergaing user teleop because it't the only thing we have and we are interested in generating commands for autonomous flight}
 Through observation of a single demonstrated trial, we are able to identify important commands sent to the system. An example of this is shown below:
 
 \begin{figure}[ht]
@@ -237,9 +223,26 @@ Through observation of a single demonstrated trial, we are able to identify impo
     \label{fig:sampleintegral}
 \end{figure}
 
-In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration. The pilot flies the UAV forward over a distance of approximately $3$ meters. The command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in in the negative $y$-direction. Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the total area under the string of commands, or the integral. Because the pitch is proportional to the linear velocity in the $y$-direction, we know that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled.
+In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in in the negative $y$-direction. 
 
-Lastly, we are interested in the average command sent to the system, as indicated by the dotted line. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and heights. Making use of the average command, we are able to identify the correct height of the teleoperation commands and improve precision in the process of generating autonomous commands, which must be fixed to a certain length (time) and travel a certain distance. %\NB{we need to think how to pose the command better. A reviewer here can still ask why and what so special about the command.}
+Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the total area under the string of commands, or the integral. Because the pitch is proportional to the linear velocity in the $y$-direction, we know that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled.
+
+Lastly, we are interested in the average command sent to the system, as indicated by the dotted line. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and heights. Making use of the average command, we are able to identify the correct height of the teleoperation commands and improve precision in the process of generating autonomous commands, which must be fixed to a certain length (time) and travel a certain distance. 
+
+%\NB{we need to think how to pose the command better. A reviewer here can still ask why and what so special about the command.}
+%\NB{here we need to stress again that these parameters are hard to find online}
+%\NB{here we need a model and discussion about the controller}
+%The low-level controller, which consists of a series of PID loops [CITE], generate the angle inputs and attitude control that follow the desired trajectory, $\mathbf{p_r}$. The attitude controller and motion dynamics generate the thrust and moment values applied by each rotor. Lastly, the quadrotor body dynamics give the position of the system, which is then fed back into the position controller. This control architecture assumes that the quadrotor is moving at a constant z level with a zero yaw constraint, which is discussed later on in the paper.
+%Fig. \ref{fig:ctrl} summarizes the overall control architecture for an autonomous quadrotor.
+%\begin{figure}[ht]
+%    \includegraphics[width=0.48\textwidth]{images/ctrler.png}
+%    \caption{UAV Autonomous Control Architecture}
+%    \label{fig:ctrl}
+%\end{figure}
+%Both model parameters and control gains shown above, however, are difficult to identify and can vary a lot from UAV to UAV.
+%\NB{here we need to mention that the low level control is typically already developed }
+%\NB{this figure should change to include the teleoperation control instead of the position control} \NB{we should include the inner par of the diagram into a gray box and leave outside the joystick commands and the output of the quadrotor.}
+%, and the controller architecture shown in Fig.\ref{fig:ctrl} consists of multiple PID loops, and therefore multiple parameters that require platform-specific tuning for autonomous flight and control. It is this requirement that calls for a different method that can be used to enable autonomous flight.
 
 \section{Methodology}
 
@@ -251,15 +254,18 @@ Lastly, we are interested in the average command sent to the system, as indicate
 \NB{the figure needs to be changed. jx(t) jy(t) should input into the plant and the output is x(t) y(t) and all goes as input to the Training. The figure is still blurry}
 %\NB{let's use power point fro the diagrams..it's blurry}
 
-The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of an integral, $g_u$ \NB{what integral?}, and average teleoperation command, $\bar{x}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity,a new command string consisting of commands for both lateral and longitudinal direction is created. At this stage, we have obtained the actions \NB{rewrite. At this stage we have obtain nothing because we have not presented the approach yet. From the integral we synthesis the inputs needed by the system to follow the given trajectory... }, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, that track trajectory $\mathbf{p}_r(t)$. Because these actions are created in open-loop, some error is possible. This error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$.
+The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the integral of the input commands, $g_u$, and average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity,a new command string consisting of commands for both lateral and longitudinal direction is created. At this stage, we generate the inputs, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, some error is possible. This error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$.
 \NB{introduce next section... the paper reads like independent sections}
  %\NB{in this section or before we need to stress and clarify that this approach allows us to figure out the actions for the system to follow autonomously any trajectory but we need still to close the loop. Technically is a 2 phase method:1) open loop actions and 2) corrections for closed loop}
 
     
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
-In this section, we show how we generate trajectory based on given waypoints \NB{YOU NEED TO EXPLAIN WHY}. We want our vehicle to track a smooth trajectory as much as possible with linear motion, so this part of the approach is twofold: generating a smooth trajectory, and decomposing this trajectory into linear parts \NB{you need to explain why}, as to be congruous with our training set, which consists of training only on linear motion, which will be discussed further in Section \ref{sec:train}.
 
-From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while enables longitudinal motion. Yaw enables rotations around the center of mass and thrust is mostly responsible for changes in height along the global $z$ coordinate. For ease of discussion in this work we do not consider yaw, as we are primarily interested in planar motion, which also implies that the height is kept constant. As a result, any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands, or commands that send the vehicle in along the global $x$ and $y$ coordinates \NB{this section needs to go before and needs to be explain better}.
+In this section, we discuss how a smooth trajectory is generate between waypoints, and how this trajectory is decomposed into $x$ and $y$ components. We want our vehicle to track a smooth trajectory as much as possible with linear motion, so this part of the approach is twofold: generating a smooth trajectory, and decomposing this trajectory into linear parts, 
+
+From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. As a result, any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands, or commands that send the vehicle in along the global $x$ and $y$ coordinates 
+
+%\NB{this section needs to go before and needs to be explain better}.
 
 For smoothing purposes, we use the minimum jerk trajectory \NB{why? you need to explain better. Besides, we should use snap not jerk}. Jerk is defined as the time derivative of acceleration and is often associated rapidly changing actuator forces. [CITE] The general equation for a minimum jerk trajectory is as follows:
 
@@ -274,10 +280,13 @@ Solving \eqref{eq:minjerkint}, we obtain the form:
 \end{equation}
 where $c_0,\ldots,c_5$ are constants specific to the waypoints in the trajectory.
 \NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
-Having obtained the smooth trajectory, we are want to decompose said trajectory into lines. This decomposition is done using temporal discretization the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over the interval $[\mathbf{p}^*(t_s), \mathbf{p}^*(t_{s+1})]$, where $t_s$ is the time at the start of a segment and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_x + \delta t$ \NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
-\NB{please write the mathematical expression for the x and y component from the trajectory otherwise this section is incomplete}
+Having obtained the smooth trajectory, we are want to decompose said trajectory into lines. This decomposition is done using temporal discretization the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over the interval $[\mathbf{p}^*(t_s), \mathbf{p}^*(t_{s+1})]$, where $t_s$ is the time at the start of a segment and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_x + \delta t$ 
 
-Several \NB{several? they are just 3...please ad the decomposition otherwise this section is useless}examples of decomposed trajectories are shown in Fig.\ref{fig:trajs}. All of the trajectories shown in Fig.\ref{fig:trajs} start at the world frame origin $(0,0)$.
+%\NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
+%\NB{please write the mathematical expression for the x and y component from the trajectory otherwise this section is incomplete}
+%\NB{several? they are just 3...please ad the decomposition otherwise this section is useless}
+
+Some examples of decomposed trajectories are shown in Fig.\ref{fig:trajs}. All of the trajectories shown in Fig.\ref{fig:trajs} start at the world frame origin $(0,0)$.
 
 \begin{figure}[h]
 	\centering
@@ -288,22 +297,24 @@ Several \NB{several? they are just 3...please ad the decomposition otherwise thi
 	\label{fig:trajs}
 \end{figure}
 
-From the discretized trajectory, we have the $x$ and $y$ components of each leg of the trajectory, which require roll and pitch commands, as discussed previously. As a result, \NB{no no no...this is completely wrong. It's not a result of this. It's the opposite. We decompose the trajectory in x and y} our training only needs to be performed on lateral and longitudinal motion. In the case that the UAV is symmetrical, it is possible to only train on movement in one direction, and use the same results for any motion of the system. In this work, we assume we are learning to enable autonomous behaviors on symmetrical UAVs, as expanding to the non-symmetrical case adds little complexity to the approach.
+From the discretized trajectory, we can obtain the $x$ and $y$ components of each leg of the trajectory:
+
+As a result, \NB{no no no...this is completely wrong. It's not a result of this. It's the opposite. We decompose the trajectory in x and y} our training only needs to be performed on lateral and longitudinal motion. In the case that the UAV is symmetrical, it is possible to only train on movement in one direction, and use the same results for any motion of the system. In this work, we assume we are learning to enable autonomous behaviors on symmetrical UAVs, as expanding to the non-symmetrical case adds little complexity to the approach.
 
 \subsection{Regression Based Training and Evaluation} \label{sec:train}
-\NB{what is this section about? Why do we need this section?}
+%\NB{what is this section about? Why do we need this section?}
 In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{J_i}\}$, \NB{the reasoning here doesn't make sense. you write that because we need to track a trajectory, we use d and j. This is not intuitive. Why?} where $i=1,\ldots,m$ reflects the number of demonstrations, %\NB{what is $i$?} 
 $d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{J}_i$ is the sequence of user teleoperation commands. The outputs of our training phase are \begin{itemize}
-    \item The integral of the string of teleoperation commands, $g_i = \int_0^{t_i}\mathbf{J}_i$
-    \item The steady-state, or average, teleoperation command, $\bar{j}_i \in \mathbf{J}_i$
+    \item The integral of the string of teleoperation input commands, $g_i = \int_0^{t_i}\mathbf{J}_i$
+    \item The  average teleoperation input command, $\bar{j}_i \in \mathbf{J}_i$
     \item The position of the system at all times, $\mathbf{p}(t)$
 \end{itemize}
 %\NB{here it's confusing. Be careful, we are mixing input with outputs.Inout is the distance, time and sequence of commands while the output is the intgeral of the commands, the steady stae teleop, and the state, position, covered by the system}
-The steady-state command, in this case, provides information about the pilot's average in-flight velocity, and is obtained by taking the mean of all entries in $\mathbf{x_i}$. The integral, meanwhile, describes the area under the string of commands, as discussed in the previous section.
+The average command, in this case, provides information about the pilot's average in-flight velocity, and is obtained by taking the mean of all entries in $\mathbf{J_i}$. The integral, meanwhile, describes the area under the string of commands, as discussed in the previous section.
 
-\subsection{Offline Training Data}
+\subsubsection{Offline Training Data}
 
-Our training data in this work consists of multiple demonstrations of a human-pilot flying forward at varying speeds for varying distances. In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. In this case, we have training samples where the pilot flies forward and then stops, meaning the initial and final velocities are both zero, which is why there are an extended periods where there is no forward motion at the ends of the trajectories in Fig.~\ref{fig:trajs}.
+Our training data in this work consists of multiple demonstrations of a human-pilot flying forward at varying speeds for varying distances. In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. In this case, we have training samples where the pilot flies forward and then stops, which is why there are an extended periods where there is no forward motion at the ends of the trajectories in Fig.~\ref{fig:trajs}.
 
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/training.png}
@@ -311,9 +322,14 @@ Our training data in this work consists of multiple demonstrations of a human-pi
     \label{fig:train}
 \end{figure}
 
-\NB{rewrite stating that with these data we can train a model for trajectory starting and finishing with 0 speed. If the initial and final velocities are not 0...} This data, however, would only be effective if trajectories involved stopping at each waypoint. In order to further expand the information obtained, considerations were made on the training data to include trajectories for demonstrations where the velocity does not start and end at zero \NB{this sentence states nothing. What considerations? This is a technical paper and these sentences kills the paper.}.
-
-The velocities and trajectories of the new training data is pictured in Fig.~\ref{fig:trainelab}.
+%\NB{rewrite stating that with these data we can train a model for trajectory starting and finishing with 0 speed. If the initial and final velocities are not 0...} 
+With this data, we can train a model for trajectories that start and end with $0$ speed. This training would only be effective if trajectories involved stopping intermittently throughout the trajectory. However, we desire a continuous movement between the discretized components of the trajectory. To satsify this requirement, we segment the training data to include trajectories for demonstrations where the velocity does not start and end at $0$. We are interested in three separate types of segments:
+\begin{itemize}
+    \item[a.] Trajectory Start, where the segment begins with a velocity of $0$ and ends with a certain nonzero velocity
+    \item[b.] Trajectory Intermediate, where the segment begins and end with a certain nonzero velocity
+    \item[c.] Trajectory End, where the segment begins with a certain nonzero velocity and ends with a velocity of $0$
+\end{itemize}
+In order to expand our data for this purpose, we train on portions of the training set pictured in Fig.~\ref{fig:train}, which correspond to each of the three segments we outlined. The segments are formed by cutting the training data and trajectories at the start, the middle, and the end. Shown in Fig.~\ref{fig:trainelab} is an example of the velocities and trajectories of the intermediary segments.
 
 \begin{figure}[h]
 	\includegraphics[width=0.48\textwidth]{images/inttrain.png}
@@ -321,18 +337,20 @@ The velocities and trajectories of the new training data is pictured in Fig.~\re
 	\label{fig:trainelab}
 \end{figure}
 
-Having trained on not only start-to-stop trajectories, but also on segments enables more specific command generation based on where the system is in relation to the provided trajectory\NB{you are not explaing well how you are doing this}. For example, if the command for the middle the trajectory (i.e., between two points that neither the start nor end) needs to be generated, then the training from the trajectories in Fig.~\ref{fig:trainelab} is used \NB{no no no...this is terrible. Delete and rewrite this section from the beginning.}.
+Training on not only start-to-stop trajectories, but also on segments enables more specific command generation based on where the system is in relation to the provided trajectory. For example, if the command for the middle of the trajectory (i.e., between two points that are neither the start nor end of the trajectory) needs to be generated, then the training from the trajectories in Fig.~\ref{fig:trainelab} is used.
 
-\NB{I'm stopping here for now...the paper needs major changes}
+%\NB{you are not explaining well how you are doing this}
+%\NB{no no no...this is terrible. Delete and rewrite this section from the beginning.}.
+%\NB{I'm stopping here for now...the paper needs major changes}
 
-\subsection{Thin-Plate Spline Regression Analysis}
+\subsubsection{Thin-Plate Spline Regression Analysis}
 
 The offline training data is applied to a thin-plate spline surface fit to describe the relationship between training inputs and integral and average velocity. The general form of a thin-plate spline equation is 
 \begin{equation}
     f(x,y) = a_1 + a_xx + a_yy + \sum_{i=1}^mw_iU(||(x_i,y_i)-(x,y)||)
 \end{equation}
 
-where $a_1,a_x,\text{and}~a_y$ are scalar coefficients, $w_i$ is a coefficient that corresponds to each specific trial, subject to the following condition: \begin{equation}
+where $a_1,a_x,\text{and}~a_y$ are scalar coefficients, $w_i$ is a coefficient that corresponds to each specific trial, subject to the following smoothing condition: \begin{equation}
 \sum_{i=1}^mw_i=\sum_{i=1}^mw_ix_i=\sum_{i=1}^mw_iy_i=0
 \end{equation}
 and the function $U$ is of the form
@@ -340,7 +358,7 @@ and the function $U$ is of the form
   U(r) = r^2\log{r} 
 \end{equation}
 
-Given the corresponding $z_i$ for each $(x_i,y_i)$ pair, we are able to solve the following linear system to obtain the coefficients $w_i,\ldots,w_m$ and $a_1,a_x,a_y$,
+Given the corresponding $z_i$ for each $(x_i,y_i)$ pair, we solve the following linear system to obtain the coefficients $w_i,\ldots,w_m$ and $a_1,a_x,a_y$,
 
 \begin{equation}
     \begin{bmatrix}
@@ -359,7 +377,7 @@ Given the corresponding $z_i$ for each $(x_i,y_i)$ pair, we are able to solve th
 
 where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, $P_i* = (1,x_i,y_i)$, $\mathbf{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\mathbf{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\mathbf{w} \in \mathbb{R}^{m\times1}$ and $\mathbf{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\mathbf{a}$ is the column vector with elements $a_1,a_x,a_y$.
 
-Given the general framework for performing the thin-plate spline, we develop two separate relationships for our specific application. In our work, the first regression is applied to $d$ (distance) and $t$ (time) as inputs to obtain the integral of the commands $g_i = f(d_i,t_i)$ while the second one has the same inputs to obtain the average teleoperation command $\bar{x}_i = h(d_i,t_i)$. With the functions we have obtained, we are able to find an estimated integral and steady-state command, $g_u$ and $\bar{j}_u$, for any given desired distance and time, $d_u$ and $t_u$, respectively,
+Given the general framework for performing the thin-plate spline, we develop two separate relationships for our specific application. In our work, the first regression is applied to $d$ (distance) and $t$ (time) as inputs to obtain the integral of the commands $g_i = f(d_i,t_i)$ while the second one has the same inputs to obtain the average teleoperation command $\bar{j}_i = h(d_i,t_i)$. With the functions we have obtained, we are able to find an estimated integral and steady-state command, $g_u$ and $\bar{j}_u$, for any given desired distance and time, $d_u$ and $t_u$, respectively,
 
 \begin{equation} \label{eq:integralfit}
 g_u = f(d_u,t_u)
@@ -369,7 +387,7 @@ g_u = f(d_u,t_u)
 \end{equation}
 
 %\NB{PROBLEM: training is performed starting from 0 reaching 0...on a new trajectory online how can you consider different starting velocities? Can we do some considerations on the training? Look among training set, pick all primitives}
-where $d_u$ and $t_u$ are the user-set desired distance and time, respectively. In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represent the two functions $g_i = f(d_i,t_i)$ and $\bar{j}_i = h(d_i,t_i)$, respectively. The points in these figures represent actual training data points, all of which lay on the surface created with the thin-plate spline.
+In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represent the two functions $g_i = f(d_i,t_i)$ and $\bar{j}_i = h(d_i,t_i)$, respectively. The points in these figures represent actual training data points, all of which lay on the surface created with the thin-plate spline.
 
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/integs.png}
