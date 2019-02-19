@@ -179,7 +179,7 @@ As hinted in the introduction, we use knowledge about the UAV dynamics and contr
     \label{fig:otsctrl}
 \end{figure}
 
-The presented structure is a gray box model, where the only information known are the teleoperation inputs, indicated by $\mathbf{J}_x$ and $\mathbf{J}_y$, and the output, which is the position of the vehicle, $\mathbf{p}(t)$, over time. The low level controller usually consists of multiple PID loops [CITE], which are already developed and tuned with certain specific control gains, which can be very difficult to identify. The quadrotor body dynamics can be modeled using a $12^{\text{th}}$ order state vector as follows:
+The presented structure is a gray box model, where the only information \NB{we know input and outout data and the mdoel architecture} known are the teleoperation inputs, indicated by $\mathbf{J}_x$ and $\mathbf{J}_y$, and the output, which is the position of the vehicle, $\mathbf{p}(t)$, over time. The low level controller usually consists of multiple PID loops [CITE], which are already developed and tuned with certain specific control gains, which can be very difficult to identify. The quadrotor body dynamics can be modeled using a $12^{\text{th}}$ order state vector as follows:
 %\NB{why q in $\mathbf{p}_q$? In the problem formulation there is not q}
 \begin{equation}
     \mathbf{q} = 
@@ -222,10 +222,14 @@ Through observation of a single demonstrated trial, we are able to identify impo
     \caption{A sample of a single demonstrated flight}
     \label{fig:sampleintegral}
 \end{figure}
-
+\NB{we should show this picture in parallel with the speed and position of the vehicle to connect with the integral}
 In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in in the negative $y$-direction. 
 {\color{red}CONNECT INTEGRAL HERE TO EQ 2}
+<<<<<<< Updated upstream
 From \eqref{eq:cinputs}, we can observe that the inputs $u_2$ and $u_3$ for roll and pitch rely on the change in the desired Euler roll and pitch angles. In order to capture that that change in the desired angles, which are set by the human teleoperation, we take the area under the curve of the input commands. The shaded portion of Fig.\ref{fig:sampleintegral} represents this integral. Since these changes in roll and pitch affect the global $x$ and $y$ position of the vehicle, the integral that captures these changes is connected to the distance travelled by the vehicle.
+=======
+Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the integral. i.e. the total area, under the string of commands. Because the pitch is proportional to the linear velocity in the $y$-direction, we know that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled \NB{here show that because u2 depends on $\phi_c$ and $\phi_c$ depends on x then this integral represents motion but what you really need to stress is that it is a compact measure without having to use the entire string of commands for learning}.
+>>>>>>> Stashed changes
 
 Lastly, we are interested in the average command sent to the system, as indicated by the dotted line. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and heights. Making use of the average teleoperated input command, we are able to identify the correct average autonomous input command and therefore, improve the precision in the process of generating autonomous commands, which must be fixed to a certain length (time) and travel a certain distance. 
 
@@ -254,13 +258,17 @@ Lastly, we are interested in the average command sent to the system, as indicate
 %\NB{the figure needs to be changed. jx(t) jy(t) should input into the plant and the output is x(t) y(t) and all goes as input to the Training. The figure is still blurry}
 %\NB{let's use power point fro the diagrams..it's blurry}
 
+<<<<<<< Updated upstream
 The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity, a new command string consisting of commands for both lateral and longitudinal directions is created. At this stage, we generate the inputs, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, accurate trajectory tracking cannot be guaranteed. Tracking error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. First, we will discuss the trajectory decomposition, as our problem ultimately is to accurately track any trajectory.
+=======
+The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity, a new command string consisting of commands for both lateral and longitudinal directions is created \NB{how?}. At this stage, we generate the inputs, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, accurate trajectory tracking cannot be guaranteed. Tracking error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. First, we will discuss the trajectory decomposition, as our problem ultimately is to track any trajectory.
+>>>>>>> Stashed changes
 
 %\NB{introduce next section... the paper reads like independent sections}
  %\NB{in this section or before we need to stress and clarify that this approach allows us to figure out the actions for the system to follow autonomously any trajectory but we need still to close the loop. Technically is a 2 phase method:1) open loop actions and 2) corrections for closed loop}
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
 
-In this section, we discuss how a smooth trajectory is generated between waypoints, and how this trajectory is decomposed into $x$ and $y$ components. From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. Because this is possible, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
+In this section, we discuss how a smooth trajectory is generated between waypoints, and how this trajectory is decomposed into $x$ and $y$ components. From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ \NB{and yaw} can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. Because this is possible\NB{?}, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
 
 %\NB{this section needs to go before and needs to be explain better}.
 
@@ -297,7 +305,7 @@ From the discretized trajectory, we can obtain the $x$ and $y$ components of eac
     c_{y}(t_s,t_{s+1}) = \mathbf{p_y}^*(t_{s+1}) - \mathbf{p_y}^*(t_{s})
 \end{align}
 
-where $c_{x}(t_s,t_{s+1})$ and $c_{y}(t_s,t_{s+1})$ are the $x$ and $y$ components between each segment. These values are taken for each of the $n$ trajectory segments with the same time-step, $\delta t$, and are appended to one another to create the desired output for which we will generate input commands. In Fig.~\ref{fig:trajdec}, we show an example of a generated trajectory with its discretization and the $x$ and $y$ components that are stitched together.
+where $c_{x}(t_s,t_{s+1})$ and $c_{y}(t_s,t_{s+1})$ are the $x$ and $y$ components \NB{what's a component? length/distance to travel?} between each segment. These values are taken for each of the $n$ trajectory segments with the same time-step, $\delta t$, and are appended to one another to create the desired output for which we will generate input commands. In Fig.~\ref{fig:trajdec}, we show an example of a generated trajectory with its discretization and the $x$ and $y$ components that are stitched together.
 \begin{figure}[h]
 	\centering
 	\subfigure[\label{fig:t2dec}]{\includegraphics[width=0.48\linewidth]{images/traj2dec.png}}
