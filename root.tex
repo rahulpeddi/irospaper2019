@@ -203,7 +203,7 @@ The dynamics of the vehicle are then described as follows:
 	\label{eq:quadrotor_dynamics} \nonumber
 \end{equation} [CITE]
 
-This dynamical model consists of many platform-specific parameters that are also difficult to identify, much like the controller gains discussed above. Moreover, these parameters often vary a lot between UAVs, and that further complicates the identification problem. The model and architecture given assume that the quadrotor is moving at a constant z level with a zero yaw constraint, and therefore, we are primarily concerned with two of the inputs, $u_2$ and $u_3$. The equations for the control inputs are as follows:
+This dynamical model consists of many platform-specific parameters that are also difficult to identify, much like the controller gains discussed above. Moreover, these parameters often vary a lot between UAVs, and that further complicates the identification problem. The model and architecture provided assume that the quadrotor is moving at a constant z level with a zero yaw constraint, and therefore, we are primarily concerned with two of the inputs, $u_2$ and $u_3$. The equations for the control inputs are as follows:
 \begin{align}
     %u_1 &= m(g + \ddot{z}_{des} + k_{d,z}(\dot{z}_{des}  \dot{z}) + k_{p,z}(z_{des}-z)) \nonumber \\
     u_2 &= k_{p,\phi}(\phi_c-\phi) + k_{d,\phi}(\dot{\phi}_c - \dot{\phi}) \nonumber \\
@@ -212,7 +212,7 @@ This dynamical model consists of many platform-specific parameters that are also
     \theta_c &= -\frac{1}{g}(\ddot{y}_{des} + k_{d,y}(\dot{y}_{des}-\dot{y}) + k_{p,y}(y_{des}-y))
 \end{align}
 
-In this work, we are interested in generating control inputs for autonomous flight when the only information available for training comes from human-piloted demonstrations. From the aforementioned demonstrations, we assume that we can obtain position and velocity of the system during training as well as the input commands sent to the vehicles from the user teleoperation.
+In this work, we are interested in generating control inputs for autonomous flight when the only information available for training comes from human-piloted demonstrations. From the aforementioned demonstrations, we assume that we can obtain position ad the velocity of the system during training as well as the input commands sent to the vehicles from the user teleoperation.
 %\NB{this part needs to be rewritten and generalized. We can mention later that in our case we use a MOCAP but here we just need to say that we assume that we can obtain position and velocity of the system during training as well as the commands sent to the vehicles as a result of the user teleop}
 %\NB{this is also not true...we are not interested in learning from user. We are levergaing user teleop because it't the only thing we have and we are interested in generating commands for autonomous flight}
 Through observation of a single demonstrated trial, we are able to identify important commands sent to the system. An example of this is shown below:
@@ -224,7 +224,7 @@ Through observation of a single demonstrated trial, we are able to identify impo
 \end{figure}
 
 In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in in the negative $y$-direction. 
-
+{\color{red}CONNECT INTEGRAL HERE TO EQ 2}
 Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the total area under the string of commands, or the integral. Because the pitch is proportional to the linear velocity in the $y$-direction, we know that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled.
 
 Lastly, we are interested in the average command sent to the system, as indicated by the dotted line. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and heights. Making use of the average teleoperated input command, we are able to identify the correct average autonomous input command and therefore, improve the precision in the process of generating autonomous commands, which must be fixed to a certain length (time) and travel a certain distance. 
@@ -254,11 +254,10 @@ Lastly, we are interested in the average command sent to the system, as indicate
 %\NB{the figure needs to be changed. jx(t) jy(t) should input into the plant and the output is x(t) y(t) and all goes as input to the Training. The figure is still blurry}
 %\NB{let's use power point fro the diagrams..it's blurry}
 
-The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the integral of the input commands, $g_u$, and average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity,a new command string consisting of commands for both lateral and longitudinal direction is created. At this stage, we generate the inputs, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, some error is possible. This error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. First, we will discuss the trajectory decomposition, which is the first part of the command generation process.
+The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity, a new command string consisting of commands for both lateral and longitudinal directions is created. At this stage, we generate the inputs, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, accurate trajectory tracking cannot be guaranteed. Tracking error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. First, we will discuss the trajectory decomposition, as our problem ultimately is to track any trajectory.
+
 %\NB{introduce next section... the paper reads like independent sections}
  %\NB{in this section or before we need to stress and clarify that this approach allows us to figure out the actions for the system to follow autonomously any trajectory but we need still to close the loop. Technically is a 2 phase method:1) open loop actions and 2) corrections for closed loop}
-
-    
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
 
 In this section, we discuss how a smooth trajectory is generated between waypoints, and how this trajectory is decomposed into $x$ and $y$ components. From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. Because this is possible, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
@@ -278,7 +277,7 @@ Solving \eqref{eq:minjerkint}, we obtain the form:
 \end{equation}
 where $c_0,\ldots,c_5$ are constants specific to the waypoints in the trajectory.
 \NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
-Having obtained the smooth trajectory, we are want to decompose said trajectory into lines. This decomposition is done using temporal discretization the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over the interval $[\mathbf{p}^*(t_s), \mathbf{p}^*(t_{s+1})]$, where $t_s$ is the time at the start of a segment and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_x + \delta t$. 
+Having obtained the smooth trajectory, we then discretize the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over the interval $[\mathbf{p}^*(t_s), \mathbf{p}^*(t_{s+1})]$, where $t_s$ is the time at the start of a segment and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_s + \delta t$. 
 %\NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
 %\NB{please write the mathematical expression for the x and y component from the trajectory otherwise this section is incomplete}
 %\NB{several? they are just 3...please ad the decomposition otherwise this section is useless}
@@ -294,13 +293,12 @@ Some examples of decomposed trajectories are shown in Fig.\ref{fig:trajs}. All o
 \end{figure}
 
 From the discretized trajectory, we can obtain the $x$ and $y$ components of each leg of the trajectory. Each component is calculated as follows:
-
 \begin{align}
-    c_x =  
+    c_{x}(t_s,t_{s+1}) = \mathbf{p_x}^*(t_{s+1}) - \mathbf{p_x}^*(t_{s}) \nonumber \\
+    c_{y}(t_s,t_{s+1}) = \mathbf{p_y}^*(t_{s+1}) - \mathbf{p_y}^*(t_{s})
 \end{align}
 
-In Fig.~\ref{fig:trajdec}, we show an example of a generated trajectory with its discretization and the $x$ and $y$ components that are stitched together.
-
+where $c_{x}(t_s,t_{s+1})$ and $c_{y}(t_s,t_{s+1})$ are the $x$ and $y$ components between each segment. These values are taken for each of the $n$ trajectory segments with the same time-step, $\delta t$, and are appended to one another to create the desired output for which we will generate input commands. In Fig.~\ref{fig:trajdec}, we show an example of a generated trajectory with its discretization and the $x$ and $y$ components that are stitched together.
 \begin{figure}[h]
 	\centering
 	\subfigure[\label{fig:t2dec}]{\includegraphics[width=0.48\linewidth]{images/traj2dec.png}}
@@ -309,14 +307,15 @@ In Fig.~\ref{fig:trajdec}, we show an example of a generated trajectory with its
 	\label{fig:trajdec}
 \end{figure}
 
+In Fig.~\ref{fig:tdec}, we show the components at each interval. These components, when executed simultaneously, correspond to the trajectory pictured in Fig.~\ref{fig:t2dec}. Having obtained the trajectory $x$ and $y$ components, we will now discuss the training and command generation procedures that we use to build a policy that enables autonomous tracking of the trajectory.
 
 
 \subsection{Regression Based Training and Evaluation} \label{sec:train}
 %\NB{what is this section about? Why do we need this section?}
-In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. Because the goal indicated in our problem statement is to be able to track a certain trajectory, the inputs of the training phase are $\{d_i,t_i,\mathbf{J_i}\}$, \NB{the reasoning here doesn't make sense. you write that because we need to track a trajectory, we use d and j. This is not intuitive. Why?} where $i=1,\ldots,m$ reflects the number of demonstrations, %\NB{what is $i$?} 
-$d_i$ is the distance travelled in each trial, $t_i$ is the length of the trial, and $\mathbf{J}_i$ is the sequence of user teleoperation commands. The outputs of our training phase are \begin{itemize}
+In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ human-piloted trials. As our goal is to track a trajectory, we are interested in training on the distance traveled by the pilot, because trajectories involve travelling certain distances, the time in which the pilot was able to travel that distance, and the sequence of user teleoperation input commands that correspond to the trajectory: $\{d_i,t_i,\mathbf{J_i}\}$, respectively, where $i=1,\ldots,m$ reflects the number of demonstrations. %\NB{what is $i$?}\NB{the reasoning here doesn't make sense. you write that because we need to track a trajectory, we use d and j. This is not intuitive. Why?}.
+The outputs of our training phase are \begin{itemize} %should I put Fig 2 and description here instead? It may make more sense, but it's separated from the dynamical model, and that connection is important.
     \item The integral of the string of teleoperation input commands, $g_i = \int_0^{t_i}\mathbf{J}_i$
-    \item The  average teleoperation input command, $\bar{j}_i \in \mathbf{J}_i$
+    \item The average teleoperation input command, $\bar{j}_i \in \mathbf{J}_i$
     \item The position of the system at all times, $\mathbf{p}(t)$
 \end{itemize}
 %\NB{here it's confusing. Be careful, we are mixing input with outputs.Inout is the distance, time and sequence of commands while the output is the intgeral of the commands, the steady stae teleop, and the state, position, covered by the system}
@@ -355,7 +354,7 @@ Training on not only start-to-stop trajectories, but also on segments enables mo
 
 \subsubsection{Thin-Plate Spline Regression Analysis}
 
-The offline training data is applied to a thin-plate spline surface fit to describe the relationship between training inputs and integral and average velocity. The general form of a thin-plate spline equation is 
+The offline training data is applied to a thin-plate spline (TPS) surface regression to describe the relationship between training inputs and integral and average velocity. The general form of a thin-plate spline equation is 
 \begin{equation}
     f(x,y) = a_1 + a_xx + a_yy + \sum_{i=1}^mw_iU(||(x_i,y_i)-(x,y)||)
 \end{equation}
@@ -421,25 +420,26 @@ where $s$ is the sample standard deviation of all of the points in the training 
 t_{\hat{\beta}} = \frac{|\hat{\beta}-\bar{\beta}|}{\sigma_{est}}    
 \end{equation}
 where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest known point. In equation \eqref{eq:tstat}, if $t_{\hat{\beta}} \geq 1$, that means that the test point $\hat{\beta}$ propagates an error higher than the standard error. Therefore, it is desirable to have $t_{\hat{\beta}} < 1$. Using a certain set-point for the t-statistic, the maximum allowable departure from known points is obtained:
-
 \begin{equation}
     \sigma_{est}t_{\hat{\beta}} = |\hat{\beta}-\bar{\beta}|
 \end{equation}
-The appropriate departure is used to set the bounds for each training data point, for example:
+This maximum departure, $\sigma_{est}t_{\hat{\beta}}$, is used to set the bounds for each training data point, for example:
 \begin{align}
     \hat{\beta}_{\min} = \bar{\beta} - \sigma_{est}t_{\hat{\beta}} \nonumber \\
     \hat{\beta}_{\max} = \bar{\beta} + \sigma_{est}t_{\hat{\beta}}
 \end{align}
 where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for known parameter $\bar{\beta}$.
 
-In our case, there are two parameters we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two parameters as statistically independent, to obtain a generic interval for each point in the training set, denoted $[d_{i\min},d_{i\max}]$ and $[t_{i\min},t_{i\max}]$, where $i=1,\ldots,m$. Because we are ultimately interested in using the distance and time values together as input pairs, {WORK FROM HERE} we then obtain a maximum distance from each of the training data points as follows:
-
+In our case, there are two inputs we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two quantities as statistically independent, to obtain maximum departure values for each of the parameters: $\sigma_{d,est}t_{\hat{\beta}}$ and $\sigma_{t,est}t_{\hat{\beta}}$. In \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, the distance and time values are used together as input pairs, so a method to tie the two independent departure values together is desirable. Standard error rectangles [CITE], which create rectangular intervals around each data point, could be used for this purpose, but they are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by our TPS regression. An alternative method is to use standard error ellipses, which can be accurately attributed to smooth surfaces as per [CITE]. A general equation for a standard error ellipse for our maximum departure is shown below:
 \begin{equation}
-    \delta_i = \sqrt{(\sigma_{d_{est}})^2+(\sigma_{t_{est}})^2}
+    \bigg(\frac{x}{\sigma_{d,est}t_{\hat{\beta}}}\bigg)^2 + \bigg(\frac{y}{\sigma_{t,est}t_{\hat{\beta}}}\bigg)^2 = 1
 \end{equation}
-
-Using the maximum distance for each point $\delta_i$, we are able the generate intervals around each point, where the data is within the standard error of the estimate. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error intervals around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary [CITE] created by the intervals.
-
+The ellipses at each point in our training data is calculated using the following parametrized equations:
+\begin{align}
+    x = d_i + {\sigma_{d,est}t_{\hat{\beta}}}\cos{r} \nonumber \\
+    y = t_i + {\sigma_{d,est}t_{\hat{\beta}}}\sin{r} 
+\end{align}
+where $r$ is the parameter from $[0,2\pi]$, and $i = 1,\ldots,m$ and reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error ellipses around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary [CITE] created by the ellipses. \{i need to explain that we don't actually care about this boundary but this is the best way to show it on the surface. also should i discuss that rectangles will have corners that poke out of the surface?\}
 \begin{figure}[ht]
 	\centering
 	\subfigure[Prediction Bounds \label{fig:preds}]{\includegraphics[width=0.48\linewidth]{images/predictionbds.png}}
@@ -448,17 +448,17 @@ Using the maximum distance for each point $\delta_i$, we are able the generate i
 	\label{fig:bounds}
 \end{figure}
 
-\subsection{Autonomous Behaviour Generation} \label{sec:generate}
+Given these prediction bounds, we are able to assess whether or not our trajectory components will have accurate results in the command generation portion of this paper, which follows.
 
-In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands. A string of commands is generated for each leg of a trajectory, as described in Section \ref{sec:traj}.
+\subsection{Autonomous Input Generation} \label{sec:generate}
+
+In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands. A string of commands is generated for each component of a trajectory, as described in Section \ref{sec:traj}.
 
 From the training set of $m$ samples, we select the trial that has the closest integral, $g_i$, to the estimated integral $g_u$. This is done by forming an error vector, $\mathbf{e}\in\R^{m}$, where each element is defined by
-
 \begin{equation}
  e_i = \vert g_i-g_u \vert , ~i= \{1,\ldots,m\}
 \end{equation}
  The lowest error is then found and is paired with the appropriate pre-trained sample, $\mathbf{J}^*$,
-
 \begin{equation}
 \mathbf{J}^* = \mathbf{J}_i \in \mathbf{J}\vert e_i = \min_e(\mathbf{e})
 \end{equation}
