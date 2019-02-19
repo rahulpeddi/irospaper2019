@@ -207,9 +207,9 @@ This dynamical model consists of many platform-specific parameters that are also
 \begin{align} \label{eq:cinputs}
     %u_1 &= m(g + \ddot{z}_{des} + k_{d,z}(\dot{z}_{des}  \dot{z}) + k_{p,z}(z_{des}-z)) \nonumber \\
     u_2 &= k_{p,\phi}(\phi_c-\phi) + k_{d,\phi}(\dot{\phi}_c - \dot{\phi}) \nonumber \\
-    \phi_c &= -\frac{1}{g}(\ddot{x}_{des} + k_{d,x}(\dot{x}_{des}-\dot{x}) + k_{p,x}(x_{des}-x)) \nonumber \\
-    u_3 &= k_{p,\theta}(\theta_c-\theta) + k_{d,\theta}(\dot{\theta}_c - \dot{\theta}) \nonumber \\
-    \theta_c &= -\frac{1}{g}(\ddot{y}_{des} + k_{d,y}(\dot{y}_{des}-\dot{y}) + k_{p,y}(y_{des}-y))
+    %\phi_c &= -\frac{1}{g}(\ddot{x}_{des} + k_{d,x}(\dot{x}_{des}-\dot{x}) + k_{p,x}(x_{des}-x)) \nonumber \\
+    u_3 &= k_{p,\theta}(\theta_c-\theta) + k_{d,\theta}(\dot{\theta}_c - \dot{\theta}) %\nonumber \\
+    %\theta_c &= -\frac{1}{g}(\ddot{y}_{des} + k_{d,y}(\dot{y}_{des}-\dot{y}) + k_{p,y}(y_{des}-y))
 \end{align}
 
 In this work, we are interested in generating control inputs for autonomous flight when the only information available for training comes from human-piloted demonstrations. From the aforementioned demonstrations, we assume that we can obtain position ad the velocity of the system during training as well as the input commands sent to the vehicles from the user teleoperation.
@@ -225,7 +225,7 @@ Through observation of a single demonstrated trial, we are able to identify impo
 
 In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in in the negative $y$-direction. 
 {\color{red}CONNECT INTEGRAL HERE TO EQ 2}
-Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the total area under the string of commands, or the integral. From \eqref{eq:cinputs}, we see that the changes in roll and pitch that dictate the inputs 
+From \eqref{eq:cinputs}, we can observe that the inputs $u_2$ and $u_3$ for roll and pitch rely on the change in the desired Euler roll and pitch angles. In order to capture that that change in the desired angles, which are set by the human teleoperation, we take the area under the curve of the input commands. The shaded portion of Fig.\ref{fig:sampleintegral} represents this integral.
 
 Lastly, we are interested in the average command sent to the system, as indicated by the dotted line. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and heights. Making use of the average teleoperated input command, we are able to identify the correct average autonomous input command and therefore, improve the precision in the process of generating autonomous commands, which must be fixed to a certain length (time) and travel a certain distance. 
 
