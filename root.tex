@@ -204,7 +204,7 @@ The dynamics of the vehicle are then described as follows:
 \end{equation} [CITE]
 
 This dynamical model consists of many platform-specific parameters that are also difficult to identify, much like the controller gains discussed above. Moreover, these parameters often vary a lot between UAVs, and that further complicates the identification problem. The model and architecture provided assume that the quadrotor is moving at a constant z level with a zero yaw constraint, and therefore, we are primarily concerned with two of the inputs, $u_2$ and $u_3$. The equations for the control inputs are as follows:
-\begin{align}
+\begin{align} \label{eq:cinputs}
     %u_1 &= m(g + \ddot{z}_{des} + k_{d,z}(\dot{z}_{des}  \dot{z}) + k_{p,z}(z_{des}-z)) \nonumber \\
     u_2 &= k_{p,\phi}(\phi_c-\phi) + k_{d,\phi}(\dot{\phi}_c - \dot{\phi}) \nonumber \\
     \phi_c &= -\frac{1}{g}(\ddot{x}_{des} + k_{d,x}(\dot{x}_{des}-\dot{x}) + k_{p,x}(x_{des}-x)) \nonumber \\
@@ -225,7 +225,7 @@ Through observation of a single demonstrated trial, we are able to identify impo
 
 In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in in the negative $y$-direction. 
 {\color{red}CONNECT INTEGRAL HERE TO EQ 2}
-Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the total area under the string of commands, or the integral. Because the pitch is proportional to the linear velocity in the $y$-direction, we know that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled.
+Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the total area under the string of commands, or the integral. From \eqref{eq:cinputs}, we see that the 
 
 Lastly, we are interested in the average command sent to the system, as indicated by the dotted line. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and heights. Making use of the average teleoperated input command, we are able to identify the correct average autonomous input command and therefore, improve the precision in the process of generating autonomous commands, which must be fixed to a certain length (time) and travel a certain distance. 
 
@@ -254,7 +254,7 @@ Lastly, we are interested in the average command sent to the system, as indicate
 %\NB{the figure needs to be changed. jx(t) jy(t) should input into the plant and the output is x(t) y(t) and all goes as input to the Training. The figure is still blurry}
 %\NB{let's use power point fro the diagrams..it's blurry}
 
-The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity, a new command string consisting of commands for both lateral and longitudinal directions is created. At this stage, we generate the inputs, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, accurate trajectory tracking cannot be guaranteed. Tracking error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. First, we will discuss the trajectory decomposition, as our problem ultimately is to track any trajectory.
+The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity, a new command string consisting of commands for both lateral and longitudinal directions is created. At this stage, we generate the inputs, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, accurate trajectory tracking cannot be guaranteed. Tracking error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. First, we will discuss the trajectory decomposition, as our problem ultimately is to accurately track any trajectory.
 
 %\NB{introduce next section... the paper reads like independent sections}
  %\NB{in this section or before we need to stress and clarify that this approach allows us to figure out the actions for the system to follow autonomously any trajectory but we need still to close the loop. Technically is a 2 phase method:1) open loop actions and 2) corrections for closed loop}
@@ -264,7 +264,7 @@ In this section, we discuss how a smooth trajectory is generated between waypoin
 
 %\NB{this section needs to go before and needs to be explain better}.
 
-For smoothing purposes, we generate a minimum snap trajectory.  [CITE] The general equation for a minimum jerk trajectory is as follows:
+In order to generate a trajectory, we first select waypoints through which the UAV should travel. In order to determine the optimal path in our case, we generate a minimum snap trajectory. Minimum snap trajectories are associated with low control effort as they are based on the fourth derivative of . The general equation for a minimum snap trajectory is as follows:
 %\NB{why? you need to explain better. Besides, we should use snap not jerk}
 \begin{equation} \label{eq:minjerkint}
     \mathbf{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\ddddot{p},\dddot{p},\ddot{p},\dot{p},p,t)dt
@@ -275,7 +275,7 @@ Solving \eqref{eq:minjerkint}, we obtain the form:
 \begin{equation}
     \mathbf{p}^*(t) = c_7t^7 + c_6t^6 + c_5t^5 + c_4t^4 + c_3t^3 + c_2t^2 + c_1t + c_0 
 \end{equation}
-where $c_0,\ldots,c_5$ are constants specific to the waypoints in the trajectory.
+where $c_0,\ldots,c_7$ are constants associated with specific waypoints in the trajectory.
 \NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
 Having obtained the smooth trajectory, we then discretize the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over the interval $[\mathbf{p}^*(t_s), \mathbf{p}^*(t_{s+1})]$, where $t_s$ is the time at the start of a segment and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_s + \delta t$. 
 %\NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
