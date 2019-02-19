@@ -126,7 +126,7 @@ Different from other supervised learning approaches, in this work we leverage th
 \NB{we need to stress how different this work is in comparison with the rest of the literature on learning from demonstration. We need to show our contribution clearly}
 \NB{we need to stress that these quadrotors already come with well designed controllers and at the bare minimum we can teleop }
 
-
+%The rest of this paper is organized as follows: In Section \ref{sec:traj}, we discuss how we generate and decompose smooth trajectories for our UAV to follow. Next, we discuss the training data and regression analysis in Section \ref{sec:train}. This is then followed by discussing how the autonomous commands are generated in Section \ref{sec:generate}, which is followed by the online adaptation and correction in Section \ref{sec:adapt}. Lastly, we describe and demonstrate our experimental results in Section \ref{sec:exper}, and we conclude our work and discuss future work in \ref{sec:conc}.
 
 \section{Related Work}
 
@@ -141,7 +141,7 @@ Formally, the problem we investigate in this work can be stated as:
 \begin{problem}
 
  \textbf{\textit{Parameter-free Autonomous Control of UAVs}}: 
-Consider a pre-trained ready to fly UAV, with known model architecture $\dot{x}=f(x,u,p)$ and control architecture $u=g(y)$ and unknown internal parameters $p$. Design a policy to generate the sequence of inputs $\mathbf{u}$ to track a given trajectory $\mathbf{p}_r(t),~ t \in [0,T]$ over a finite user defined horizon $T$. Specifically the policy should guarantee that the UAV position $\mathbf{p}(t)$ is always within a certain threshold $\delta_d$ from the generated trajectory 
+Consider a pre-trained ready to fly UAV, with known model architecture $\dot{x}=f(x,u,p)$ and control architecture $u=g(y)$ and unknown internal parameters $p$. Design a policy to generate the sequence of inputs $\mathbf{J}$ to track a given trajectory $\mathbf{p}_r(t),~ t \in [0,T]$ over a finite user defined horizon $T$. Specifically the policy should guarantee that the UAV position $\mathbf{p}(t)$ is always within a certain threshold $\delta_d$ from the generated trajectory 
  \begin{equation} \label{eq:positlive}
         ||\mathbf{p}(t)-\mathbf{p}_r(t)|| \leq \delta_d,~\forall t \in [0,T]
     \end{equation}
@@ -169,7 +169,7 @@ Consider a pre-trained ready to fly UAV, with known model architecture $\dot{x}=
 %\end{enumerate}
 
 
-\section{System Models}
+\section{System Models} \label{sec:sysdyn}
 \NB{in this section we need to show the dynamical model, and control model and architecture with teleoperation. We need to stress that everything is a gray box with known model but unknown params and that the inputs and outputs are known and used later to obtain a model for autonomous fly. We need to explain the relation between teleop and u1 u2 u3 and u4 and how increasing the joystick increase the inputs and thus the integral measures mobility in the system.}
 As hinted in the introduction, we use knowledge about the UAV dynamics and control architecture to extract useful information about the system to guide a regression approach for the generation of autonomous control commands for the UAV. As mentioned above, we focus on off-the-shelf tuned and stable quadrotors that typically are ready for teleoperation but not for autonomous flight. The control architecture of the off-the-shelf quadrotor is shown in Fig.~\ref{fig:otsctrl}.
 
@@ -227,7 +227,7 @@ In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstrat
 
 Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the total area under the string of commands, or the integral. Because the pitch is proportional to the linear velocity in the $y$-direction, we know that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled.
 
-Lastly, we are interested in the average command sent to the system, as indicated by the dotted line. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and heights. Making use of the average command, we are able to identify the correct height of the teleoperation commands and improve precision in the process of generating autonomous commands, which must be fixed to a certain length (time) and travel a certain distance. 
+Lastly, we are interested in the average command sent to the system, as indicated by the dotted line. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and heights. Making use of the average teleoperated input command, we are able to identify the correct average autonomous input command and therefore, improve the precision in the process of generating autonomous commands, which must be fixed to a certain length (time) and travel a certain distance. 
 
 %\NB{we need to think how to pose the command better. A reviewer here can still ask why and what so special about the command.}
 %\NB{here we need to stress again that these parameters are hard to find online}
@@ -244,48 +244,44 @@ Lastly, we are interested in the average command sent to the system, as indicate
 %\NB{this figure should change to include the teleoperation control instead of the position control} \NB{we should include the inner par of the diagram into a gray box and leave outside the joystick commands and the output of the quadrotor.}
 %, and the controller architecture shown in Fig.\ref{fig:ctrl} consists of multiple PID loops, and therefore multiple parameters that require platform-specific tuning for autonomous flight and control. It is this requirement that calls for a different method that can be used to enable autonomous flight.
 
-\section{Methodology}
+\section{Methodology} \label{sec:approach}
 
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/blocks.PNG}
     \caption{Block Diagram of Proposed Approach}
     \label{fig:blockdiagram}
 \end{figure}
-\NB{the figure needs to be changed. jx(t) jy(t) should input into the plant and the output is x(t) y(t) and all goes as input to the Training. The figure is still blurry}
+%\NB{the figure needs to be changed. jx(t) jy(t) should input into the plant and the output is x(t) y(t) and all goes as input to the Training. The figure is still blurry}
 %\NB{let's use power point fro the diagrams..it's blurry}
 
-The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the integral of the input commands, $g_u$, and average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity,a new command string consisting of commands for both lateral and longitudinal direction is created. At this stage, we generate the inputs, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, some error is possible. This error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$.
-\NB{introduce next section... the paper reads like independent sections}
+The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the integral of the input commands, $g_u$, and average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity,a new command string consisting of commands for both lateral and longitudinal direction is created. At this stage, we generate the inputs, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, some error is possible. This error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. First, we will discuss the trajectory decomposition, which is the first part of the command generation process.
+%\NB{introduce next section... the paper reads like independent sections}
  %\NB{in this section or before we need to stress and clarify that this approach allows us to figure out the actions for the system to follow autonomously any trajectory but we need still to close the loop. Technically is a 2 phase method:1) open loop actions and 2) corrections for closed loop}
 
     
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
 
-In this section, we discuss how a smooth trajectory is generate between waypoints, and how this trajectory is decomposed into $x$ and $y$ components. We want our vehicle to track a smooth trajectory as much as possible with linear motion, so this part of the approach is twofold: generating a smooth trajectory, and decomposing this trajectory into linear parts, 
-
-From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. As a result, any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands, or commands that send the vehicle in along the global $x$ and $y$ coordinates 
+In this section, we discuss how a smooth trajectory is generated between waypoints, and how this trajectory is decomposed into $x$ and $y$ components. From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. Because this is possible, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
 
 %\NB{this section needs to go before and needs to be explain better}.
 
-For smoothing purposes, we use the minimum jerk trajectory \NB{why? you need to explain better. Besides, we should use snap not jerk}. Jerk is defined as the time derivative of acceleration and is often associated rapidly changing actuator forces. [CITE] The general equation for a minimum jerk trajectory is as follows:
-
+For smoothing purposes, we generate a minimum snap trajectory.  [CITE] The general equation for a minimum jerk trajectory is as follows:
+%\NB{why? you need to explain better. Besides, we should use snap not jerk}
 \begin{equation} \label{eq:minjerkint}
-    \mathbf{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\dddot{p},\ddot{p},\dot{p},p,t)dt
+    \mathbf{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\ddddot{p},\dddot{p},\ddot{p},\dot{p},p,t)dt
 \end{equation}
 
 Solving \eqref{eq:minjerkint}, we obtain the form:
 
 \begin{equation}
-    \mathbf{p}^*(t) = c_5t^5 + c_4t^4 + c_3t^3 + c_2t^2 + c_1t + c_0 
+    \mathbf{p}^*(t) = c_7t^7 + c_6t^6 + c_5t^5 + c_4t^4 + c_3t^3 + c_2t^2 + c_1t + c_0 
 \end{equation}
 where $c_0,\ldots,c_5$ are constants specific to the waypoints in the trajectory.
 \NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
-Having obtained the smooth trajectory, we are want to decompose said trajectory into lines. This decomposition is done using temporal discretization the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over the interval $[\mathbf{p}^*(t_s), \mathbf{p}^*(t_{s+1})]$, where $t_s$ is the time at the start of a segment and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_x + \delta t$ 
-
+Having obtained the smooth trajectory, we are want to decompose said trajectory into lines. This decomposition is done using temporal discretization the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over the interval $[\mathbf{p}^*(t_s), \mathbf{p}^*(t_{s+1})]$, where $t_s$ is the time at the start of a segment and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_x + \delta t$. 
 %\NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
 %\NB{please write the mathematical expression for the x and y component from the trajectory otherwise this section is incomplete}
 %\NB{several? they are just 3...please ad the decomposition otherwise this section is useless}
-
 Some examples of decomposed trajectories are shown in Fig.\ref{fig:trajs}. All of the trajectories shown in Fig.\ref{fig:trajs} start at the world frame origin $(0,0)$.
 
 \begin{figure}[h]
@@ -297,9 +293,23 @@ Some examples of decomposed trajectories are shown in Fig.\ref{fig:trajs}. All o
 	\label{fig:trajs}
 \end{figure}
 
-From the discretized trajectory, we can obtain the $x$ and $y$ components of each leg of the trajectory:
+From the discretized trajectory, we can obtain the $x$ and $y$ components of each leg of the trajectory. Each component is calculated as follows:
 
-As a result, \NB{no no no...this is completely wrong. It's not a result of this. It's the opposite. We decompose the trajectory in x and y} our training only needs to be performed on lateral and longitudinal motion. In the case that the UAV is symmetrical, it is possible to only train on movement in one direction, and use the same results for any motion of the system. In this work, we assume we are learning to enable autonomous behaviors on symmetrical UAVs, as expanding to the non-symmetrical case adds little complexity to the approach.
+\begin{align}
+    c_x =  
+\end{align}
+
+In Fig.~\ref{fig:trajdec}, we show an example of a generated trajectory with its discretization and the $x$ and $y$ components that are stitched together.
+
+\begin{figure}[h]
+	\centering
+	\subfigure[\label{fig:t2dec}]{\includegraphics[width=0.48\linewidth]{images/traj2dec.png}}
+	\subfigure[\label{fig:tdec}]{\includegraphics[width=0.48\linewidth]{images/trajdecomp.png}}
+	\caption{Example of a Generated Trajectory with its $x,y$ Decomposition}
+	\label{fig:trajdec}
+\end{figure}
+
+
 
 \subsection{Regression Based Training and Evaluation} \label{sec:train}
 %\NB{what is this section about? Why do we need this section?}
@@ -400,7 +410,7 @@ In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represen
     \label{fig:joys}
 \end{figure}
 
-While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases [CITE]. In order to quantify this, we leverage the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression with known values:
+While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases [CITE]. In order to quantify this, we leverage the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression [CITE] with known values:
 
 \begin{equation} \label{eq:stderr}
     \sigma_{est} \approx \frac{s}{\sqrt{m}}
@@ -410,7 +420,7 @@ where $s$ is the sample standard deviation of all of the points in the training 
 \begin{equation} \label{eq:tstat}
 t_{\hat{\beta}} = \frac{|\hat{\beta}-\bar{\beta}|}{\sigma_{est}}    
 \end{equation}
-where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest known point. In equation \eqref{eq:tstat}, if $t_{\hat{\beta}} \geq 1$, that means that the test point $\hat{\beta}$ propagates an error higher than the standard error. As a result, it is desirable to have $t_{\hat{\beta}} < 1$. Using a certain set-point for the t-statistic, the maximum allowable departure from known points is obtained:
+where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest known point. In equation \eqref{eq:tstat}, if $t_{\hat{\beta}} \geq 1$, that means that the test point $\hat{\beta}$ propagates an error higher than the standard error. Therefore, it is desirable to have $t_{\hat{\beta}} < 1$. Using a certain set-point for the t-statistic, the maximum allowable departure from known points is obtained:
 
 \begin{equation}
     \sigma_{est}t_{\hat{\beta}} = |\hat{\beta}-\bar{\beta}|
@@ -422,13 +432,13 @@ The appropriate departure is used to set the bounds for each training data point
 \end{align}
 where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for known parameter $\bar{\beta}$.
 
-In our case, there are two parameters we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two parameters as statistically independent, to obtain a generic interval for each point in the training set, denoted $[d_{i\min},d_{i\max}]$ and $[t_{i\min},t_{i\max}]$, where $i=1,\ldots,m$. Because we are ultimately interested in using the distance and time values together as input pairs, we then obtain a maximum distance from each of the training data points as follows:
+In our case, there are two parameters we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two parameters as statistically independent, to obtain a generic interval for each point in the training set, denoted $[d_{i\min},d_{i\max}]$ and $[t_{i\min},t_{i\max}]$, where $i=1,\ldots,m$. Because we are ultimately interested in using the distance and time values together as input pairs, {WORK FROM HERE} we then obtain a maximum distance from each of the training data points as follows:
 
 \begin{equation}
     \delta_i = \sqrt{(\sigma_{d_{est}})^2+(\sigma_{t_{est}})^2}
 \end{equation}
 
-Using the maximum distance for each point $\Delta_i$, we are able the generate intervals around each point, where the data is within the standard error of the estimate. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error intervals around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary [CITE] created by the intervals.
+Using the maximum distance for each point $\delta_i$, we are able the generate intervals around each point, where the data is within the standard error of the estimate. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error intervals around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary [CITE] created by the intervals.
 
 \begin{figure}[ht]
 	\centering
@@ -438,7 +448,7 @@ Using the maximum distance for each point $\Delta_i$, we are able the generate i
 	\label{fig:bounds}
 \end{figure}
 
-\subsection{Autonomous Behaviour Generation}
+\subsection{Autonomous Behaviour Generation} \label{sec:generate}
 
 In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands. A string of commands is generated for each leg of a trajectory, as described in Section \ref{sec:traj}.
 
@@ -479,7 +489,7 @@ In Fig.~\ref{fig:gensample}, we show visually the steps of command generation. I
 	\label{fig:gensample}
 \end{figure}
 
-\subsection{Online Adaptation of Generated Commands}
+\subsection{Online Adaptation of Generated Commands} \label{sec:adapt}
 
 The commands generated in the previous section are generated and sent to the UAV in open-loop. In order to close the loop, we propose a method to control for any possible error. While executing generated command string, $\mathbf{x_a}(t)$, we constantly monitor for error between the position of the vehicle, $\mathbf{p}(t)$ and the reference position as per the generated trajectory, $\mathbf{p_r}(t)$:
 
@@ -505,12 +515,12 @@ The quantity $\frac{\xi(t)}{\mathbf{p_r}(t)}$ related the current error to the d
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
 
 
-\section{Experiments}
+\section{Experiments} \label{sec:exper}
 
 
 
 
-\section{Conclusions}
+\section{Conclusions} \label{sec:conc}
 
 \section{Acknowledgement}
 
