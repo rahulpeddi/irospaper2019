@@ -259,11 +259,9 @@ Lastly, we are interested in the average command sent to the system, as indicate
 %\NB{the figure needs to be changed. jx(t) jy(t) should input into the plant and the output is x(t) y(t) and all goes as input to the Training. The figure is still blurry}
 %\NB{let's use power point fro the diagrams..it's blurry}
 
-%<<<<<<< Updated upstream
+
 The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity, a new command string consisting of commands for both lateral and longitudinal directions is created using the training set \NB{how?}. At this stage, we generate the inputs, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, accurate trajectory tracking cannot be guaranteed. Tracking error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. First, we will discuss the trajectory decomposition, as our problem ultimately is to accurately track any trajectory.
-%=======
-%The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity, a new command string consisting of commands for both lateral and longitudinal directions is created \NB{how?}. At this stage, we generate the inputs, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, accurate trajectory tracking cannot be guaranteed. Tracking error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. First, we will discuss the trajectory decomposition, as our problem ultimately is to track any trajectory.
-%>>>>>>> Stashed changes
+
 
 %\NB{introduce next section... the paper reads like independent sections}
  %\NB{in this section or before we need to stress and clarify that this approach allows us to figure out the actions for the system to follow autonomously any trajectory but we need still to close the loop. Technically is a 2 phase method:1) open loop actions and 2) corrections for closed loop}
@@ -306,7 +304,7 @@ From the discretized trajectory, we can obtain the $x$ and $y$ components of eac
     c_{y}(t_s,t_{s+1}) = \mathbf{p_y}^*(t_{s+1}) - \mathbf{p_y}^*(t_{s})
 \end{align}
 
-where $c_{x}(t_s,t_{s+1})$ and $c_{y}(t_s,t_{s+1})$ are the distances \NB{what's a component? length/distance to travel?} between each segment in $x$ and $y$. These values are taken for each of the $n$ trajectory segments with the same time-step, $\delta t$, and are appended to one another to create the desired output for which we will generate input commands. In Fig.~\ref{fig:trajdec}, we show an example of a generated trajectory with its discretization and the $x$ and $y$ components that are stitched together.
+where $c_{x}(t_s,t_{s+1})$ and $c_{y}(t_s,t_{s+1})$ are the distances between each segment in $x$ and $y$ directions. These values are taken for each of the $n$ trajectory segments with the same time-step, $\delta t$, and are appended to one another to create the desired output for which we will generate input commands. In Fig.~\ref{fig:trajdec}, we show an example of a generated trajectory with its discretization and the $x$ and $y$ components that are stitched together.
 \begin{figure}[h]
 	\centering
 	\subfigure[\label{fig:t2dec}]{\includegraphics[width=0.48\linewidth]{images/traj2dec.png}}
@@ -413,7 +411,7 @@ In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represen
 \end{figure}
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/joycmds.png}
-    \caption{Average Teleop Command vs Distance and Time}
+    \caption{Average Teleoperation Input Command vs Distance and Time}
     \label{fig:joys}
 \end{figure}
 
