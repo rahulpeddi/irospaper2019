@@ -96,7 +96,7 @@ On the other hand, data-driven machine learning techniques like neural networks,
 In this work we propose a novel approach that leverages both model-based and data-driven theories to generate autonomous flight behavior for an aerial vehicle from few user teleoperation demonstrations. 
 We focus on off-the-shelf quadrotor UAVs which have a well studied dynamical and control architecture as will be described later in the paper and are by far the most common UAVs because of the growing hobby and DIY community. Our framework however can scale and apply to any other aerial vehicle. Fig. \ref{} shows some examples of such quadrotors focus of this paper, all characterized by having the same shape but different motors, propellers, boom size, and electronics and hence different dynamic and control models.
 
-Different from other supervised learning approaches, in this work we leverage the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contribution of this work is a generalized framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles. 
+Different from other supervised learning approaches, in this work we use the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contribution of this work is a generalized framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles. 
 %Besides a general framework for the generation of autonomous commands for any quadrotor, in this work we offer a scheme to integrate model-based and data-driven approaches 
 \NB{need to reinforce this statement}
 \NB{need to add a figure here that summarizes the approach}
@@ -123,12 +123,22 @@ Different from other supervised learning approaches, in this work we leverage th
 %    \item how to learn to correct 
 %%    \item how to expand the knowledge obtained from several demonstrations to follow any trajectory
 %\end{itemize}
-\NB{we need to stress how different this work is in comparison with the rest of the literature on learning from demonstration. We need to show our contribution clearly}
+
 \NB{we need to stress that these quadrotors already come with well designed controllers and at the bare minimum we can teleop }
 
 %The rest of this paper is organized as follows: In Section \ref{sec:traj}, we discuss how we generate and decompose smooth trajectories for our UAV to follow. Next, we discuss the training data and regression analysis in Section \ref{sec:train}. This is then followed by discussing how the autonomous commands are generated in Section \ref{sec:generate}, which is followed by the online adaptation and correction in Section \ref{sec:adapt}. Lastly, we describe and demonstrate our experimental results in Section \ref{sec:exper}, and we conclude our work and discuss future work in \ref{sec:conc}.
 
 \section{Related Work}
+%\NB{we need to stress how different this work is in comparison with the rest of the literature on learning from demonstration. We need to show our contribution clearly}
+
+
+In recent years, we have seen many developments in the study of unmanned aerial vehicles (UAVs). A very common and widely researched task for UAVs is controlling a vehicle such that a certain trajectory can be followed. The authors in \cite{minsnap,waypt,tvec} provide well optimized approaches for UAV trajectory generation and tracking by utilizing near perfect knowledge of the controller and dynamical model parameters. Access to these parameters, as they are in our case, are often limited. In \cite{modelparams}, the authors leverage exact knowledge of the model dynamics an controller architecture to identify necessary parameters for trajectory tracking, and perform a parameter estimation using particle swarm optimization, which the authors state can be a long and iterative process, which is the case for many other model-based parameter identification works \cite{modelbased1,modelbased2}.
+Some of the more recent advancements in this area feature machine learning and data-driven approaches, such as deep learning (DL), imitation learning (IL), and reinforcement learning (RL). In \cite{dln}, the authors use DL to learn driving models for ground vehicles by using large-scale video datasets, and in \cite{rlctrl}, the authors use RL  over $1,000$ training samples for accurate quadrotor trajectory tracking. These methods are model and parameter free, but use extremely large datasets to resolve that issue. In \cite{uavrace}, the authors explore the idea of observational imitation learning (OIL), where they learn from a relatively small number demonstrations, but also assume knowledge of the controller architecture and perform parameter estimation, which can be a daunting task without knowledge of the controller architecture. The authors in \cite{abbeel} use apprenticeship learning, which is similar to IL, to train a UAV to perform trajectories with a very simplified model, but they still need to learn some dynamical parameters, while assuming knowledge of several others. In apprenticeship learning, the training set consists of demonstrations, from which the authors can glean important information.
+Our work is largely based on the same principle - we can obtain important information from demonstrations. In our assume no knowledge of specific dynamical parameters, and only a very basic idea of the structure of the dynamical model and controller architecture. This makes parameter estimation a rather unfeasible and inefficient task. Instead, we use information obtained from our training demonstrations to directly generate control inputs to track any trajectory, by way of training and analyzing a regression model and implementing online adaptive loop-closure.
+
+
+
+
 
 
 %\NB{overall outline for reference: model of quadrotor is unknown but skeleton architecture is known and the controller is u1, u2, u3 = equations. Because of how the controller is designed, we know that u2 is used to change x and u3 y. A change in u2 is equivalent to a change in the x position. The higher is this change the more motion is generated hence the area under the curve described by the commands sent to the quadrotor is related to the motion of the system and here is where the regression approach is sued. Instead of learnign the parameters that is hard we use regression to learn to fly directly by leveraging the integral and the knowledge about the system. }
@@ -271,7 +281,7 @@ In this section, we discuss how a smooth trajectory is generated between waypoin
 
 %\NB{this section needs to go before and needs to be explain better}.
 
-In order to generate a trajectory, we first select waypoints through which the UAV should travel. In order to determine the optimal path in our case, we generate a minimum snap trajectory. Minimum snap trajectories are associated with low control effort as they are based on the fourth derivative of position and ensure smoothness [CITE]. The general equation for a minimum snap trajectory is as follows:
+In order to generate a trajectory, we first select waypoints through which the UAV should travel. In order to determine the optimal path in our case, we generate a minimum snap trajectory. Minimum snap trajectories are associated with low control effort as they are based on the fourth derivative of position and ensure smoothness \cite{minsnap}. The general equation for a minimum snap trajectory is as follows:
 %\NB{why? you need to explain better. Besides, we should use snap not jerk}
 \begin{equation} \label{eq:minjerkint}
     \mathbf{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\ddddot{p},\dddot{p},\ddot{p},\dot{p},p,t)dt
@@ -544,12 +554,9 @@ The quantity $\frac{\xi(t)}{\mathbf{p_r}(t)}$ related the current error to the d
 
 
 
-\begin{thebibliography}{99}
 
-\bibitem{c1} G. O. Young,
-
-
-\end{thebibliography}
+\bibliographystyle{IEEEtran}
+\bibliography{bib.bib}
 
 
 
