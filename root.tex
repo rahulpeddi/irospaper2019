@@ -454,7 +454,7 @@ The ellipses at each point in our training data is calculated using the followin
     x = d_i + {\sigma_{d,est}t_{\hat{\beta}}}\cos{r} \nonumber \\
     y = t_i + {\sigma_{d,est}t_{\hat{\beta}}}\sin{r} 
 \end{align}
-where $r$ is the parameter from $[0,2\pi]$, and $i = 1,\ldots,m$ and reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error ellipses around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary \cite{bounds} created by the ellipses. \{i need to explain that we don't actually care about this boundary but this is the best way to show it on the surface. also should i discuss that rectangles will have corners that poke out of the surface?\}
+where $r$ is the parameter from $[0,2\pi]$, and $i = 1,\ldots,m$ and reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error ellipses around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary \cite{bounds} created by the ellipses.
 \begin{figure}[ht]
 	\centering
 	\subfigure[Prediction Bounds \label{fig:preds}]{\includegraphics[width=0.48\linewidth]{images/predictionbds.png}}
@@ -467,7 +467,7 @@ Given these prediction bounds, we are able to assess whether or not our trajecto
 
 \subsection{Autonomous Input Generation} \label{sec:generate}
 
-In order for the system to autonomously reach a user-set goal, $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands. A string of commands is generated for each component of a trajectory, as described in Section \ref{sec:traj}.
+In order for the system to autonomously reach a point within trajectory $\mathbf{p_r}(t)$, $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands. A string of commands is generated for each component of a trajectory, as described in Section \ref{sec:traj}.
 
 From the training set of $m$ samples, we select the trial that has the closest integral, $g_i$, to the estimated integral $g_u$. This is done by forming an error vector, $\mathbf{e}\in\R^{m}$, where each element is defined by
 \begin{equation}
@@ -478,7 +478,7 @@ From the training set of $m$ samples, we select the trial that has the closest i
 \mathbf{J}^* = \mathbf{J}_i \in \mathbf{J}\vert e_i = \min_e(\mathbf{e})
 \end{equation}
 
-This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing vector interpolation to re-size $\mathbf{J}^*$, such that important features in the optimal command vector are not lost. These methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss [CITE]. Bicubic interpolation is our chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity [CITE]. The general form of a bicubic interpolation equation is 
+This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing vector interpolation to re-size $\mathbf{J}^*$, such that important features in the optimal command vector are not lost. These methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss \cite{bicfeatures}. Bicubic interpolation is our chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity \cite{biccomp}. The general form of a bicubic interpolation equation is 
 
 \begin{equation} \label{eq:bicinter}
     b(x) = \sum_{i=0}^3a_ij^i
