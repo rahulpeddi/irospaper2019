@@ -534,12 +534,12 @@ The quantity $\frac{\xi(t)}{\mathbf{p_r}(t)}$ relates the current error to the d
 
 The proposed approach was validated experimentally using an Parrot Bebop 2 Drone quadrotor UAV, which arrives tuned and stable for teleoperation off-the-shelf. Since experiments were conducted indoors, a Vicon motion capture system was used to obtain the position and velocity of the vehicle. The teleoperation was performed using a node written in the ROS environment.
 
-First, we will discuss how training samples were generated. A human teleoperated the system for 12 samples of motion that only consisted of pitch commands. These training trajectories had different distances and took different amounts of time. We were also able to use this same training set to generate roll commands. The regression and error analysis was done in MATLAB to obtain the surfaces pictured in Section \ref{sec:train} Figs.~\ref{fig:integs} and \ref{fig:joys}.
+First, we will discuss how training samples were generated. A human teleoperated the system for 12 samples of motion that only consisted of pitch commands. These training trajectories had different distances and took different amounts of time. We were also able to use this same training set to generate roll commands. The regression and error analysis was done in Matlab to obtain the surfaces pictured in Section \ref{sec:train} Figs.~\ref{fig:integs} and \ref{fig:joys}. Next, the command generation was done using the Image Processing Toolbox, and simulations of the adaptive control portion were both done in Matlab. Lastly, the real experiments were done using ROS in conjunction with the Robotics System Toolbox to interface our regression models within the Matlab environment with ROS.
 
 
 
 \section{Conclusions} \label{sec:conc}
-In this work, we have presented an approach that enable autonomous flight on off-the-shelf quadrotors that are primarily tuned for teleoperation. Our approach shows that we can use a small training set along with a regression analysis to generate commands for any trajectory, with minimal knowledge of the control architecture and specific dynamical parameters. 
+In this work, we have presented an approach that enable autonomous flight on off-the-shelf quadrotors that are primarily tuned for teleoperation. Our approach shows that we can use a small training set along with a regression analysis to generate accurate commands for any trajectory, along with adapting and closing the loop in real-time to avoid error. This is all done with just a basic knowledge of the control architecture and no knowledge of specific dynamical parameters. 
 
 
 
