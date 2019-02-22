@@ -424,7 +424,7 @@ In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represen
     \label{fig:joys}
 \end{figure}
 
-While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases [CITE]. In order to quantify this, we leverage the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression [CITE] with known values:
+While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases [CITE]. In order to quantify this, we leverage the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression \cite{stdereg} with known values:
 
 \begin{equation} \label{eq:stderr}
     \sigma_{est} \approx \frac{s}{\sqrt{m}}
@@ -445,7 +445,7 @@ This maximum departure, $\sigma_{est}t_{\hat{\beta}}$, is used to set the bounds
 \end{align}
 where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for known parameter $\bar{\beta}$.
 
-In our case, there are two inputs we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two quantities as statistically independent, to obtain maximum departure values for each of the parameters: $\sigma_{d,est}t_{\hat{\beta}}$ and $\sigma_{t,est}t_{\hat{\beta}}$. In \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, the distance and time values are used together as input pairs, so a method to tie the two independent departure values together is desirable. Standard error rectangles [CITE], which create rectangular intervals around each data point, could be used for this purpose, but they are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by our TPS regression. An alternative method is to use standard error ellipses, which can be accurately attributed to smooth surfaces as per [CITE]. A general equation for a standard error ellipse for our maximum departure is shown below:
+In our case, there are two inputs we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two quantities as statistically independent, to obtain maximum departure values for each of the parameters: $\sigma_{d,est}t_{\hat{\beta}}$ and $\sigma_{t,est}t_{\hat{\beta}}$. In \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, the distance and time values are used together as input pairs, so a method to tie the two independent departure values together is desirable. Standard error rectangles \cite{stdellipse}, which create rectangular intervals around each data point, could be used for this purpose, but they are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by our TPS regression. An alternative method is to use standard error ellipses, which can be accurately attributed to smooth surfaces as per \cite{stdellipse}. A general equation for a standard error ellipse for our maximum departure is shown below:
 \begin{equation}
     \bigg(\frac{x}{\sigma_{d,est}t_{\hat{\beta}}}\bigg)^2 + \bigg(\frac{y}{\sigma_{t,est}t_{\hat{\beta}}}\bigg)^2 = 1
 \end{equation}
@@ -454,7 +454,7 @@ The ellipses at each point in our training data is calculated using the followin
     x = d_i + {\sigma_{d,est}t_{\hat{\beta}}}\cos{r} \nonumber \\
     y = t_i + {\sigma_{d,est}t_{\hat{\beta}}}\sin{r} 
 \end{align}
-where $r$ is the parameter from $[0,2\pi]$, and $i = 1,\ldots,m$ and reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error ellipses around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary [CITE] created by the ellipses. \{i need to explain that we don't actually care about this boundary but this is the best way to show it on the surface. also should i discuss that rectangles will have corners that poke out of the surface?\}
+where $r$ is the parameter from $[0,2\pi]$, and $i = 1,\ldots,m$ and reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error ellipses around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary \cite{bounds} created by the ellipses. \{i need to explain that we don't actually care about this boundary but this is the best way to show it on the surface. also should i discuss that rectangles will have corners that poke out of the surface?\}
 \begin{figure}[ht]
 	\centering
 	\subfigure[Prediction Bounds \label{fig:preds}]{\includegraphics[width=0.48\linewidth]{images/predictionbds.png}}
@@ -518,13 +518,13 @@ The error $\xi(t)$ is attributed to the most recent command $\mathbf{J}_a(t)$, a
     \mathbf{J}_c(t+1) = \mathbf{J}_a(t+1) + k_p(t)\xi(t)
 \end{equation}
 
-The proportional gain, $k_p(t)$, is automatically tuned based loosely off the Ziegler-Nichols method [CITE] where the proportional gain is increased until there is stable and consistent oscillation in the output, which in our case, is the position error, $\xi(t)$. In order to set the interval of gain increase each iteration, we use the ratio of the error to desired position:
+The proportional gain, $k_p(t)$, is automatically tuned based using a gradient descent method where the proportional gain is adjusted until the position error, $\xi(t)$ converges to $0$. In order to set the interval of gain increase each iteration, we use
 
 \begin{equation}
     k_p(t+1) = k_p(t) + \frac{\xi(t)}{\mathbf{p_r}(t)}
 \end{equation}
 
-The quantity $\frac{\xi(t)}{\mathbf{p_r}(t)}$ related the current error to the desired position within the trajectory. 
+The quantity $\frac{\xi(t)}{\mathbf{p_r}(t)}$ relates the current error to the desired position within the trajectory. 
 
 
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
