@@ -518,7 +518,7 @@ The error $\xi(t)$ is attributed to the most recent command $\mathbf{J}_a(t)$, a
     \mathbf{J}_c(t+1) = \mathbf{J}_a(t+1) + k_p(t)\xi(t)
 \end{equation}
 
-The proportional gain, $k_p(t)$, is automatically tuned based using a gradient descent method where the proportional gain is adjusted until the position error, $\xi(t)$ converges to $0$. In order to set the interval of gain increase each iteration, we use
+The proportional gain, $k_p(t)$, is automatically tuned based using a gradient descent method where the proportional gain is adjusted until the position error, $\xi(t)$ converges to $0$. The initial value of our gain, $k_p$ is set to $0$, which indicates that we assume 
 
 \begin{equation}
     k_p(t+1) = k_p(t) + \frac{\xi(t)}{\mathbf{p_r}(t)}
@@ -532,7 +532,7 @@ The quantity $\frac{\xi(t)}{\mathbf{p_r}(t)}$ relates the current error to the d
 
 \section{Experiments} \label{sec:exper}
 
-The platform used for this work is the Parrot Bebop 2 Drone. The Parrot is a quadrotor that is already tuned off-the-shelf. 
+The proposed approach was validated experimentally using an Parrot Bebop 2 Drone quadrotor UAV, which arrives tuned and stable for teleoperation off-the-shelf. Since experiments were conducted indoors, there was a 
 
 \section{Conclusions} \label{sec:conc}
 
