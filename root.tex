@@ -220,6 +220,7 @@ This dynamical model consists of many platform-specific parameters that are also
     u_3 &= k_{p,\theta}(\theta_c-\theta) + k_{d,\theta}(\dot{\theta}_c - \dot{\theta}) \nonumber \\
     \theta_c &= -\frac{1}{g}(\ddot{y}_{des} + k_{d,y}(\dot{y}_{des}-\dot{y}) + k_{p,y}(y_{des}-y))
 \end{align}
+where $\phi_c$ and $\theta_c$ are the desired roll and pitch angles, respectively.
 
 In this work, we are interested in generating control inputs for autonomous flight when the only information available for training comes from human-piloted demonstrations. From the aforementioned demonstrations, we assume that we can obtain position ad the velocity of the system during training as well as the input commands sent to the vehicles from the user teleoperation.
 %\NB{this part needs to be rewritten and generalized. We can mention later that in our case we use a MOCAP but here we just need to say that we assume that we can obtain position and velocity of the system during training as well as the commands sent to the vehicles as a result of the user teleop}
@@ -235,13 +236,12 @@ Through observation of a single demonstrated trial, we are able to identify impo
 In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in in the negative $y$-direction. 
 
 
-From \eqref{eq:cinputs}, we can observe that the inputs $u_2$ and $u_3$ for roll and pitch rely on the change in the desired Euler roll and pitch angles. In order to capture that that change in the desired angles, which are set by the human teleoperation, we take the area under the curve of the input commands. The shaded portion of Fig.\ref{fig:sampleintegral} represents this integral. Since these changes in roll and pitch affect the global $x$ and $y$ position of the vehicle, the integral that captures these changes is connected to the distance travelled by the vehicle.
+From \eqref{eq:cinputs}, we can observe that the inputs $u_2$ and $u_3$ for roll and pitch rely on the change in the desired Euler roll and pitch angles, which then rely on the desired $x$ and $y$ positions and velocities. In order to capture that that change in the desired angles, which are set by the human teleoperation, we take the area under the curve of the input commands. The shaded portion of Fig.\ref{fig:sampleintegral} represents this integral. Since these changes in roll and pitch affect the global $x$ and $y$ position of the vehicle, the integral that captures these changes is connected to the distance travelled by the vehicle. This integral is used as a compact measure for our training, and this removes the necessity to train on the entire string of commands, which could be large and more computationally intensive. 
 
 %Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the integral. i.e. the total area, under the string of commands. Because the pitch is proportional to the linear velocity in the $y$-direction, we know that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled 
-\NB{here show that because u2 depends on $\phi_c$ and $\phi_c$ depends on x then this integral represents motion but what you really need to stress is that it is a compact measure without having to use the entire string of commands for learning}.
-%>>>>>>> Stashed changes
+%\NB{here show that because u2 depends on $\phi_c$ and $\phi_c$ depends on x then this integral represents motion but what you really need to stress is that it is a compact measure without having to use the entire string of commands for learning}.
 
-Lastly, we are interested in the average command sent to the system, as indicated by the dotted line. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and heights. Making use of the average teleoperated input command, we are able to identify the correct average autonomous input command and therefore, improve the precision in the process of generating autonomous commands, which must be fixed to a certain length (time) and travel a certain distance. 
+Lastly, the average command sent to the system, as indicated by the dotted line, is of interest. The integral itself, while conveying information about the distance traveled, lacks precision in that the same integral can be achieved with commands strings of different lengths and velocities. Making use of the average teleoperation input command, we are able to identify the correct average autonomous input command and therefore, improve the precision in the process of generating autonomous commands, which must be fixed to a certain length (time) and travel a certain distance. 
 
 %\NB{we need to think how to pose the command better. A reviewer here can still ask why and what so special about the command.}
 %\NB{here we need to stress again that these parameters are hard to find online}
@@ -450,11 +450,11 @@ In our case, there are two inputs we are primarily concerned about for predictio
     \bigg(\frac{x}{\sigma_{d,est}t_{\hat{\beta}}}\bigg)^2 + \bigg(\frac{y}{\sigma_{t,est}t_{\hat{\beta}}}\bigg)^2 = 1
 \end{equation}
 The ellipses at each point in our training data is calculated using the following parametrized equations:
-\begin{align}
-    x = d_i + {\sigma_{d,est}t_{\hat{\beta}}}\cos{r} \nonumber \\
-    y = t_i + {\sigma_{d,est}t_{\hat{\beta}}}\sin{r} 
+\begin{align} \label{eq:bounds}
+    x_i = d_i + {\sigma_{d,est}t_{\hat{\beta}}}\cos{r} \nonumber \\
+    y_i = t_i + {\sigma_{d,est}t_{\hat{\beta}}}\sin{r} 
 \end{align}
-where $r$ is the parameter from $[0,2\pi]$, and $i = 1,\ldots,m$ and reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error ellipses around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary \cite{bounds} created by the ellipses.
+where $r$ is the parameter in $[0,2\pi]$, and $i = 1,\ldots,m$ and reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error ellipses around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary \cite{bounds} created by the ellipses.
 \begin{figure}[ht]
 	\centering
 	\subfigure[Prediction Bounds \label{fig:preds}]{\includegraphics[width=0.48\linewidth]{images/predictionbds.png}}
@@ -467,7 +467,7 @@ Given these prediction bounds, we are able to assess whether or not our trajecto
 
 \subsection{Autonomous Input Generation} \label{sec:generate}
 
-In order for the system to autonomously reach a point within trajectory $\mathbf{p_r}(t)$, $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands. A string of commands is generated for each component of a trajectory, as described in Section \ref{sec:traj}.
+In order for the system to autonomously reach a point within trajectory $\mathbf{p_r}(t)$, $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands. We first check back with our generated trajectory components to ensure that the distances of each leg are within the bounds of our error ellipses, as calculated in \eqref{eq:bounds}, and displayed in Fig.\ref{fig:preds}. A string of commands is generated for each component of a trajectory, as described in Section \ref{sec:traj}.
 
 From the training set of $m$ samples, we select the trial that has the closest integral, $g_i$, to the estimated integral $g_u$. This is done by forming an error vector, $\mathbf{e}\in\R^{m}$, where each element is defined by
 \begin{equation}
@@ -532,9 +532,16 @@ The quantity $\frac{\xi(t)}{\mathbf{p_r}(t)}$ relates the current error to the d
 
 \section{Experiments} \label{sec:exper}
 
-The proposed approach was validated experimentally using an Parrot Bebop 2 Drone quadrotor UAV, which arrives tuned and stable for teleoperation off-the-shelf. Since experiments were conducted indoors, there was a 
+The proposed approach was validated experimentally using an Parrot Bebop 2 Drone quadrotor UAV, which arrives tuned and stable for teleoperation off-the-shelf. Since experiments were conducted indoors, a Vicon motion capture system was used to obtain the position and velocity of the vehicle. The teleoperation was performed using a node written in the ROS environment.
+
+First, we will discuss how training samples were generated. A human teleoperated the system for 12 samples of motion that only consisted of pitch commands. These training trajectories had different distances and took different amounts of time. We were also able to use this same training set to generate roll commands. The regression and error analysis was done in MATLAB to obtain the surfaces pictured in Section \ref{sec:train} Figs.~\ref{fig:integs} and \ref{fig:joys}.
+
+
 
 \section{Conclusions} \label{sec:conc}
+In this work, we have presented an approach that enable autonomous flight on off-the-shelf quadrotors that are primarily tuned for teleoperation. Our approach shows that we can use a small training set along with a regression analysis to generate commands for any trajectory, with minimal knowledge of the control architecture and specific dynamical parameters. 
+
+
 
 \section{Acknowledgement}
 
