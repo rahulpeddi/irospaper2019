@@ -76,7 +76,7 @@ Parameter-free Regression-based Autonomous Control of Off-the-shelf Quadrotor UA
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-
+Autonomous flight in unmanned aerial vehicles (UAVs) generally require platform-specific knowledge of the dynamical parameters and control architecture. Recently, UAVs have become more accessible with off-the-shelf options that are well-tuned and stable for user teleoperation. In this paper, we develop a method to enable autonomous flight on vehicles that are designed for teleoperation with minimal knowledge of the system parameters and the control architecture. The proposed method leverages human teleoperated trajectories to train a thin-plate spline (TPS) regression model, which is then used with image processing on the pre-trained commands to generate new autonomous input commands for new trajectories. A control strategy is also proposed to adjust autonomous input commands in real-time, in order to close the loop for assured autonomy. Finally, we validate the proposed approach with trajectory-following experiments on a quadrotor UAV.
 
 \end{abstract}
 
@@ -492,7 +492,7 @@ The next step is to adjust the input vector such that the system reaches the use
 \mathbf{J}_a = \mathbf{J}'\bigg(\frac{\bar{j}_u}{\bar{j}'}\bigg)
 \end{equation}
 
-In Fig.~\ref{fig:gensample}, we show visually the steps of command generation. In Fig.~\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.~\ref{fig:sampleintegral}. This flight travelled approximately $4.4$ seconds for $3$ meters. For testing purposes, our use input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.~\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same, which is a verification of feature retention using bicubic interpolation from \eqref{eq:bicinter}. If the vector were just stretched without using an interpolation method, we would expect slight variation in the mean, which could damage the integrity of the final step, shown in Fig.~\ref{fig:fullyadj}, which is obtained using \eqref{eq:imgscale}. At this point we have obtained the autonomous command string $\mathbf{J}_a$, which is then sent to the UAV to follow the trajectory $\mathbf{p_r}(t)$.
+In Fig.~\ref{fig:gensample}, we show visually the steps of command generation. In Fig.~\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.~\ref{fig:sampleintegral}. This flight travelled approximately $4.4$ seconds for $3$ meters. For testing purposes, our use input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.~\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same, which is a verification of feature retention aspect of bicubic interpolation from \eqref{eq:bicinter}. If the vector were stretched without using an interpolation method, we would expect slight variation in the mean, which could damage the integrity of the final step, shown in Fig.~\ref{fig:fullyadj}, which is obtained using \eqref{eq:imgscale}. At this point we have obtained the autonomous command string $\mathbf{J}_a$, which is then sent to the UAV to follow the trajectory $\mathbf{p_r}(t)$.
 
 
 \begin{figure}[h]
@@ -534,7 +534,9 @@ The quantity $\frac{\xi(t)}{\mathbf{p_r}(t)}$ relates the current error to the d
 
 The proposed approach was validated experimentally using an Parrot Bebop 2 Drone quadrotor UAV, which arrives tuned and stable for teleoperation off-the-shelf. Since experiments were conducted indoors, a Vicon motion capture system was used to obtain the position and velocity of the vehicle. The teleoperation was performed using a node written in the ROS environment.
 
-First, we will discuss how training samples were generated. A human teleoperated the system for 12 samples of motion that only consisted of pitch commands. These training trajectories had different distances and took different amounts of time. We were also able to use this same training set to generate roll commands. The regression and error analysis was done in Matlab to obtain the surfaces pictured in Section \ref{sec:train} Figs.~\ref{fig:integs} and \ref{fig:joys}. Next, the command generation was done using the Image Processing Toolbox, and simulations of the adaptive control portion was done in Matlab. Lastly, the real experiments were done using ROS in conjunction with the Robotics System Toolbox to interface our regression models within the Matlab environment with ROS.
+The training set was generating by having a human teleoperate the system $12$ times with motion that only consisted of pitch commands. These training trajectories had different distances and took different amounts of time. We were also able to use this same training set to generate roll commands for our UAV. The regression and error analysis was done in Matlab to obtain the surfaces pictured in Section \ref{sec:train}, and are shown in Figs.~\ref{fig:integs}, \ref{fig:joys}, and \ref{fig:bounds}. Next, the command generation was done using the Image Processing Toolbox in Matlab. Lastly, the real experiments were conducted using ROS in conjunction with the Robotics System Toolbox to interface our regression models within the Matlab environment with ROS.
+
+The first experiments consisted of tracking straight line distances and diagonal distance, to validate that $x$ and $y$ components as discussed in Section~\ref{sec:traj} can be attained accurately. For straight line distances, we
 
 
 
