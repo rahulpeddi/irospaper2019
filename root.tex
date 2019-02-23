@@ -440,19 +440,19 @@ where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest known poi
 \end{equation}
 This maximum departure, $\sigma_{est}t_{\hat{\beta}}$, is used to set the bounds for each training data point, for example:
 \begin{align}
-    \hat{\beta}_{\min} = \bar{\beta} - \sigma_{est}t_{\hat{\beta}} \nonumber \\
-    \hat{\beta}_{\max} = \bar{\beta} + \sigma_{est}t_{\hat{\beta}}
+    \hat{\beta}_{\min} = \bar{\beta} - \sigma_{est}t^* \nonumber \\
+    \hat{\beta}_{\max} = \bar{\beta} + \sigma_{est}t^*
 \end{align}
 where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for known parameter $\bar{\beta}$.
 
 In our case, there are two inputs we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two quantities as statistically independent, to obtain maximum departure values for each of the parameters: $\sigma_{d,est}t_{\hat{\beta}}$ and $\sigma_{t,est}t_{\hat{\beta}}$. In \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, the distance and time values are used together as input pairs, so a method to tie the two independent departure values together is desirable. Standard error rectangles \cite{stdellipse}, which create rectangular intervals around each data point, could be used for this purpose, but they are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by our TPS regression. An alternative method is to use standard error ellipses, which can be accurately attributed to smooth surfaces as per \cite{stdellipse}. A general equation for a standard error ellipse for our maximum departure is shown below:
 \begin{equation}
-    \bigg(\frac{x}{\sigma_{d,est}t_{\hat{\beta}}}\bigg)^2 + \bigg(\frac{y}{\sigma_{t,est}t_{\hat{\beta}}}\bigg)^2 = 1
+    \bigg(\frac{x}{\sigma_{d,est}t^*}\bigg)^2 + \bigg(\frac{y}{\sigma_{t,est}t^*}\bigg)^2 = 1
 \end{equation}
 The ellipses at each point in our training data is calculated using the following parametrized equations:
 \begin{align} \label{eq:bounds}
-    x_i = d_i + {\sigma_{d,est}t_{\hat{\beta}}}\cos{r} \nonumber \\
-    y_i = t_i + {\sigma_{d,est}t_{\hat{\beta}}}\sin{r} 
+    x_i = d_i + \sigma_{d,est}t^*\cos{r} \nonumber \\
+    y_i = t_i + \sigma_{t,est}t^*\sin{r} 
 \end{align}
 where $r$ is the parameter in $[0,2\pi]$, and $i = 1,\ldots,m$ reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error ellipses around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary \cite{bounds} created by the ellipses.
 \begin{figure}[ht]
