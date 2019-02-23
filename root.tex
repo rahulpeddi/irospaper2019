@@ -188,7 +188,7 @@ As hinted in the introduction, we use knowledge about the UAV dynamics and contr
     \label{fig:otsctrl}
 \end{figure}
 
-The presented structure is a gray box model, where the only information known are the teleoperation inputs, indicated by $\mathbf{J}_x$ and $\mathbf{J}_y$, the output, which is the position of the vehicle, $\mathbf{p}(t)$, over time, and the basic model architecture. The low level controller usually consists of multiple PID loops [CITE], which are already developed and tuned with certain specific control gains, which can be very difficult to identify. The quadrotor body dynamics can be modeled using a $12^{\text{th}}$ order state vector as follows:
+The presented structure is a gray box model, where the only information known are the teleoperation inputs, indicated by $\mathbf{J}_x$ and $\mathbf{J}_y$, the output, which is the position of the vehicle, $\mathbf{p}(t)$, over time, and the basic model architecture. The low level controller usually consists of multiple PID loops \cite{esen}, which are already developed and tuned with certain specific control gains, which can be very difficult to identify. The quadrotor body dynamics can be modeled using a $12^{\text{th}}$ order state vector as follows:
 %\NB{why q in $\mathbf{p}_q$? In the problem formulation there is not q}
 \begin{equation}
     \mathbf{q} = 
@@ -210,7 +210,7 @@ The dynamics of the vehicle are then described as follows:
 	\begin{bmatrix}\dot{\omega}_{x} \\ \dot{\omega}_{y} \\ \dot{\omega}_{z}\end{bmatrix} &= \begin{bmatrix}\frac{I_{yy} - I_{zz}}{I_{xx}} \omega_{y}\omega_{z}\\ \frac{I_{zz} - I_{xx}}{I_{yy}} \omega_{x}\omega_{z} \\ \frac{I_{xx} - I_{yy}}{I_{zz}} \omega_{x}\omega_{y} \end{bmatrix} +  \begin{bmatrix}\frac{1}{I_{xx}} & 0 & 0\\ 0 & \frac{1}{I_{yy}} & 0\\ 0 & 0 & \frac{1}{I_{zz}}\end{bmatrix} \begin{bmatrix}u_{2} \\ u_{3} \\ u_{4} \end{bmatrix}
 	\end{aligned}
 	\label{eq:quadrotor_dynamics} \nonumber
-\end{equation} [CITE]
+\end{equation} \cite{esencite}
 
 This dynamical model consists of many platform-specific parameters that are also difficult to identify, much like the controller gains discussed above. Moreover, these parameters often vary a lot between UAVs, and that further complicates the identification problem. The model and architecture provided assume that the quadrotor is moving at a constant z level with a zero yaw constraint, and therefore, we are primarily concerned with two of the inputs, $u_2$ and $u_3$. The equations for the control inputs are as follows:
 \begin{align} \label{eq:cinputs}
@@ -434,9 +434,9 @@ where $s$ is the sample standard deviation of all of the points in the training 
 \begin{equation} \label{eq:tstat}
 t_{\hat{\beta}} = \frac{|\hat{\beta}-\bar{\beta}|}{\sigma_{est}}    
 \end{equation}
-where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest known point. In equation \eqref{eq:tstat}, if $t_{\hat{\beta}} \geq 1$, that means that the test point $\hat{\beta}$ propagates an error higher than the standard error. Therefore, it is desirable to have $t_{\hat{\beta}} < 1$. Using a certain set-point for the t-statistic, the maximum allowable departure from known points is obtained:
+where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest known point. In equation \eqref{eq:tstat}, if $t_{\hat{\beta}} \geq 1$, that means that the test point $\hat{\beta}$ propagates an error higher than the standard error. Therefore, it is desirable to have $t_{\hat{\beta}} < 1$. Using a certain desired set-point for the t-statistic, $t^*$,the maximum allowable departure from known points is obtained:
 \begin{equation}
-    \sigma_{est}t_{\hat{\beta}} = |\hat{\beta}-\bar{\beta}|
+    \sigma_{est}t^* = |\hat{\beta}-\bar{\beta}|
 \end{equation}
 This maximum departure, $\sigma_{est}t_{\hat{\beta}}$, is used to set the bounds for each training data point, for example:
 \begin{align}
@@ -454,7 +454,7 @@ The ellipses at each point in our training data is calculated using the followin
     x_i = d_i + {\sigma_{d,est}t_{\hat{\beta}}}\cos{r} \nonumber \\
     y_i = t_i + {\sigma_{d,est}t_{\hat{\beta}}}\sin{r} 
 \end{align}
-where $r$ is the parameter in $[0,2\pi]$, and $i = 1,\ldots,m$ and reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error ellipses around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary \cite{bounds} created by the ellipses.
+where $r$ is the parameter in $[0,2\pi]$, and $i = 1,\ldots,m$ reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, contains a pictorial representation of the standard error ellipses around each point. In Fig.~\ref{fig:predsur}, the surface shown in Fig.~\ref{fig:integs} is modified with a conforming boundary \cite{bounds} created by the ellipses.
 \begin{figure}[ht]
 	\centering
 	\subfigure[Prediction Bounds \label{fig:preds}]{\includegraphics[width=0.48\linewidth]{images/predictionbds.png}}
@@ -467,7 +467,7 @@ Given these prediction bounds, we are able to assess whether or not our trajecto
 
 \subsection{Autonomous Input Generation} \label{sec:generate}
 
-In order for the system to autonomously reach a point within trajectory $\mathbf{p_r}(t)$, $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands. We first check back with our generated trajectory components to ensure that the distances of each segment are within the bounds of our error ellipses, as calculated in \eqref{eq:bounds}, and displayed in Fig.\ref{fig:preds}. If the error regions are violated, we can regenerate a new trajectory or select a different timestep by which to discretize. A string of commands is generated for each component of a trajectory, as described in Section \ref{sec:traj}.
+In order for the system to autonomously reach a point within trajectory $\mathbf{p_r}(t)$, $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, and the offline training samples are leveraged to generate a new string of commands. We first check back with our generated trajectory components to ensure that the distances of each segment are within the bounds of our error ellipses, as calculated in \eqref{eq:bounds}, and displayed in Fig.\ref{fig:preds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the desired trajectory, which is an indication of the strength and viability of the training set. After checking for possible error, commands are generated for each component of a trajectory, as described in Section \ref{sec:traj}.
 
 From the training set of $m$ samples, we select the trial that has the closest integral, $g_i$, to the estimated integral $g_u$. This is done by forming an error vector, $\mathbf{e}\in\R^{m}$, where each element is defined by
 \begin{equation}
@@ -506,7 +506,7 @@ In Fig.~\ref{fig:gensample}, we show visually the steps of command generation. I
 
 \subsection{Online Adaptation of Generated Commands} \label{sec:adapt}
 
-The commands generated in the previous section are generated and sent to the UAV in open-loop. In order to close the loop, we propose a method to control for any possible error. While executing generated command string, $\mathbf{x_a}(t)$, we constantly monitor for error between the position of the vehicle, $\mathbf{p}(t)$ and the reference position as per the generated trajectory, $\mathbf{p_r}(t)$:
+The commands generated in the previous section are generated and sent to the UAV in open-loop. While we have experimentally verified open-loop results for reasonable accuracy, we desire more assured trajectory tracking by closing the loop by controlling for any possible error. While executing generated command string, $\mathbf{x_a}(t)$, we monitor the error between the position of the vehicle, $\mathbf{p}(t)$ and the reference position as per the generated trajectory, $\mathbf{p_r}(t)$:
 
 \begin{equation}
     \xi(t) = \mathbf{p}(t)-\mathbf{p_r}(t)
