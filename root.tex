@@ -148,18 +148,14 @@ In this work, we are interested in developing autonomous navigation for a UAV by
 Formally, the problem we investigate in this work can be stated as:
 
 \begin{problem}
-
  \textbf{\textit{Parameter-free Autonomous Control of UAVs}}: 
 Consider a pre-configured off-the shelf ready to fly UAV, with known model architecture $\dot{\bm{x}}=f(\bm{x},\bm{u},\bm{p})$ and control architecture $\bm{u}=g(\bm{y})$ and unknown internal parameters $\bm{p}$. Design a policy to generate the sequence of inputs $\bm{u}$ to track a user defined reference trajectory $\bm{x}_r(t),~ t \in [0,T]$ over a finite user defined horizon $T$. Specifically the policy should guarantee that the UAV position $\bm{p}(t)$ is always within a certain threshold $\delta_d$ from the generated trajectory position $\bm{p}_r(t)$
  \begin{equation} \label{eq:positlive}
         ||\bm{p}(t)-\bm{p}_r(t)|| \leq \delta_d,~\forall t \in [0,T]
     \end{equation}
     where $||\cdot||$ is the Euclidean norm.
-
 \end{problem}
 %    where $\bm{p_r}(t)$ is the reference position at time $t$, where $T$ represents an overall time horizon for the trajectory, and $\delta_d$ is a threshold for allowable deviation.
-
-
 %A UAV has the objective to track a trajectory $\bm{p_r}(t),~ t \in [0,T]$ without specific knowledge of its model parameters
 %
 %visit a set of $n$ goals, $\bm{g}\in\mathbb{R}^{n}$, at a set of $n$ target times, $\bm{t} \in\mathbb{R}^{n}$. Given $m$ human-piloted flight demonstrations, the aim is to find a policy that enables autonomous flight to generate and track a trajectory $\bm{p_r}(t),~ t \in [0,T]$ that visits the target goals $\bm{g}_i$ at the respective target times, $\bm{t}_i$, such that the following liveness requirements are met:
@@ -176,19 +172,15 @@ Consider a pre-configured off-the shelf ready to fly UAV, with known model archi
 %    \end{align}
 %    where $\tau$ is a time at which the liveness condition is met for a specific goal and $\delta_t$ is the allowable deviation in time from the target.
 %\end{enumerate}
-
-
 \section{System Models} \label{sec:sysdyn}
 %\NB{in this section we need to show the dynamical model, and control model and architecture with teleoperation. We need to stress that everything is a gray box with known model but unknown params and that the inputs and outputs are known and used later to obtain a model for autonomous fly. We need to explain the relation between teleop and u1 u2 u3 and u4 and how increasing the joystick increase the inputs and thus the integral measures mobility in the system.}
 As hinted in the introduction, we use knowledge about the UAV dynamics and control architecture to extract useful information about the system to guide a regression approach for the generation of autonomous control commands for the UAV. We focus on off-the-shelf tuned and stable quadrotors that typically are ready for teleoperation but not for autonomous flight. The control architecture of the off-the-shelf quadrotor is shown in Fig.~\ref{fig:otsctrl}.
-
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/teleopctrl.png}
     \caption{Off-the-Shelf UAV Teleoperation Control Architecture}
     \label{fig:otsctrl}
 \end{figure}
-
-The presented structure is a gray box model, where the only information known are the teleoperation inputs, indicated by $\bm{J}_x$ and $\bm{J}_y$ \NB{instead of bm please use bm everywhere}, the output, which is the position of the vehicle, $\bm{p}(t)$, over time, and the basic model architecture. The low level controller usually consists of multiple PID loops \cite{esen}, which are already developed and tuned with certain specific control gains, which can be very difficult to identify by analyzing the output of the system. The quadrotor body dynamics can be modeled using a $12^{\text{th}}$ order state vector as follows:
+The presented structure is a gray box model, where the only information known are the teleoperation inputs, indicated by $\bm{J}_x$ and $\bm{J}_y$, the output, which is the position of the vehicle, $\bm{p}(t)$, over time, and the basic model architecture. The low level controller usually consists of multiple PID loops \cite{esen}, which are already developed and tuned with certain specific control gains, which can be very difficult to identify by analyzing the output of the system. The quadrotor body dynamics can be modeled using a $12^{\text{th}}$ order state vector as follows:
 %\NB{why q in $\bm{p}_q$? In the problem formulation there is not q}
 \begin{equation}
     \bm{q} = 
@@ -196,8 +188,8 @@ The presented structure is a gray box model, where the only information known ar
     \bm{p}^\intercal & \phi & \theta & \psi & v_x & v_y & v_z & \omega_x & \omega_y & \omega_z
     \end{bmatrix}^\intercal \nonumber
 \end{equation} 
-\NB{use $\bm{p}_q$}
-where $\bm{p}_q=[x \; y \; z]^{\mathsf{T}}$ is the world frame position, $v_{x}$, $v_{y}$ and $v_z$ are the world frame velocities, $\phi$, $\theta$ and $\psi$ are the roll, pitch and yaw Euler angles and $\omega_{x}$, $\omega_{y}$ and $\omega_{z}$ are the body frame angular velocities.
+%\NB{use $\bm{p}_q$}
+where $\bm{p}=[x \; y \; z]^{\mathsf{T}}$ is the world frame position, $v_{x}$, $v_{y}$ and $v_z$ are the world frame velocities, $\phi$, $\theta$ and $\psi$ are the roll, pitch and yaw Euler angles and $\omega_{x}$, $\omega_{y}$ and $\omega_{z}$ are the body frame angular velocities.
 
 The dynamics of the vehicle are then described as follows:
 \begin{equation}
