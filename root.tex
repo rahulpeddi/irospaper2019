@@ -528,13 +528,13 @@ The commands generated in the previous section are generated and sent to the UAV
     \xi(t) = \bm{p_r}(t)-\bm{p}(t)
 \end{equation}
 
-This error, $\xi(t)$, is attributed to the most recent command sent to the system. Because the goal is to travel a certain distance over time, we take ratio of the error $\xi(t)$ to the desired distance travelled at any point in the trajectory, $\frac{\xi(t)}{\bm{p_r}(t)-\bm{p_r}(1)}$, where $\bm{p_r}(1)$ is the start of the trajectory. and a proportional controller is used to adjust the following command $\bm{J}_a(t+1)$ to obtain the closed-loop command $\bm{J}_c(t+1)$.
+This error, $\xi(t)$, is attributed to the most recent command sent to the system. To relate our error to the expected results in run-time, we take ratio of the error $\xi(t)$ to the desired distance travelled at any point in the trajectory, $\frac{\xi(t)}{\bm{p_r}(t)-\bm{p_r}(1)}$, where $\bm{p_r}(1)$ is the start of the trajectory. and a proportional controller is used to adjust the subsequent command, $\bm{J}_a(t+1)$, to obtain the closed-loop command $\bm{J}_c(t+1)$ as follows:
 
 \begin{equation}
     \bm{J}_c(t+1) = \bm{J}_a(t+1) + k_p\frac{\xi(t)}{\bm{p_r}(t)-\bm{p_r}(1)}
 \end{equation}
 
-The proportional gain, $k_p$, is set manually after experimentation.
+The proportional gain, $k_p$, is limited in our case, such that the new input command does not exceed .
 
 
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
