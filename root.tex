@@ -564,15 +564,33 @@ The first experiments consisted of tracking a diagonal distance, to validate tha
 	\centering
 	\subfigure[Open-Loop Trajectory \label{fig:1723open}]{\includegraphics[width=0.48\linewidth]{images/1723open.png}}
     \subfigure[Closed-Loop Trajectory \label{fig:1723close}]{\includegraphics[width=0.48\linewidth]{images/1723closed.png}}
-	\caption{Command Generation Process}
+	\caption{Diagonal Trajectories of UAV Experiments}
 	\label{fig:1723}
 \end{figure}
 
+In addition to the diagonal trajectories, the $x$ and $y$ component trajectories in open and closed loop are presented in Fig.~\ref{fig:expcomponents}. The $x$ trajectories were flipped to appear positive for the purposes of visualization.
 
+\begin{figure}[h]
+	\centering
+	\subfigure[X Component Trajectories\label{fig:expxcomp}]{\includegraphics[width=0.48\linewidth]{images/17Xtraj.png}}
+    \subfigure[Y Component Trajectories \label{fig:expycomp}]{\includegraphics[width=0.48\linewidth]{images/23Ytraj.png}}
+	\caption{Component Trajectories of UAV Experiments}
+	\label{fig:expcomponents}
+\end{figure}
 
+Within the same experiment, the commands sent to the system in open and closed loop were also recorded. These commands in Fig.~\ref{fig:expcmds}, show how the commands change when we close the loop using the approach in Section~\ref{sec:adapt}. 
 
+\begin{figure}[h]
+	\centering
+	\subfigure[X Component Commands\label{fig:xcmds}]{\includegraphics[width=0.48\linewidth]{images/1723Xcmds.png}}
+    \subfigure[Y Component Commands \label{fig:ycmds}]{\includegraphics[width=0.48\linewidth]{images/1723Ycmds.png}}
+	\caption{Commands Generated in UAV Experiments}
+	\label{fig:expcmds}
+\end{figure}
 
-To further validate the approach, a square-shaped trajectory, and a discretized $8$ shaped trajectory were tested. 
+In Fig.~\ref{fig:xcmds}, it is evident that there is little correction being done. This is because the commands given in the $x$ direction proved to only slightly deviate from the desired target. The commands in Fig~\ref{fig:ycmds} show a clear adjustment, as the open loop trajectory clearly does not reach the target. 
+
+To further validate the approach, a square-shaped trajectory, and a discretized $8$ shaped trajectory were tested.[In Progress] 
 
 Lastly, the letters U, V, and A were created with the UAV. The planned trajectories were created using minimum snap trajectories, as discussed in Section~\ref{sec:traj} and actual trajectories travelled by the UAV are shown in Fig.~\ref{fig:UVA}.
 
