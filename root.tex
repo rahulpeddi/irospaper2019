@@ -227,7 +227,9 @@ Through observation of a single demonstrated trial, we are able to identify impo
     \label{fig:sampleintegral}
 \end{figure}
 \NB{we should show this picture in parallel with the speed and position of the vehicle to connect with the integral}
-In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration on a Parrot BeBop 2 quadrotor which is a hobby-grade quadrotor. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in the negative $y$-direction.  \NB{just so we remember to mention somewhere: this command from the joystick could be anything...velocity acceleration, torque, voltage...and the approach will be able to relate that command with the change of velocity and position in the system}
+In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration on a Parrot BeBop 2 quadrotor which is a hobby-grade quadrotor. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in the negative $y$-direction. The teleoperation command, in our case, adheres to desired pitch angles, but the user could be adjusting any value that affects motion of the system, such as acceleration, torque, or even voltage provided to the motors. Our approach is able to connect any of these commands to the change in position  and velocity of the system.
+
+%\NB{just so we remember to mention somewhere: this command from the joystick could be anything...velocity acceleration, torque, voltage...and the approach will be able to relate that command with the change of velocity and position in the system}
 
 
 From \eqref{eq:cinputs}, we observe that the inputs $u_2$ and $u_3$ for roll and pitch rely on the change in the desired Euler roll $\phi_c$ and pitch $\theta_c$ angles, and these desired roll and pitch angles are a function of the desired positions and velocities which are provided by the user in our work. 
@@ -238,7 +240,7 @@ Hence, each stroke in the joystick transforms into motion of the vehicle which i
 %Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the integral. i.e. the total area, under the string of commands. Because the pitch is proportional to the linear velocity in the $y$-direction, we know that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled 
 %\NB{here show that because u2 depends on $\phi_c$ and $\phi_c$ depends on x then this integral represents motion but what you really need to stress is that it is a compact measure without having to use the entire string of commands for learning}.
 
-Because the integral by itself may not be enough to characterize a unique behavior of the UAV because the same integral can be achieved with commands strings for different traveling distance and velocities, here we collect also the average command. By using the combination of integral and average input commands we can improve precision during the process of generating autonomous commands during missions, which consists in selecting a certain distance and time during run-time.
+Because the integral by itself may not be enough to characterize a unique behavior of the UAV because the same integral can be achieved with commands strings for different traveling distance and velocities, here we collect also the average command. By using the combination of integral and average input commands, we can improve precision during the process of generating autonomous commands during missions, which consists of selecting a certain distance and time during run-time.
 
 %must be fixed to a certain length (time) and travel a certain distance.
 %
@@ -534,8 +536,7 @@ This error, $\xi(t)$, is attributed to the most recent command sent to the syste
     \bm{J}_c(t+1) = \bm{J}_a(t+1) + k_p\frac{\xi(t)}{\bm{p_r}(t)-\bm{p_r}(1)}
 \end{equation}
 
-The proportional gain, $k_p$, is limited in our case, such that the new input command does not exceed .
-
+In our work, the proportional gain, $k_p$ is a static value that is set based on the input being provided to the system. 
 
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
 
@@ -544,7 +545,7 @@ The proportional gain, $k_p$, is limited in our case, such that the new input co
 
 The proposed approach was validated experimentally using an Parrot Bebop 2 Drone quadrotor UAV, which arrives tuned and stable for teleoperation off-the-shelf. Since experiments were conducted indoors, a Vicon motion capture system was used to obtain the position and velocity of the vehicle. The teleoperation was performed using a node written in the ROS environment.
 
-The training set was generating by having a human teleoperate the system $12$ times with motion that only consisted of pitch commands. These training trajectories had different distances and took different amounts of time. We were also able to use this same training set to generate roll commands for our UAV. The regression and error analysis was done in Matlab to obtain the surfaces pictured in Section \ref{sec:train}, and are shown in Figs.~\ref{fig:integs}, \ref{fig:joys}, and \ref{fig:bounds}. Next, the command generation was done using the Image Processing Toolbox in Matlab. Lastly, the real experiments were conducted using ROS in conjunction with the Robotics System Toolbox to interface our regression models within the Matlab environment with ROS.
+The training set was generated by having a human teleoperate the system $12$ times with motion that only consisted of pitch commands. These training trajectories had different distances and took different amounts of time. We were also able to use this same training set to generate roll commands for our UAV. The regression and error analysis was done in Matlab to obtain the surfaces pictured in Section \ref{sec:train}, and are shown in Figs.~\ref{fig:integs}, \ref{fig:joys}, and \ref{fig:bounds}. Next, the command generation was done using the Image Processing Toolbox in Matlab. Lastly, the experiments were conducted using ROS in conjunction with the Robotics System Toolbox to interface our regression models within the Matlab environment with ROS.
 
 The first experiments consisted of tracking straight line distances and diagonal distance, to validate that $x$ and $y$ components as discussed in Section~\ref{sec:traj} can be attained accurately. For straight line distances, we use a trajectory that travelled $1.85$m in $5$ seconds.
 
