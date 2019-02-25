@@ -276,14 +276,14 @@ Going back to the architecture in Fig.\~ref{fig:blockdiagram}, in the next few s
 %First, we will discuss the trajectory decomposition, as our problem ultimately is to accurately track any trajectory.
  
 
-<<<<<<< HEAD
+%<<<<<<< HEAD
 
 %The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity, a new command string consisting of commands for both lateral and longitudinal directions is created using the models within training set. At this stage, we generate the inputs, $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, accurate trajectory tracking cannot be guaranteed. 
 %
 %Tracking error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. First, we will discuss the trajectory decomposition, as our problem ultimately is to accurately track any trajectory.
-=======
-The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity, a new command string consisting of commands for both lateral and longitudinal directions is created using the models within training set. At this stage, we generate the inputs, $\bm{J}_x(t)$ and $\bm{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, accurate trajectory tracking cannot be guaranteed. Tracking error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\bm{J}_x(t+1)$ and $\bm{J}_y(t+1)$ to obtain closed loop input commands $\bm{J}_{cx}(t+1)$ and $\bm{J}_{cy}(t+1)$. First, we will discuss the trajectory decomposition, as our problem ultimately is to accurately track any trajectory.
->>>>>>> origin/master
+%=======
+%The proposed approach is outlined in Fig.\ref{fig:blockdiagram}. The approach begins with multiple demonstrations that are used to build a regression model that enables identification of the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, given a user-set target distance, $d_u$, and time, $t_u$. With the integral and average velocity, a new command string consisting of commands for both lateral and longitudinal directions is created using the models within training set. At this stage, we generate the inputs, $\bm{J}_x(t)$ and $\bm{J}_y(t)$, needed by the system to follow the given trajectory. Because these actions are created in open-loop, accurate trajectory tracking cannot be guaranteed. Tracking error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\bm{J}_x(t+1)$ and $\bm{J}_y(t+1)$ to obtain closed loop input commands $\bm{J}_{cx}(t+1)$ and $\bm{J}_{cy}(t+1)$. First, we will discuss the trajectory decomposition, as our problem ultimately is to accurately track any trajectory.
+%>>>>>>> origin/master
 
 
 %\NB{introduce next section... the paper reads like independent sections}
@@ -535,11 +535,9 @@ The error $\xi(t)$ is attributed to the most recent command $\bm{J}_a(t)$, and a
 \end{equation}
 
 The proportional gain, $k_p(t)$, is automatically tuned based using a gradient descent method where the proportional gain is adjusted until the position error, $\xi(t)$ converges to $0$. The initial value of our gain, $k_p$ is set to $0$, which indicates that we assume 
-
 \begin{equation}
     k_p(t+1) = k_p(t) + \frac{\xi(t)}{\bm{p_r}(t)}
 \end{equation}
-
 The quantity $\frac{\xi(t)}{\bm{p_r}(t)}$ relates the current error to the desired position within the trajectory. 
 
 
