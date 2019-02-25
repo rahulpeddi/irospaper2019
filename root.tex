@@ -225,11 +225,20 @@ Through observation of a single demonstrated trial, we are able to identify impo
 
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/sampleintegral.png}
-    \caption{A sample of a single demonstrated flight}
+    \caption{A Sample of a Single Demonstrated Flight}
     \label{fig:sampleintegral}
 \end{figure}
-\NB{we should show this picture in parallel with the speed and position of the vehicle to connect with the integral}
-In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration on a Parrot BeBop 2 quadrotor which is a hobby-grade quadrotor. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in the negative $y$-direction. The teleoperation command, in our case, adheres to desired pitch angles, but the user could be adjusting any value that affects motion of the system, such as acceleration, torque, or even voltage provided to the motors. Our approach is able to connect any of these commands to the change in position  and velocity of the system.
+
+\begin{figure}[h]
+	\centering
+	\subfigure[Sample Trajectory\label{fig:sampt}]{\includegraphics[width=0.48\linewidth]{images/sampletrajectory.png}}
+	\subfigure[Sample Velocity\label{fig:sampv}]{\includegraphics[width=0.48\linewidth]{images/samplevelocity.png}}
+	\caption{Sample Demonstration Trajectory and Velocity}
+	\label{fig:samps}
+\end{figure}
+
+%\NB{we should show this picture in parallel with the speed and position of the vehicle to connect with the integral}
+In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration on a Parrot BeBop 2 quadrotor which is a hobby-grade quadrotor. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in the negative $y$-direction. The teleoperation command, in our case, adheres to desired pitch angles, but the user could be adjusting any value that affects motion of the system, such as acceleration, torque, or even voltage provided to the motors. Our approach is able to connect any of these commands to the change in position  and velocity of the system. In our case, we connect the integral to the distance travelled by the trajectory in Fig.~\ref{fig:sampt} anf the velocity profile shown in Fig.~\ref{fig:sampv}.
 
 %\NB{just so we remember to mention somewhere: this command from the joystick could be anything...velocity acceleration, torque, voltage...and the approach will be able to relate that command with the change of velocity and position in the system}
 
@@ -336,8 +345,8 @@ From the discretized trajectory, we can obtain the $x$ and $y$ components of eac
 where $c_{x}(t_s,t_{s+1})$ and $c_{y}(t_s,t_{s+1})$ are the distances between each segment in $x$ and $y$ directions. These values are taken for each of the $n$ trajectory segments with the same time-step, $\delta t$, and are appended to one another to create the desired output for which we will generate input commands. In Fig.~\ref{fig:trajdec}, we show an example of a generated trajectory with its discretization and the $x$ and $y$ components that are stitched together.
 \begin{figure}[h]
 	\centering
-	\subfigure[\label{fig:t2dec}]{\includegraphics[width=0.48\linewidth]{images/traj2dec.png}}
-	\subfigure[\label{fig:tdec}]{\includegraphics[width=0.48\linewidth]{images/trajdecomp.png}}
+	\subfigure[Discretized Trajectory\label{fig:t2dec}]{\includegraphics[width=0.48\linewidth]{images/traj2dec.png}}
+	\subfigure[X and Y Components\label{fig:tdec}]{\includegraphics[width=0.48\linewidth]{images/trajdecomp.png}}
 	\caption{Example of a Generated Trajectory with its $x,y$ Decomposition}
 	\label{fig:trajdec}
 \end{figure}
@@ -498,7 +507,7 @@ From the training set of $m$ samples, we select the trial that has the closest i
 \bm{J}^* = \bm{J}_i \in \bm{J}\vert e_i = \min_e(\bm{e})
 \end{equation}
 
-This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing vector interpolation to re-size $\bm{J}^*$, such that important features in the optimal command vector are not lost. These methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss \cite{bicfeatures}. Bicubic interpolation is our chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity \cite{biccomp}. The general form of a bicubic interpolation equation is 
+This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing vector interpolation to re-size $\bm{J}^*$, such that important features in the optimal command vector are not lost. Interpolation methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss \cite{bicfeatures}. Bicubic interpolation is our chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity \cite{biccomp}. The general form of a bicubic interpolation equation is: 
 
 \begin{equation} \label{eq:bicinter}
     b(x) = \sum_{i=0}^3a_ij^i
