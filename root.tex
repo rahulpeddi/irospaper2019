@@ -78,7 +78,7 @@ Parameter-free Regression-based Autonomous Control of Off-the-shelf Quadrotor UA
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-Autonomous flight in unmanned aerial vehicles (UAVs) generally require platform-specific knowledge of the dynamical parameters and control architecture. Recently, UAVs have become more accessible with off-the-shelf options that are well-tuned and stable for user teleoperation. In this paper, we develop a method to enable autonomous flight on vehicles that are designed for teleoperation with minimal knowledge of the system parameters and the control architecture. The proposed method leverages human teleoperated trajectories to train a thin-plate spline (TPS) regression model, which is then used with image processing on the pre-trained commands to generate new autonomous input commands for new trajectories. A control strategy is also proposed to adjust autonomous input commands in real-time, in order to close the loop for assured autonomy. Finally, we validate the proposed approach with trajectory-following experiments on a quadrotor UAV.
+Autonomous flight in unmanned aerial vehicles (UAVs) generally require platform-specific knowledge of the dynamical parameters and control architecture. Recently, UAVs have become more accessible with off-the-shelf options that are well-tuned and stable for user teleoperation. In this paper, we develop a method to enable autonomous flight on vehicles that are designed for teleoperation with minimal knowledge of the system parameters and the control architecture. The proposed method leverages human teleoperated trajectories to train a thin-plate spline (TPS) regression model, which is then used with image processing \NB{?} on the pre-trained commands to generate new autonomous input commands for new trajectories. A control strategy is also proposed to adjust autonomous input commands in real-time, in order to close the loop for assured autonomy. Finally, we validate the proposed approach with trajectory-following experiments on a quadrotor UAV.
 
 \end{abstract}
 
@@ -236,7 +236,7 @@ Through observation of a single demonstrated trial, we are able to identify impo
 	\caption{Sample Demonstration Trajectory and Velocity}
 	\label{fig:samps}
 \end{figure}
-
+\NB{make these figures long and short and aligned vertically }
 %\NB{we should show this picture in parallel with the speed and position of the vehicle to connect with the integral}
 In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration on a Parrot BeBop 2 quadrotor which is a hobby-grade quadrotor. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in the negative $y$-direction. The teleoperation command, in our case, adheres to desired pitch angles, but the user could be adjusting any value that affects motion of the system, such as acceleration, torque, or even voltage provided to the motors. Our approach is able to connect any of these commands to the change in position  and velocity of the system. In our case, we connect the integral to the distance travelled by the trajectory in Fig.~\ref{fig:sampt} anf the velocity profile shown in Fig.~\ref{fig:sampv}.
 
@@ -515,7 +515,7 @@ This optimal pre-trained sample is then adjusted to reflect the user-set time, $
 
 where $j$ is an entry in vector $\bm{J}^*$ and $a$ represents the coefficients of the function at each point. Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\bm{J}^*$. After resizing, we obtain the time adjusted input vector $\bm{J}'$.
 
-The next step is to adjust the input vector such that the system reaches the user-set goal $d_u$. This is done by leveraging the average velocity information, that is, $\bar{j}_u$. Because distance is a function of average velocity and time, the scale time-adjusted vector $\bm{J}'$ is scaled such that its mean is equivalent to $\bar{j}_u$. We then obtain
+The next step is to adjust the input vector such that the system reaches the user-set goal $d_u$. This is done by leveraging the average velocity \NB{average velocity?} information, that is, $\bar{j}_u$. Because distance is a function of average velocity and time, the scale time-adjusted vector $\bm{J}'$ is scaled such that its mean is equivalent to $\bar{j}_u$. We then obtain
 
 \begin{equation} \label{eq:imgscale}
 \bm{J}_a = \bm{J}'\bigg(\frac{\bar{j}_u}{\bar{j}'}\bigg)
@@ -554,7 +554,7 @@ In our work, the proportional gain, $k_p$ is a static value that is set based on
 
 \section{Experiments} \label{sec:exper}
 
-The proposed approach was validated experimentally using an Parrot Bebop 2 Drone quadrotor UAV, which arrives tuned and stable for teleoperation off-the-shelf. Since experiments were conducted indoors, a Vicon motion capture system was used to obtain the position and velocity of the vehicle. The teleoperation was performed using a node written in the ROS environment.
+The proposed approach was validated experimentally using a Parrot Bebop 2 quadrotor UAV, which is tuned and stable for teleoperation off-the-shelf. Since experiments were conducted indoors, a Vicon motion capture system was used to obtain the position and velocity of the vehicle. Alternatively, one could use GPS and IMU data to obtain similar features. The teleoperation was performed using a node written in the ROS environment.
 
 The training set was generated by having a human teleoperate the system $12$ times with motion that only consisted of pitch commands. These training trajectories had different distances and took different amounts of time. We were also able to use this same training set to generate roll commands for our UAV. The regression and error analysis was done in Matlab to obtain the surfaces pictured in Section \ref{sec:train}, and are shown in Figs.~\ref{fig:integs}, \ref{fig:joys}, and \ref{fig:bounds}. Next, the command generation was done using the Image Processing Toolbox in Matlab. Lastly, the experiments were conducted using ROS in conjunction with the Robotics System Toolbox to interface our regression models within the Matlab environment with ROS.
 
@@ -616,7 +616,7 @@ Lastly, the letters U, V, and A were created with the UAV. The planned trajector
 
 \section{Conclusions} \label{sec:conc}
 In this work, we have presented an approach that enables autonomous flight on off-the-shelf quadrotors that are primarily tuned for teleoperation. Our approach shows that we can use a small training set along with a regression analysis to generate commands for any trajectory, along with adapting and closing the loop in real-time to reduce tracking error. For future work, we plan to increase the capabilities of our work by adding yaw commands and changing the altitude of the UAV.
-
+\NB{need to add that we want to test with other sensors like cameras and imu which add errors}
 
 
 \section{Acknowledgement}
