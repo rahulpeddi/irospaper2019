@@ -139,7 +139,7 @@ In recent years, we have seen many developments in the study of unmanned aerial 
 
 Some of the more recent advancements in this area feature machine learning and data-driven approaches, such as deep learning (DL), imitation learning (IL), and reinforcement learning (RL). In \cite{dln}, the authors use DL to learn driving models for ground vehicles by using large-scale video datasets, and in \cite{rlctrl}, the authors use RL over $1,000$ training samples for accurate quadrotor trajectory tracking. These methods are model and parameter free, but use extremely large datasets to resolve that issue. In \cite{uavrace}, the authors explore the idea of observational imitation learning (OIL), where they learn from a relatively small number of demonstrations, but also assume knowledge of the controller architecture and perform parameter estimation, which can be a daunting task without knowledge of the controller architecture. The authors in \cite{abbeel} use apprenticeship learning, which is similar to IL, to train a UAV to perform trajectories with a very simplified model, but there is still a necessity to learn some dynamical parameters, while assuming knowledge of several others. Despite having to learn certain parameters, these authors show the ability to learn trajectory tracking using only important information from only $20$ minutes of flight time. The understated desire for smaller training sets is prevalent in many of the works in this area. Some works, such as \cite{gppaper} use a stochastic method known as a Gaussian Process (GP) to accurately tune a simplified UAV controller. Use of stochastic or regression based methods, such as GPs have shown the ability to execute imitation learning with limited training sets and information \cite{imlerngp,imlernreg}.
 
-Our work is largely based on combining the aforementioned apprenticeship learning theory with a regression method - we show how we can obtain and analyze important information from a relatively small number of demonstrations. Contrary to the model based approaches, we assume no knowledge of specific dynamical parameters, and only a basic idea of the structure of the dynamical model and controller architecture. This makes parameter estimation a rather unfeasible and inefficient task. Instead, we use information obtained from our human-piloted training demonstrations to directly generate control inputs to track any trajectory, by way of training and analyzing a regression model and implementing online adaptive loop-closure.
+Our work is largely based on combining the aforementioned apprenticeship learning theory with a regression method - we show how we can obtain and analyze important information from a relatively small number of demonstrations. Contrary to the model based approaches, we assume no knowledge of specific dynamical parameters, and only a general idea of the dynamical model and controller architecture. This makes parameter estimation a rather unfeasible and inefficient task. Instead, we use information obtained from our human-piloted training demonstrations to directly generate control inputs to track any trajectory, by way of training and analyzing a regression model and implementing online adaptive loop-closure.
 
 
 %\NB{overall outline for reference: model of quadrotor is unknown but skeleton architecture is known and the controller is u1, u2, u3 = equations. Because of how the controller is designed, we know that u2 is used to change x and u3 y. A change in u2 is equivalent to a change in the x position. The higher is this change the more motion is generated hence the area under the curve described by the commands sent to the quadrotor is related to the motion of the system and here is where the regression approach is sued. Instead of learnign the parameters that is hard we use regression to learn to fly directly by leveraging the integral and the knowledge about the system. }
@@ -151,7 +151,7 @@ Formally, the problem we investigate in this work can be stated as:
 
 \begin{problem}
  \textbf{\textit{Parameter-free Autonomous Control of UAVs}}: 
-Consider a pre-configured off-the shelf ready to fly UAV, with known model architecture $\dot{\bm{x}}=f(\bm{x},\bm{u},\bm{p})$ and control architecture $\bm{u}=g(\bm{y})$ and unknown internal parameters $\bm{p}$. Design a policy to generate the sequence of inputs $\bm{u}$ to track a user defined reference trajectory $\bm{x}_r(t),~ t \in [0,T]$ over a finite user defined horizon $T$. Specifically the policy should guarantee that the UAV position $\bm{p}(t)$ is always within a certain threshold $\delta_d$ from the generated trajectory position $\bm{p}_r(t)$
+Consider a pre-configured off-the shelf ready to fly UAV, with known model architecture $\dot{\bm{x}}=f(\bm{x},\bm{u},\bm{p})$ and control architecture $\bm{u}=g(\bm{y})$ and unknown internal parameters $\mathcal{P}$. Design a policy to generate the sequence of inputs $\bm{u}$ to track a user defined reference trajectory $\bm{x}_r(t),~ t \in [0,T]$ over a finite user defined horizon $T$. Specifically the policy should ensure that the UAV position $\bm{p}(t)$ is always within a certain threshold $\delta_d$ from the generated trajectory position $\bm{p}_r(t)$
  \begin{equation} \label{eq:positlive}
         ||\bm{p}(t)-\bm{p}_r(t)|| \leq \delta_d,~\forall t \in [0,T]
     \end{equation}
@@ -236,7 +236,10 @@ Through observation of a single demonstrated trial, we are able to identify impo
 	\caption{Sample Demonstration Trajectory and Velocity}
 	\label{fig:samps}
 \end{figure}
-\NB{make these figures long and short and aligned vertically }
+
+
+
+%\NB{make these figures long and short and aligned vertically }
 %\NB{we should show this picture in parallel with the speed and position of the vehicle to connect with the integral}
 In Fig. \ref{fig:sampleintegral}, we show a sample of a single flight demonstration on a Parrot BeBop 2 quadrotor which is a hobby-grade quadrotor. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which would send the UAV in the negative $y$-direction. The teleoperation command, in our case, adheres to desired pitch angles, but the user could be adjusting any value that affects motion of the system, such as acceleration, torque, or even voltage provided to the motors. Our approach is able to connect any of these commands to the change in position  and velocity of the system. In our case, we connect the integral to the distance travelled by the trajectory in Fig.~\ref{fig:sampt} anf the velocity profile shown in Fig.~\ref{fig:sampv}.
 
@@ -515,8 +518,8 @@ This optimal pre-trained sample is then adjusted to reflect the user-set time, $
 
 where $j$ is an entry in vector $\bm{J}^*$ and $a$ represents the coefficients of the function at each point. Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\bm{J}^*$. After resizing, we obtain the time adjusted input vector $\bm{J}'$.
 
-The next step is to adjust the input vector such that the system reaches the user-set goal $d_u$. This is done by leveraging the average velocity \NB{average velocity?} information, that is, $\bar{j}_u$. Because distance is a function of average velocity and time, the scale time-adjusted vector $\bm{J}'$ is scaled such that its mean is equivalent to $\bar{j}_u$. We then obtain
-
+The next step is to adjust the input vector such that the system reaches the user-set goal $d_u$. This is done by leveraging the average input command information, that is, $\bar{j}_u$. Because we have identified in Section~\ref{sec:sysdyn} that distance is a function of this average input command and time, the scale time-adjusted vector $\bm{J}'$ is scaled such that its mean is equivalent to $\bar{j}_u$. We then obtain
+%\NB{average velocity?}
 \begin{equation} \label{eq:imgscale}
 \bm{J}_a = \bm{J}'\bigg(\frac{\bar{j}_u}{\bar{j}'}\bigg)
 \end{equation}
@@ -535,19 +538,25 @@ In Fig.~\ref{fig:gensample}, we show visually the steps of command generation. I
 
 \subsection{Online Adaptation of Generated Commands} \label{sec:adapt}
 
-The commands generated in the previous section are generated and sent to the UAV in open-loop. While we have experimentally verified open-loop results for reasonable accuracy, we desire more assured trajectory tracking by closing the loop by controlling for any possible error. While executing generated command string, $\bm{x_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$:
+The commands generated in the previous section are generated and sent to the UAV in open-loop. While we have experimentally verified open-loop results for reasonable accuracy, we desire more assured trajectory tracking by closing the loop by controlling for any possible error. While executing generated command string, $\bm{J_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$:
 
 \begin{equation}
     \xi(t) = \bm{p_r}(t)-\bm{p}(t)
 \end{equation}
 
-This error, $\xi(t)$, is attributed to the most recent command sent to the system. To relate our error to the expected results in run-time, we take ratio of the error $\xi(t)$ to the desired distance travelled at any point in the trajectory, $\frac{\xi(t)}{\bm{p_r}(t)-\bm{p_r}(1)}$, where $\bm{p_r}(1)$ is the start of the trajectory. and a proportional controller is used to adjust the subsequent command, $\bm{J}_a(t+1)$, to obtain the closed-loop command $\bm{J}_c(t+1)$ as follows:
+This error, $\xi(t)$, is attributed to the most recent command sent to the system. In order to adjust the next input to correct for the error, we use a proportional-integral (PI) controller to adjust the subsequent command, $\bm{J}_a(t+1)$, to obtain the closed-loop command $\bm{J}_c(t+1)$ as follows:
 
 \begin{equation}
-    \bm{J}_c(t+1) = \bm{J}_a(t+1) + k_p\frac{\xi(t)}{\bm{p_r}(t)-\bm{p_r}(1)}
+    \bm{J}_c(t+1) = \bm{J}_a(t+1) + k_p\xi(t) + k_i\int_{0}^{t}\xi(t')dt'
 \end{equation}
 
-In our work, the proportional gain, $k_p$ is a static value that is set based on the input being provided to the system. 
+In our work, the controller gains, $k_p$ and $k_i$, are static values that are set based on the input being provided to the system. The gains are set as follows:
+\begin{align} \label{eq:ctrls}
+    k_p &= r_p\bar{j}_a  \nonumber \\
+    k_i &= r_i\bm{J}_a(t)
+\end{align}
+
+where $\bar{j}_a$ is the average input from the open loop commands, and $\bm{J}_a(t)$ is the previously sent input command. In \eqref{eq:ctrls}, $r_p$ and $r_i$ represent the ratios applied to each of the gains. These correction ratios depend on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions (i.e., different correction ratios may be desirable for indoor and outdoor flight due to disturbances and other effects). Using this controller, we are able to ensure that the error stays within the assigned threshold
 
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
 
@@ -588,9 +597,16 @@ Within the same experiment, the commands sent to the system in open and closed l
 	\label{fig:expcmds}
 \end{figure}
 
-In Fig.~\ref{fig:xcmds}, it is evident that there is little correction being done. This is because the commands given in the $x$ direction proved to only slightly deviate from the desired target. The commands in Fig~\ref{fig:ycmds} show a clear adjustment, as the open loop trajectory clearly does not reach the target. 
+In Fig.~\ref{fig:xcmds}, it is evident that there is little correction being done. This is because the commands given in the $x$ direction proved to only slightly deviate from the desired target. The commands in Fig~\ref{fig:ycmds} show a clear adjustment, as the open loop trajectory clearly does not reach the target. For this experiment, the correction ratios were set to $r_p = r_i = 1/(ft_u)$, where $t_u$ is the target time set for this trajectory, and $f$ is the rate at which autonomous commands are sent to the system. 
 
-To further validate the approach, a square-shaped trajectory, and a discretized $8$ shaped trajectory were tested.[In Progress] 
+To further validate the approach, a square-shaped trajectory was tested. 
+\begin{figure}[h]
+	\centering
+	\subfigure[Closed Loop Square \label{fig:clsquare}]{\includegraphics[width=0.48\columnwidth]{images/closedsquare.png}}
+    \subfigure[Open Loop Square \label{fig:opensquare}]{\includegraphics[width=0.48\columnwidth]{images/opensquare.png}}
+	\caption{Square-Shaped Trajectory in Open and Closed Loop}
+	\label{fig:sqr}
+\end{figure}
 
 Lastly, the letters U, V, and A were created with the UAV. The planned trajectories were created using minimum snap trajectories, as discussed in Section~\ref{sec:traj} and actual trajectories travelled by the UAV are shown in Fig.~\ref{fig:UVA}.
 
@@ -608,10 +624,6 @@ Lastly, the letters U, V, and A were created with the UAV. The planned trajector
 \subfigure[UAV A Trajectory]{\label{ex6}
 \includegraphics[width=0.3\textwidth]{images/FINAL_A.png}}
 \end{figure*}
-
-
-
-
 
 
 \section{Conclusions} \label{sec:conc}
