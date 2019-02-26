@@ -553,9 +553,10 @@ In Fig.~\ref{fig:gensample}, we show visually the steps of command generation \N
 	\label{fig:gensample}
 \end{figure}
 
+\NB{where is the part of the text in which you show how to generate the prediction of the position occupied by the vehicle by following the determined sequence of inputs?}
 \subsection{Online Adaptation of Generated Commands} \label{sec:adapt}
 
-The commands generated in the previous section are generated and sent to the UAV in open-loop. While we have experimentally verified open-loop results for reasonable accuracy, we desire more assured trajectory tracking by closing the loop by controlling for any possible error. While executing generated command string, $\bm{J_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$:
+The commands generated in the previous section are generated and sent to the UAV in open-loop. While we have experimentally verified open-loop results for reasonable accuracy\NB{where? I haven't seen any results yet.}, we desire more assured trajectory tracking by closing the loop by controlling for any possible error. While executing generated command string, $\bm{J_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$:
 
 \begin{equation}
     \xi(t) = \bm{p_r}(t)-\bm{p}(t)
