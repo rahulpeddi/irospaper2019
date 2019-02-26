@@ -316,14 +316,14 @@ In order to generate a trajectory, we first select waypoints through which the U
 %    \bm{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\ddddot{p},\dddot{p},\ddot{p},\dot{p},p,t)dt
     \bm{p}^*(t) = \argmin_{p(t)}\int_0^T(\ddddot{p})^2dt
 \end{equation}
-\NB{I've correct the expression above}
-Solving \eqref{eq:minjerkint}, we obtain the form:
-\begin{equation}
-    \bm{p}^*(t) = c_7t^7 + c_6t^6 + c_5t^5 + c_4t^4 + c_3t^3 + c_2t^2 + c_1t + c_0 
-\end{equation}
-where $c_0,\ldots,c_7$ are constants associated with specific waypoints in the trajectory.\NB{this is incorrect. Are you doing this in your simulation???}
-\NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
-Having obtained the smooth trajectory, we then discretize the trajectory into $n$ parts, each of which will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$.
+%\NB{I've correct the expression above}
+%Solving \eqref{eq:minjerkint}, we obtain the form:
+%\begin{equation}
+%    \bm{p}^*(t) = c_7t^7 + c_6t^6 + c_5t^5 + c_4t^4 + c_3t^3 + c_2t^2 + c_1t + c_0 
+%\end{equation}
+%where $c_0,\ldots,c_7$ are constants associated with specific waypoints in the trajectory.%\NB{this is incorrect. Are you doing this in your simulation???}
+%\NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
+Having obtained a smooth trajectory, we then discretize the trajectory into $n$ parts, each of which will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$.
 % and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_s + \Delta t$. 
 %\NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
 %\NB{please write the mathematical expression for the x and y component from the trajectory otherwise this section is incomplete}
