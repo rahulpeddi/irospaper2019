@@ -477,8 +477,8 @@ Some examples of discretized trajectories are shown in Fig.~\ref{fig:trajs}.
 
 From the discretized trajectory, we can obtain the $x$ and $y$ components of each leg of the trajectory. All components can then be composed in a sequence obtaining two trajectories in the $x$ and $y$ directions as follows:
 \begin{align}
-    \bm{p}_x^*&=\left[ \bm{p}_x^*(t_1), \bm{p}_x^*(t_2), \ldots, \bm{p}_x^*(t_n-1)\right] \nonumber \\
-    \bm{p}_y^*&=\left[ \bm{p}_y^*(t_1), \bm{p}_y^*(t_2), \ldots, \bm{p}_y^*(t_n-1)\right]
+    \bm{p}_x^*&=\left[ \bm{p}_x^*(t_1), \bm{p}_x^*(t_2), \ldots, \bm{p}_x^*(t_{n})\right] \nonumber \\
+    \bm{p}_y^*&=\left[ \bm{p}_y^*(t_1), \bm{p}_y^*(t_2), \ldots, \bm{p}_y^*(t_{n})\right]
 \end{align}
 
 Fig.~\ref{fig:trajdec}(a) shows an example of a generated trajectory with its discretization while Fig.~\ref{fig:trajdec}(b) displays the $x$ and $y$ sequences together.
@@ -491,7 +491,16 @@ Fig.~\ref{fig:trajdec}(a) shows an example of a generated trajectory with its di
 \end{figure}
 
 %In Fig.~\ref{fig:tdec}, we show the components at each interval. 
-These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory.  
+These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. We alleviate this problem algorithmically:
+
+\begin{algorithm}[ht!]
+\caption{Trajectory Correction} \label{alg:pred}
+\begin{algorithmic}[1]
+\IF{$\bm{p}_x^*(t_{i+1})-\bm{p}_x^*(t_{i}) \notin $}
+\STATE
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
 
 Having obtained the $x$ and $y$ trajectory components, we will now discuss the command generation procedures that we use to build a policy that enables autonomous tracking of the trajectory.
 %\NB{it may be better to show the trajectory generation later}
@@ -520,16 +529,16 @@ This optimal pre-trained sample is then adjusted to reflect the user-set time, $
 \end{equation}
 
 where $j$ is an entry in vector $\bm{J}^*$ and $a_i$ represents the coefficient of the best-fit cubic function at each point. %\NB{no clue what this means...what are these coefficients? coefficients of the cubic best fit to find the values that would go in between each entry}.
-Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\bm{J}^*$. This method is result from \cite{bicfeatures}, where it is described in more detail. After resizing, we obtain the time adjusted input vector $\bm{J}'$.
+Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\bm{J}^*$. This method is a result from \cite{bicfeatures}, where it is described in more detail. After resizing, we obtain the time adjusted input vector $\bm{J}'$.
 
 The next step is to adjust the input vector such that the system reaches the waypoint at distance $d_u$ by leveraging the average input command information $\bar{j}_u$. Because we have identified in Section~\ref{sec:sysdyn} that distance is a function of this average input command and time, the time-adjusted vector $\bm{J}'$ is scaled such that its mean is equivalent to $\bar{j}_u$:
 %\NB{average velocity?}
 \begin{equation} \label{eq:imgscale}
 \bm{J}'' = \bm{J}'\bigg(\frac{\bar{j}_u}{\bar{j}'}\bigg)
 \end{equation}
-Lastly, we check for integral error. While using the fitted average input, $\bar{j}_u$, scales the string, there may still be some error between the integral of our new command string and the desired integral, $g_u$. The ratio between the two integrals is leveraged to re-scale the command string:
+Lastly, we check for integral error. While using the fitted average input, $\bar{j}_u$, scales the commands, there may still be some error between the integral of our new command string and the desired integral, $g_u$. The ratio between the two integrals is leveraged to re-scale the command string:
 \begin{equation} \label{eq:iintscale}
-\bm{J}_a = \bm{J}'\bigg(\frac{g_u}{\int_0^{t_u}\bm{J}''}\bigg)
+\bm{J}_a = \bm{J}'\bigg(\frac{g_u}{\int_0^{t_u}\bm{J}''dt}\bigg)
 \end{equation}
 
 
@@ -614,7 +623,7 @@ Within the same experiment, the commands sent to the system in open and closed l
 In Fig.~\ref{fig:xcmds}, it is evident that there is little correction being done. This is because the commands given in the $x$ direction proved to only slightly deviate from the desired target. The commands in Fig~\ref{fig:ycmds} show a clear adjustment, as the open loop trajectory clearly does not reach the target. For this experiment, the correction ratios were set to $r_p = r_i = 1/(ft_u)$, where $t_u$ is the target time set for this trajectory, and $f$ is the rate at which autonomous commands are sent to the system \NB{why??? how did you select these commands. A reviewer here will kill the entire paper for this. You need to explain why and how you are selecting these parameters!!!}. 
 
 To further validate the approach, a square-shaped trajectory was tested. 
-\begin{figure}[h]
+\begin{figure}[ht!]
 	\centering
 	\subfigure[Closed Loop Square \label{fig:clsquare}]{\includegraphics[width=0.48\columnwidth]{images/closedsquare.png}}
     \subfigure[Open Loop Square \label{fig:opensquare}]{\includegraphics[width=0.48\columnwidth]{images/opensquare.png}}
@@ -623,6 +632,10 @@ To further validate the approach, a square-shaped trajectory was tested.
 \end{figure}
 
 Lastly, the letters U, V, and A were created with the UAV. The planned trajectories were created using minimum snap trajectories, as discussed in Section~\ref{sec:traj} and actual trajectories travelled by the UAV are shown in Fig.~\ref{fig:UVA}.
+
+\section{Conclusions} \label{sec:conc}
+In this work, we have presented an approach that enables autonomous flight on off-the-shelf quadrotors that are primarily tuned for teleoperation. Our approach shows that we can use a small training set along with a regression analysis to generate commands for any trajectory, along with adapting and closing the loop in real-time to reduce tracking error. For future work, we plan to increase the capabilities of our work by adding yaw commands and changing the altitude of the UAV.
+\NB{need to add that we want to test with other sensors like cameras and imu which add errors}
 
 \begin{figure*}[t] \label{fig:UVA}
 \subfigure[Planned U Trajectory]{\label{ex0}
@@ -638,12 +651,6 @@ Lastly, the letters U, V, and A were created with the UAV. The planned trajector
 \subfigure[UAV A Trajectory]{\label{ex6}
 \includegraphics[width=0.3\textwidth]{images/FINAL_A.png}}
 \end{figure*}
-
-
-\section{Conclusions} \label{sec:conc}
-In this work, we have presented an approach that enables autonomous flight on off-the-shelf quadrotors that are primarily tuned for teleoperation. Our approach shows that we can use a small training set along with a regression analysis to generate commands for any trajectory, along with adapting and closing the loop in real-time to reduce tracking error. For future work, we plan to increase the capabilities of our work by adding yaw commands and changing the altitude of the UAV.
-\NB{need to add that we want to test with other sensors like cameras and imu which add errors}
-
 
 \section{Acknowledgement}
 
