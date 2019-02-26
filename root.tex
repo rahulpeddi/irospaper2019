@@ -410,8 +410,7 @@ In order to expand our data for this purpose, we train on portions of the traini
 %Training on not only trajectories that start and end with a velocity of $0$, but also on segments enables more specific command generation based on where the system is in relation to the provided trajectory. For example, if the command for the middle of the trajectory (i.e., between two points that are neither the start nor end of the trajectory) needs to be generated, then the training from the trajectories in Fig.~\ref{fig:trainelab} is used.
 
 %\NB{you are not explaining well how you are doing this}
-%\NB{no no no...this is terrible. Delete and rewrite this section from the beginning.}.
-%\NB{I'm stopping here for now...the paper needs major changes}
+
 
 \subsubsection{Thin-Plate Spline Regression Analysis}
 
@@ -491,9 +490,9 @@ This maximum departure, $\sigma_{est}t_{\hat{\beta}}$, is used to set the bounds
     \hat{\beta}_{\min} = \bar{\beta} - \sigma_{est}t^* \nonumber \\
     \hat{\beta}_{\max} = \bar{\beta} + \sigma_{est}t^*
 \end{align}
-where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for training point $\bar{\beta}$. \NB{so each new testing point gets a different bound? Is it based only on the closest training point? What if we have 100 points close by? How do you take into account this situation that is different from having only 1 point}
+where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for training point $\bar{\beta}$. %\NB{so each new testing point gets a different bound? Is it based only on the closest training point? What if we have 100 points close by? How do you take into account this situation that is different from having only 1 point} Adding a new test point changes the size of these ellipses because the std error changes.
 
-In our case, there are two inputs we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two quantities as statistically independent, to obtain maximum departure values for each of the parameters \NB{I don't understand this..why are you separating this values?}: $\sigma_{d,est}t^*$ and $\sigma_{t,est}t^*$. In \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, the distance and time values are used together as input pairs, so a method to tie the two independent departure values together is desirable. Standard error rectangles \cite{stdellipse}, which create rectangular intervals around each data point, could be used for this purpose, but they are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by the TPS regression. An alternative method is to use standard error ellipses, which can be accurately attributed to smooth surfaces as per \cite{stdellipse}. A general equation for a standard error ellipse for our maximum departure is shown below:\NB{this section is too long..just go to the point. State that we are using this method to compute error region or whatever they are called}
+In our case, there are two inputs we are primarily concerned about for prediction; distance and time. As a result, we perform this calculation twice over, treating each of the two quantities as statistically independent, to obtain maximum departure values for each of the parameters \NB{I don't understand this..why are you separating this values?}: $\sigma_{d,est}t^*$ and $\sigma_{t,est}t^*$. In \eqref{eq:integralfit} and \eqref{eq:ssvelfit}, the distance and time values are used together as input pairs, so a method to tie the two independent departure values together is desirable. Standard error rectangles \cite{stdellipse}, which create rectangular intervals around each data point, could be used for this purpose, but they are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by the TPS regression. An alternative method is to use standard error ellipses, which can be accurately attributed to smooth surfaces as per \cite{stdellipse}. A general equation for a standard error ellipse for our maximum departure is shown below:%\NB{this section is too long..just go to the point. State that we are using this method to compute error region or whatever they are called}
 \begin{equation}
     \bigg(\frac{x}{\sigma_{d,est}t^*}\bigg)^2 + \bigg(\frac{y}{\sigma_{t,est}t^*}\bigg)^2 = 1
 \end{equation}
@@ -541,7 +540,6 @@ The next step is to adjust the input vector such that the system reaches the way
 \begin{equation} \label{eq:imgscale}
 \bm{J}_a = \bm{J}'\bigg(\frac{\bar{j}_u}{\bar{j}'}\bigg)
 \end{equation}
-\NB{does the integral remain the same after all of this? Shouldn't we check and make sure that the integral is fine and in case change something while maintaining d and t?}
 In Fig.~\ref{fig:gensample}, the steps of command generation are demonstrated visually. % \NB{rewrite this sentence}.
 In Fig.~\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.~\ref{fig:sampleintegral}. This flight lasted approximately $4.4$ seconds for $3$ meters. For testing purposes, our user input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.~\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same, which is a verification of feature retention aspect of bicubic interpolation from \eqref{eq:bicinter}. If the vector were stretched without using an interpolation method, we would expect slight variation in the mean, which could damage the integrity of the final step, shown in Fig.~\ref{fig:fullyadj}, which is obtained using \eqref{eq:imgscale}. At this point we have obtained the autonomous command string $\bm{J}_a$, which is then sent to the UAV to follow the trajectory $\bm{p_r}(t)$.
 
@@ -555,7 +553,7 @@ In Fig.~\ref{fig:ogstring}, we start with the original pre-trained command strin
 	\label{fig:gensample}
 \end{figure}
 
-\NB{where is the part of the text in which you show how to generate the prediction of the position occupied by the vehicle by following the determined sequence of inputs?}
+%\NB{where is the part of the text in which you show how to generate the prediction of the position occupied by the vehicle by following the determined sequence of inputs?}
 \subsection{Online Adaptation of Generated Commands} \label{sec:adapt}
 
 The commands generated in the previous section are generated and sent to the UAV in open-loop. While we have experimentally verified open-loop results for reasonable accuracy\NB{where? I haven't seen any results yet.}, we desire more assured trajectory tracking by closing the loop by controlling for any possible error. While executing generated command string, $\bm{J_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$:% \NB{how is this calculated?}:
