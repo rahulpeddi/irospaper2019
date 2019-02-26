@@ -499,10 +499,10 @@ In our case, there are two inputs we are primarily concerned about for predictio
 \end{equation}
 The ellipses at each point in our training data are calculated using the following parametrized equations:
 \begin{align} \label{eq:bounds}
-    x_i = d_i + \sigma_{d,est}t^*\cos{r} \nonumber \\
-    y_i = t_i + \sigma_{t,est}t^*\sin{r} 
+    x_i = d_i + \sigma_{d,est}t^*\cos{\theta} \nonumber \\
+    y_i = t_i + \sigma_{t,est}t^*\sin{\theta} 
 \end{align}
-where $r$ \NB{r is typically a radius...angles are greek letters like $\alpha$ $\beta$ $\theta$}is the parameter in $[0,2\pi]$ \NB{what is this parameter? Here you need to be careful because it sounds like r is a parameter while it's not and you are trying to describe the perimeter of  an ellipse }, and $i = 1,\ldots,m$ reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, shows a pictorial representation of the standard error ellipses around each training point. Fig.~\ref{fig:predsur} is a modified version of Fig.~\ref{fig:integs} with a conforming boundary \cite{bounds} created by the ellipses on Fig.~\ref{fig:preds}.
+where $\theta$ is an angle in $[0,2\pi]$, and $i = 1,\ldots,m$ reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, shows a pictorial representation of the standard error ellipses around each training point. Fig.~\ref{fig:predsur} is a modified version of Fig.~\ref{fig:integs} with a conforming boundary \cite{bounds} created by the ellipses on Fig.~\ref{fig:preds}.
 \begin{figure}[ht]
 	\centering
 	\subfigure[Prediction Bounds \label{fig:preds}]{\includegraphics[width=0.48\linewidth]{images/predictionbds.png}}
