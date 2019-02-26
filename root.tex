@@ -491,10 +491,10 @@ Fig.~\ref{fig:trajdec}(a) shows an example of a generated trajectory with its di
 \end{figure}
 
 %In Fig.~\ref{fig:tdec}, we show the components at each interval. 
-These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. We alleviate this problem algorithmically:
+These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. We alleviate this problem using Algorithm~\ref{alg:correct}.
 
 \begin{algorithm}[ht!]
-\caption{Trajectory Correction} \label{alg:pred}
+\caption{Trajectory Correction} \label{alg:correct}
 \begin{algorithmic}[1]
 \IF{$\bm{p}_x^*(t_{i+1})-\bm{p}_x^*(t_{i}) \notin $}
 \STATE
