@@ -445,7 +445,7 @@ The prediction bounds presented here are used as conditions in generating trajec
 %\NB{we need to state what we do if they are not good}\NB{you mention this later. You need to anticipate the reviewer reaction. Here you need to mention that in the next section we show what to do if the result of this test is negative or you need to present here directly}
 
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
-In this section, we discuss how we generate smooth trajectories, and then decompose the trajectories using the bounds from the regression analysis.
+In this section, we discuss how we generate smooth trajectories, and then decompose the trajectories subject to the bounds from the regression analysis.
 Relating back to the system dynamics, we have established that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ and yaw can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. Hence when considering a planar $x,y$ trajectory we perform a decomposition in the $x$ and $y$ directions and generate independent roll and pitch commands to follow simultaneously trajectories in the $x$ and $y$ directions, respectively. 
 %each trajectory simultaneously.
 %Because the using just roll and pitch commands is possible, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
@@ -463,12 +463,12 @@ In order to generate a trajectory, we first select waypoints through which the U
 %\end{equation}
 %where $c_0,\ldots,c_7$ are constants associated with specific waypoints in the trajectory.%\NB{this is incorrect. Are you doing this in your simulation???}
 %\NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
-Having obtained a smooth trajectory, we then discretize the trajectory into $n$ parts, each of which will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$.
+Having obtained a smooth trajectory, we then discretize the trajectory into $n$ parts, each of which  is required to fit within the prediction bounds. To start, each will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$. 
 % and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_s + \Delta t$. 
 %\NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
 %\NB{please write the mathematical expression for the x and y component from the trajectory otherwise this section is incomplete}
 %\NB{several? they are just 3...please ad the decomposition otherwise this section is useless}
-Some examples of decomposed trajectories are shown in Fig.~\ref{fig:trajs}. 
+Some examples of discretized trajectories are shown in Fig.~\ref{fig:trajs}. 
 
 \begin{figure}[h]
 	\centering
@@ -484,17 +484,7 @@ From the discretized trajectory, we can obtain the $x$ and $y$ components of eac
     \bm{p}_x^*&=\left[ \bm{p}_x^*(t_1), \bm{p}_x^*(t_2), \ldots, \bm{p}_x^*(t_n-1)\right] \nonumber \\
     \bm{p}_y^*&=\left[ \bm{p}_y^*(t_1), \bm{p}_y^*(t_2), \ldots, \bm{p}_y^*(t_n-1)\right]
 \end{align}
-%Each component is calculated as follows:
-%\begin{align}
-%    c_{x}(t_s,t_{s+1}) = \bm{p_x}^*(t_{s+1}) - \bm{p_x}^*(t_{s}) \nonumber \\
-%    c_{y}(t_s,t_{s+1}) = \bm{p_y}^*(t_{s+1}) - \bm{p_y}^*(t_{s})
-%\end{align}
-%
-%where $c_{x}(t_s,t_{s+1})$ and $c_{y}(t_s,t_{s+1})$ are the distances between each segment in $x$ and $y$ directions. 
-%All components are then composed in a sequence obtaining two trajectories in the $x$ and $y$ directions
-%
-%
-%These values are taken for each of the $n$ trajectory segments with the same time-step, $\delta t$, and are appended to one another to create the desired output for which we will generate input commands. 
+
 Fig.~\ref{fig:trajdec}(a) shows an example of a generated trajectory with its discretization while Fig.~\ref{fig:trajdec}(b) displays the $x$ and $y$ sequences together.
 \begin{figure}[h]
 	\centering
@@ -506,10 +496,6 @@ Fig.~\ref{fig:trajdec}(a) shows an example of a generated trajectory with its di
 
 %In Fig.~\ref{fig:tdec}, we show the components at each interval. 
 These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:preds}.
-
-
-
-
 
 Having obtained the $x$ and $y$ trajectory components, we will now discuss the command generation procedures that we use to build a policy that enables autonomous tracking of the trajectory.
 %\NB{it may be better to show the trajectory generation later}
@@ -537,7 +523,7 @@ This optimal pre-trained sample is then adjusted to reflect the user-set time, $
     b(x) = \sum_{i=0}^3a_ij^i
 \end{equation}
 
-where $j$ is an entry in vector $\bm{J}^*$ and $a$ represents the coefficients of the function at each point. %\NB{no clue what this means...what are these coefficients? coefficients of the cubic best fit to find the values that would go in between each entry}.
+where $j$ is an entry in vector $\bm{J}^*$ and $a_i$ represents the coefficient of the best-fit cubic function at each point. %\NB{no clue what this means...what are these coefficients? coefficients of the cubic best fit to find the values that would go in between each entry}.
 bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\bm{J}^*$. After resizing, we obtain the time adjusted input vector $\bm{J}'$.
 
 The next step is to adjust the input vector such that the system reaches the waypoint at distance $d_u$ by leveraging the average input command information $\bar{j}_u$. Because we have identified in Section~\ref{sec:sysdyn} that distance is a function of this average input command and time, the time-adjusted vector $\bm{J}'$ is scaled such that its mean is equivalent to $\bar{j}_u$. We then obtain
@@ -566,20 +552,18 @@ The commands generated in the previous section are generated and sent to the UAV
     \xi(t) = \bm{p_r}(t)-\bm{p}(t)
 \end{equation}
 
-This error, $\xi(t)$, is attributed to the most recent command sent to the system. In order to adjust the next input to correct for the error, we use a proportional-integral (PI) controller to adjust the subsequent command, $\bm{J}_a(t+1)$, to obtain the closed-loop command $\bm{J}_c(t+1)$ as follows:
+This error, $\xi(t)$, is attributed to the most recent command sent to the system. In order to adjust the next input to correct for the error, we use a proportional controller to adjust the subsequent command, $\bm{J}_a(t+1)$, to obtain the closed-loop command $\bm{J}_c(t+1)$ as follows:
 
 \begin{equation}
-    \bm{J}_c(t+1) = \bm{J}_a(t+1) + k_p\xi(t) + k_i\int_{0}^{t}\xi(t')dt'
+    \bm{J}_c(t+1) = \bm{J}_a(t+1) + k_p\xi(t)
 \end{equation}
 
-In our work, the controller gains, $k_p$ and $k_i$, are static values that are set based on the input being provided to the system. The gains are set as follows:
-\begin{align} \label{eq:ctrls}
-    k_p &= r_p\bar{j}_a  \nonumber \\
-    k_i &= r_i\bm{J}_a(t)
-\end{align}
+In our work, the controller gain, $k_p$, is a static value that is set based on the input being provided to the system as follows:
+\begin{equation} \label{eq:ctrls}
+    k_p = r_p\bar{j}_a
+\end{equation}
 
-where $\bar{j}_a$ is the average input from the open loop commands, and $\bm{J}_a(t)$ is the input command at time $t$. '%\NB{is this a scalar, matrix, vector? bold upper case letters usually indicate a matrix usually or a vector...we need to mention that it is the component at time t}.
-In \eqref{eq:ctrls}, $r_p$ and $r_i$ represent the ratios applied to each of the gains. These correction ratios depend on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions \NB{I don't understand how r is chosen} (i.e., different correction ratios may be desirable for indoor and outdoor flight due to disturbances and other effects). Using this controller, we are able to ensure that the position error stays within the assigned threshold $\delta_d$, from Section~\ref{sec:prob}.  %\NB{what threshold?} 
+where $\bar{j}_a$ is the average input from the open loop commands and $r_p$ is a ratio applied to the average input. The gain is chosen in this manner as to avoid drastic corrections that would affect the stability of the system. If the error at time $t$, $\xi(t)$, is very high, then having $r_p = 1$ could result in a drastic and unstable change in the control. The correction ratio depends on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions (i.e., different correction ratios may be desirable for indoor and outdoor flight). Using this controller, we are able lower the position error at every time step.  %\NB{what threshold?} 
 
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
 
