@@ -419,7 +419,7 @@ This maximum departure, $\sigma_{est}t_{\hat{\beta}}$, is used to set the bounds
     \beta_{\min} = \bar{\beta} - \sigma_{est}t^* \nonumber \\
     \beta_{\max} = \bar{\beta} + \sigma_{est}t^*
 \end{align}
-where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for training point $\bar{\beta}$. %\NB{so each new testing point gets a different bound? Is it based only on the closest training point? What if we have 100 points close by? How do you take into account this situation that is different from having only 1 point} Adding a new test point changes the size of these ellipses because the std error changes.
+where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for any training point $\bar{\beta}$. %\NB{so each new testing point gets a different bound? Is it based only on the closest training point? What if we have 100 points close by? How do you take into account this situation that is different from having only 1 point} Adding a new test point changes the size of these ellipses because the std error changes.
 
 In our case, there are two inputs we are primarily concerned about for prediction; distance and time, as in \eqref{eq:integralfit} and \eqref{eq:ssvelfit}. The distance and time values are used together as input pairs, so we use standard error ellipses to connect the two together \cite{stdellipse}. A general equation for a standard error ellipse for our maximum departure is shown below: %\NB{this section is too long..just go to the point. State that we are using this method to compute error region or whatever they are called} %\NB{I don't understand this..why are you separating this values? because we obtain a height and a length of these ellipses}
 \begin{equation}
@@ -438,7 +438,7 @@ where $\theta$ is an angle in $[0,2\pi]$, and $i = 1,\ldots,m$ reflects each of 
 	\caption{Prediction Intervals and Bounds}
 	\label{fig:bounds}
 \end{figure}
-An alternate method would have been to use standard error rectangles\cite{stdellipse} instead, which create rectangular intervals around each data point, but these are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by the TPS regression. The prediction bounds presented here are used as conditions in generating trajectories, which is discussed in the next section. 
+An alternate method would have been to use standard error rectangles\cite{stdellipse} instead, which create rectangular intervals around each data point, but these are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by the TPS regression. The prediction bounds presented here satisfy the smoothness condition of our regression and are used to generate trajectories, which is discussed in the next section. 
 %\NB{we need to state what we do if they are not good}\NB{you mention this later. You need to anticipate the reviewer reaction. Here you need to mention that in the next section we show what to do if the result of this test is negative or you need to present here directly}
 
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
@@ -459,14 +459,13 @@ In order to generate a trajectory, we first select waypoints through which the U
 %    \bm{p}^*(t) = c_7t^7 + c_6t^6 + c_5t^5 + c_4t^4 + c_3t^3 + c_2t^2 + c_1t + c_0 
 %\end{equation}
 %where $c_0,\ldots,c_7$ are constants associated with specific waypoints in the trajectory.%\NB{this is incorrect. Are you doing this in your simulation???}
-%\NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
-Having obtained a smooth trajectory, we then discretize the trajectory into $n$ parts, each of which  is required to fit within the prediction bounds. To start, each will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$. 
+\NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
+Having obtained a smooth trajectory, we then discretize the trajectory into $n$ parts. To start, each will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$. 
 % and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_s + \Delta t$. 
 %\NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
 %\NB{please write the mathematical expression for the x and y component from the trajectory otherwise this section is incomplete}
 %\NB{several? they are just 3...please ad the decomposition otherwise this section is useless}
 Some examples of discretized trajectories are shown in Fig.~\ref{fig:trajs}. 
-
 \begin{figure}[h]
 	\centering
 	\subfigure[\label{fig:t1}]{\includegraphics[width=0.3\linewidth]{images/traj1.png}}
