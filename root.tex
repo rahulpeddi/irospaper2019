@@ -412,10 +412,8 @@ t_{\hat{\beta}} = \frac{|\hat{\beta}-\bar{\beta}|}{\sigma_{est}}
 \end{equation}
 where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest training point. In equation \eqref{eq:tstat}, $t_{\hat{\beta}} \geq 1$ indicates that the test point $\hat{\beta}$ propagates an error higher than the standard error. Therefore, it is desirable to have $t_{\hat{\beta}} < 1$. 
 %\NB{what you mean with known? Do you mean training point?}
-After selecting a desired set-point for the t-statistic, $t^*$,the maximum allowable departure from known points is obtained as:
-\begin{equation}
-    \sigma_{est}t^* = |\hat{\beta}-\bar{\beta}|
-\end{equation}
+After selecting a desired set-point for the t-statistic, $t^*$, the maximum allowable departure from known points is $\sigma_{est}t^*$.
+
 This maximum departure, $\sigma_{est}t_{\hat{\beta}}$, is used to set the bounds for each training data point, for example:
 \begin{align}
     \beta_{\min} = \bar{\beta} - \sigma_{est}t^* \nonumber \\
@@ -569,7 +567,7 @@ In our work, the controller gain, $k_p$, is a static value that is set based on 
     k_p = r_p\bar{j}_a
 \end{equation}
 
-where $\bar{j}_a$ is the average input from the open loop commands and $r_p$ is a ratio applied to the average input. The gain is chosen in this manner as to avoid drastic corrections that would affect the stability of the system. If the error at time $t$, $\xi(t)$, is very high, then having $r_p = 1$ could result in a drastic and unstable change in the control. The correction ratio depends on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions (i.e., different correction ratios may be desirable for indoor and outdoor flight). Using this controller, we are able lower the position error at every time step.  %\NB{what threshold?} 
+where $\bar{j}_a$ is the average input from the open loop commands and $r_p$ is a ratio applied to the average input. The gain is chosen in this manner as to avoid drastic corrections that would affect the stability of the system. If the error at time $t$, $\xi(t)$, is very high, then having $r_p = 1$ could result in a drastic and unstable change in the control input. The correction ratio depends on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions (i.e., different correction ratios may be desirable for indoor and outdoor flight). Using this controller, we are able lower the position error at every time step.  %\NB{what threshold?} 
 
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
 
