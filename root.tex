@@ -526,13 +526,19 @@ This optimal pre-trained sample is then adjusted to reflect the user-set time, $
 where $j$ is an entry in vector $\bm{J}^*$ and $a_i$ represents the coefficient of the best-fit cubic function at each point. %\NB{no clue what this means...what are these coefficients? coefficients of the cubic best fit to find the values that would go in between each entry}.
 bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\bm{J}^*$. After resizing, we obtain the time adjusted input vector $\bm{J}'$.
 
-The next step is to adjust the input vector such that the system reaches the waypoint at distance $d_u$ by leveraging the average input command information $\bar{j}_u$. Because we have identified in Section~\ref{sec:sysdyn} that distance is a function of this average input command and time, the time-adjusted vector $\bm{J}'$ is scaled such that its mean is equivalent to $\bar{j}_u$. We then obtain
+The next step is to adjust the input vector such that the system reaches the waypoint at distance $d_u$ by leveraging the average input command information $\bar{j}_u$. Because we have identified in Section~\ref{sec:sysdyn} that distance is a function of this average input command and time, the time-adjusted vector $\bm{J}'$ is scaled such that its mean is equivalent to $\bar{j}_u$:
 %\NB{average velocity?}
 \begin{equation} \label{eq:imgscale}
-\bm{J}_a = \bm{J}'\bigg(\frac{\bar{j}_u}{\bar{j}'}\bigg)
+\bm{J}'' = \bm{J}'\bigg(\frac{\bar{j}_u}{\bar{j}'}\bigg)
 \end{equation}
-In Fig.~\ref{fig:gensample}, the steps of command generation are demonstrated visually. % \NB{rewrite this sentence}.
-In Fig.~\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.~\ref{fig:sampleintegral}. This flight lasted approximately $4.4$ seconds for $3$ meters. For testing purposes, our user input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.~\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same, which is a verification of feature retention aspect of bicubic interpolation from \eqref{eq:bicinter}. If the command string were stretched without using an interpolation method, we would expect slight variation in the mean, which could damage the integrity of the final step, shown in Fig.~\ref{fig:fullyadj}, which is obtained using \eqref{eq:imgscale}. At this point we have obtained the autonomous command string $\bm{J}_a$, which is then sent to the UAV to follow the trajectory $\bm{p_r}(t)$.
+Lastly, we check for integral error. While using the fitted average input, $\bar{j}_u$, scales the string, there may still be some error between the integral of our new command string and the desired integral, $g_u$. The ratio between the two integrals is leveraged to re-scale the command string:
+\begin{equation} \label{eq:iintscale}
+\bm{J}_a = \bm{J}'\bigg(\frac{g_u}{\int_0^{t_u}\bm{J}''}\bigg)
+\end{equation}
+
+
+In Fig.~\ref{fig:gensample}, the steps of command generation visualized. % \NB{rewrite this sentence}.
+In Fig.~\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.~\ref{fig:sampleintegral}. This flight lasted approximately $4.4$ seconds for $3$ meters. For testing purposes, our user input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.~\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same, which is a verification of feature retention aspect of bicubic interpolation from \eqref{eq:bicinter}. If the command string were stretched without using an interpolation method, we would expect slight variation in the mean, which could damage the integrity of the final steps, shown in Fig.~\ref{fig:fullyadj}, which is obtained using \eqref{eq:imgscale} and \eqref{eq:iintscale}. At this point we have obtained the autonomous command string $\bm{J}_a$, which is then sent to the UAV to follow the trajectory that has been set.
 
 
 \begin{figure}[h]
