@@ -558,7 +558,7 @@ In Fig.~\ref{fig:gensample}, we show visually the steps of command generation \N
 \NB{where is the part of the text in which you show how to generate the prediction of the position occupied by the vehicle by following the determined sequence of inputs?}
 \subsection{Online Adaptation of Generated Commands} \label{sec:adapt}
 
-The commands generated in the previous section are generated and sent to the UAV in open-loop. While we have experimentally verified open-loop results for reasonable accuracy\NB{where? I haven't seen any results yet.}, we desire more assured trajectory tracking by closing the loop by controlling for any possible error. While executing generated command string, $\bm{J_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$:
+The commands generated in the previous section are generated and sent to the UAV in open-loop. While we have experimentally verified open-loop results for reasonable accuracy\NB{where? I haven't seen any results yet.}, we desire more assured trajectory tracking by closing the loop by controlling for any possible error. While executing generated command string, $\bm{J_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$ \NB{how is this calculated?}:
 
 \begin{equation}
     \xi(t) = \bm{p_r}(t)-\bm{p}(t)
@@ -575,8 +575,9 @@ In our work, the controller gains, $k_p$ and $k_i$, are static values that are s
     k_p &= r_p\bar{j}_a  \nonumber \\
     k_i &= r_i\bm{J}_a(t)
 \end{align}
+\NB{I don't understand the $k_i$}
 
-where $\bar{j}_a$ is the average input from the open loop commands, and $\bm{J}_a(t)$ is the previously sent input command. In \eqref{eq:ctrls}, $r_p$ and $r_i$ represent the ratios applied to each of the gains. These correction ratios depend on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions (i.e., different correction ratios may be desirable for indoor and outdoor flight due to disturbances and other effects). Using this controller, we are able to ensure that the error stays within the assigned threshold
+where $\bar{j}_a$ is the average input from the open loop commands, and $\bm{J}_a(t)$ is the previously sent input command \NB{is this a scalar, matrix, vector? bold upper case letters usually indicate a matrix usually or a vector...we need to mention that it is the component at time t}. In \eqref{eq:ctrls}, $r_p$ and $r_i$ represent the ratios applied to each of the gains. These correction ratios depend on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions \NB{I don't understand how r is chosen} (i.e., different correction ratios may be desirable for indoor and outdoor flight due to disturbances and other effects). Using this controller, we are able to ensure that the error stays within the assigned threshold \NB{what threshold?} 
 
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
 
