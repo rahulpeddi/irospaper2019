@@ -384,7 +384,7 @@ The average command, in this case, provides information about the pilot's averag
 
 Our training data in this work consists of multiple demonstrations of a human-pilot flying forward covering different distances with varying speeds.
 %at varying speeds for varying distances. 
-In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. In this case, we have training samples where the pilot flies forward and then stops, which is why there are an extended periods where there is no forward motion at the ends of the trajectories in Fig.~\ref{fig:trajs}\NB{?}.
+In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. In this case, we have training samples where the pilot flies forward and then stops, which is why there are an extended periods where there is no forward motion at the ends of the trajectories in Fig.~\ref{fig:trajs}.
 
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/training.png}
@@ -399,7 +399,7 @@ With this data, we can train a model for trajectories that start and end with $0
     \item[b.] Intermediate Trajectory, where the segment begins and end with $v$ velocity
     \item[c.] End Trajectory, where the segment begins with $v$ velocity and ends with $0$ velocity
 \end{itemize}
-In order to expand our data for this purpose, we train on portions of the training set pictured in Fig.~\ref{fig:train}, which correspond to each of the three outlined segments. The segments are formed by cutting the training data and trajectories at the start, the middle, and the end. Shown in Fig.~\ref{fig:trainelab} are four sample from our training set of the velocities and trajectories that correspond to the intermediary segments starting and finishing with \NB{complete and fix the figure...the figure shows starting with 0.2 and ending with 0.4...Please cut the trajectories at 0.4 start and end}.
+In order to expand our data for this purpose, we train on portions of the training set pictured in Fig.~\ref{fig:train}, which correspond to each of the three outlined segments. The segments are formed by cutting the training data and trajectories at the start, the middle, and the end. Shown in Fig.~\ref{fig:trainelab} are four sample from our training set of the velocities and trajectories that correspond to the intermediary segments starting and finishing with the same valocity. %\NB{complete and fix the figure...the figure shows starting with 0.2 and ending with 0.4...Please cut the trajectories at 0.4 start and end}.
 %ewe can extract the aformentioned segments from the training set - cut in a way that way obtain the desired initial and final conditions listed above.
 \begin{figure}[h]
 	\includegraphics[width=0.48\textwidth]{images/inttrain.png}
@@ -415,11 +415,11 @@ In order to expand our data for this purpose, we train on portions of the traini
 
 \subsubsection{Thin-Plate Spline Regression Analysis}
 
-The offline training data is applied to a thin-plate spline (TPS) surface regression to describe the relationship between training inputs and integral and average velocity \NB{what you mean with average velocity?}. The general form of a thin-plate spline equation is 
+The offline training data is applied to a thin-plate spline (TPS) surface regression to describe the relationship between training inputs and integral and average input command. The general form of a thin-plate spline equation is 
 \begin{equation}
     f(x,y) = a_1 + a_xx + a_yy + \sum_{i=1}^mw_iU(||(x_i,y_i)-(x,y)||)
 \end{equation}
-
+%\NB{what you mean with average velocity?}
 where $a_1,a_x,\text{and}~a_y$ are scalar coefficients, $w_i$ is a coefficient that corresponds to each specific trial, subject to the following smoothing condition: \begin{equation}
 \sum_{i=1}^mw_i=\sum_{i=1}^mw_ix_i=\sum_{i=1}^mw_iy_i=0
 \end{equation}
@@ -470,17 +470,18 @@ In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represen
     \label{fig:joys}
 \end{figure}
 
-While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases \cite{regress}. In order to quantify this, we leverage the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression \cite{stdereg} with known values \NB{what values?}:
+While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases \cite{regress}. In order to quantify this, we leverage the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression \cite{stdereg} with known values, which are our training points:
 
 \begin{equation} \label{eq:stderr}
     \sigma_{est} \approx \frac{s}{\sqrt{m}}
 \end{equation}
 
-where $s$ is the sample standard deviation of all of the points in the training set and $m$ is the number of training samples. The standard error, $\sigma_{est}$, is then used to determine the t-statistic for different test values\NB{CITATION}. The t-statistic is defined as the ratio of departure \NB{what does departure means here?} of a test point from a known point to its standard error and is defined \NB{please proofread the paper  carefully and correct grammar and form. Here for example you repeat defined twice on the same sentence} as
+where $s$ is the sample standard deviation of all of the points in the training set and $m$ is the number of training samples. The standard error, $\sigma_{est}$, is then used to determine the t-statistic for different test values\NB{CITATION}. The t-statistic is defined as the ratio of the distance between a test point from a known training point to its standard error and is computed as follows:
 \begin{equation} \label{eq:tstat}
 t_{\hat{\beta}} = \frac{|\hat{\beta}-\bar{\beta}|}{\sigma_{est}}    
 \end{equation}
-where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest known \NB{what you mean with known? Do you mean training point?} point. In equation \eqref{eq:tstat}, if $t_{\hat{\beta}} \geq 1$, that means that \NB{again, this is too colloquial...if, that means that is not good written english just go to the point. In equation \eqref{eq:tstat}, $t_{\hat{\beta}} \geq 1$ means that...} the test point $\hat{\beta}$ propagates an error higher than the standard error. Therefore, it is desirable to have $t_{\hat{\beta}} < 1$. 
+where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest training point. In equation \eqref{eq:tstat}, if $t_{\hat{\beta}} \geq 1$, that means that \NB{again, this is too colloquial...if, that means that is not good written english just go to the point. In equation \eqref{eq:tstat}, $t_{\hat{\beta}} \geq 1$ means that...} the test point $\hat{\beta}$ propagates an error higher than the standard error. Therefore, it is desirable to have $t_{\hat{\beta}} < 1$. 
+%\NB{what you mean with known? Do you mean training point?}
 After selecting a desired set-point for the t-statistic, $t^*$,the maximum allowable departure from known points is obtained as:
 \begin{equation}
     \sigma_{est}t^* = |\hat{\beta}-\bar{\beta}|
@@ -501,7 +502,7 @@ The ellipses at each point in our training data are calculated using the followi
     x_i = d_i + \sigma_{d,est}t^*\cos{r} \nonumber \\
     y_i = t_i + \sigma_{t,est}t^*\sin{r} 
 \end{align}
-where $r$ \NB{r is typically a radius...angles are greek letters like $\alpha$ $\beta$ $\theta$}is the parameter in $[0,2\pi]$ \NB{what is this parameter? Here you need to be careful because it sounds like r is a parameter while it's not and you are trying to describe the perimeter of  an ellipse }, and $i = 1,\ldots,m$ reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, shows a pictorial representation of the standard error ellipses around each point\NB{training point?}. Fig.~\ref{fig:predsur} is a modified version of Fig.~\ref{fig:integs} with a conforming boundary \cite{bounds} created by the ellipses on Fig.~\ref{fig:preds}.
+where $r$ \NB{r is typically a radius...angles are greek letters like $\alpha$ $\beta$ $\theta$}is the parameter in $[0,2\pi]$ \NB{what is this parameter? Here you need to be careful because it sounds like r is a parameter while it's not and you are trying to describe the perimeter of  an ellipse }, and $i = 1,\ldots,m$ reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, shows a pictorial representation of the standard error ellipses around each training point. Fig.~\ref{fig:predsur} is a modified version of Fig.~\ref{fig:integs} with a conforming boundary \cite{bounds} created by the ellipses on Fig.~\ref{fig:preds}.
 \begin{figure}[ht]
 	\centering
 	\subfigure[Prediction Bounds \label{fig:preds}]{\includegraphics[width=0.48\linewidth]{images/predictionbds.png}}
