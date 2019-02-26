@@ -480,7 +480,7 @@ where $s$ is the sample standard deviation of all of the points in the training 
 \begin{equation} \label{eq:tstat}
 t_{\hat{\beta}} = \frac{|\hat{\beta}-\bar{\beta}|}{\sigma_{est}}    
 \end{equation}
-where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest training point. In equation \eqref{eq:tstat}, if $t_{\hat{\beta}} \geq 1$, that means that \NB{again, this is too colloquial...if, that means that is not good written english just go to the point. In equation \eqref{eq:tstat}, $t_{\hat{\beta}} \geq 1$ means that...} the test point $\hat{\beta}$ propagates an error higher than the standard error. Therefore, it is desirable to have $t_{\hat{\beta}} < 1$. 
+where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest training point. In equation \eqref{eq:tstat}, $t_{\hat{\beta}} \geq 1$ indicates that the test point $\hat{\beta}$ propagates an error higher than the standard error. Therefore, it is desirable to have $t_{\hat{\beta}} < 1$. 
 %\NB{what you mean with known? Do you mean training point?}
 After selecting a desired set-point for the t-statistic, $t^*$,the maximum allowable departure from known points is obtained as:
 \begin{equation}
