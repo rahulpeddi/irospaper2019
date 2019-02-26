@@ -521,26 +521,26 @@ From the training set of $m$ samples, we select the trial that has the closest i
 \begin{equation}
  e_i = \vert g_i-g_u \vert , ~i= \{1,\ldots,m\}
 \end{equation}
- The lowest error is then found and is paired with the appropriate pre-trained sample, $\bm{J}^*$,
+ The lowest error is then found and is paired with the appropriate pre-trained sample, $\bm{J}^*$, \NB{show $\bm{e}$}
 \begin{equation}
 \bm{J}^* = \bm{J}_i \in \bm{J}\vert e_i = \min_e(\bm{e})
 \end{equation}
 
-This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done by performing vector interpolation to re-size $\bm{J}^*$, such that important features in the optimal command vector are not lost. Interpolation methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss \cite{bicfeatures}. Bicubic interpolation is our chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity \cite{biccomp}. The general form of a bicubic interpolation equation is: 
+This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$. This is done \NB{there are too many ``This is done" in this section. They brake the flow of the paper...go to the point ...This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$ by perfroming...} by performing vector interpolation to re-size $\bm{J}^*$, such that important features in the optimal command vector are not lost. Interpolation methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss \cite{bicfeatures}. Bicubic interpolation is our chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity \cite{biccomp}. The general form of a bicubic interpolation equation is: 
 
 \begin{equation} \label{eq:bicinter}
     b(x) = \sum_{i=0}^3a_ij^i
 \end{equation}
 
-where $j$ is an entry in vector $\bm{J}^*$ and $a$ represents the coefficients of the function at each point. Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\bm{J}^*$. After resizing, we obtain the time adjusted input vector $\bm{J}'$.
+where $j$ is an entry in vector $\bm{J}^*$ and $a$ represents the coefficients of the function at each point \NB{no clue what this means...what are these coefficients?}. Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points between each value in $\bm{J}^*$. After resizing, we obtain the time adjusted input vector $\bm{J}'$.
 
-The next step is to adjust the input vector such that the system reaches the user-set goal $d_u$. This is done by leveraging the average input command information, that is, $\bar{j}_u$. Because we have identified in Section~\ref{sec:sysdyn} that distance is a function of this average input command and time, the scale time-adjusted vector $\bm{J}'$ is scaled such that its mean is equivalent to $\bar{j}_u$. We then obtain
+The next step is to adjust the input vector such that the system reaches the user-set goal $d_u$. This is achieved \NB{} by leveraging the average input command information $\bar{j}_u$. Because we have identified in Section~\ref{sec:sysdyn} that distance is a function of this average input command and time, the scale time-adjusted vector $\bm{J}'$ is scaled such that its mean is equivalent to $\bar{j}_u$. We then obtain
 %\NB{average velocity?}
 \begin{equation} \label{eq:imgscale}
 \bm{J}_a = \bm{J}'\bigg(\frac{\bar{j}_u}{\bar{j}'}\bigg)
 \end{equation}
-
-In Fig.~\ref{fig:gensample}, we show visually the steps of command generation. In Fig.~\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.~\ref{fig:sampleintegral}. This flight travelled approximately $4.4$ seconds for $3$ meters. For testing purposes, our use input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.~\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same, which is a verification of feature retention aspect of bicubic interpolation from \eqref{eq:bicinter}. If the vector were stretched without using an interpolation method, we would expect slight variation in the mean, which could damage the integrity of the final step, shown in Fig.~\ref{fig:fullyadj}, which is obtained using \eqref{eq:imgscale}. At this point we have obtained the autonomous command string $\bm{J}_a$, which is then sent to the UAV to follow the trajectory $\bm{p_r}(t)$.
+\NB{does the integral remain the same after all of this? Shouldn't we check and make sure that the integral is fine and in case change something while maintaining d and t?}
+In Fig.~\ref{fig:gensample}, we show visually the steps of command generation \NB{rewrite this sentence}. In Fig.~\ref{fig:ogstring}, we start with the original pre-trained command string that was shown above in Fig.~\ref{fig:sampleintegral}. This flight travelled \NB{lasted?}approximately $4.4$ seconds for $3$ meters. For testing purposes, our use input values are $d_u=3.5$m and $t_u=3.75$s. As indicated, a time adjustment is made first; this is shown in Fig.~\ref{fig:timeadj}. It is important to note that the average command, indicated by the dashed line, is still the same, which is a verification of feature retention aspect of bicubic interpolation from \eqref{eq:bicinter}. If the vector were stretched without using an interpolation method, we would expect slight variation in the mean, which could damage the integrity of the final step, shown in Fig.~\ref{fig:fullyadj}, which is obtained using \eqref{eq:imgscale}. At this point we have obtained the autonomous command string $\bm{J}_a$, which is then sent to the UAV to follow the trajectory $\bm{p_r}(t)$.
 
 
 \begin{figure}[h]
