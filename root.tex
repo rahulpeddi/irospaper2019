@@ -495,7 +495,7 @@ From the discretized trajectory, we can obtain the $x$ and $y$ components of eac
 %
 %
 %These values are taken for each of the $n$ trajectory segments with the same time-step, $\delta t$, and are appended to one another to create the desired output for which we will generate input commands. 
-Fig.~\ref{fig:trajdec}(a) shows an example of a generated trajectory with its discretization while Fig.~\ref{fig:trajdec}(b) displays the $x$ and $y$ components stitched together.
+Fig.~\ref{fig:trajdec}(a) shows an example of a generated trajectory with its discretization while Fig.~\ref{fig:trajdec}(b) displays the $x$ and $y$ sequences together.
 \begin{figure}[h]
 	\centering
 	\subfigure[Discretized Trajectory\label{fig:t2dec}]{\includegraphics[width=0.48\linewidth]{images/traj2dec.png}}
@@ -505,7 +505,13 @@ Fig.~\ref{fig:trajdec}(a) shows an example of a generated trajectory with its di
 \end{figure}
 
 %In Fig.~\ref{fig:tdec}, we show the components at each interval. 
-These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Having obtained the $x$ and $y$ trajectory components, we will now discuss the command generation procedures that we use to build a policy that enables autonomous tracking of the trajectory.
+These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:preds}.
+
+
+
+
+
+Having obtained the $x$ and $y$ trajectory components, we will now discuss the command generation procedures that we use to build a policy that enables autonomous tracking of the trajectory.
 %\NB{it may be better to show the trajectory generation later}
 
 
