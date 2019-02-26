@@ -144,7 +144,7 @@ Our work is largely based on combining the aforementioned apprenticeship learnin
 
 %\NB{overall outline for reference: model of quadrotor is unknown but skeleton architecture is known and the controller is u1, u2, u3 = equations. Because of how the controller is designed, we know that u2 is used to change x and u3 y. A change in u2 is equivalent to a change in the x position. The higher is this change the more motion is generated hence the area under the curve described by the commands sent to the quadrotor is related to the motion of the system and here is where the regression approach is sued. Instead of learnign the parameters that is hard we use regression to learn to fly directly by leveraging the integral and the knowledge about the system. }
 
-\section{Problem Formulation}
+\section{Problem Formulation} \label{sec:prob}
 In this work, we are interested in developing autonomous navigation for a UAV by leveraging knowledge about its system dynamics and controller and by leveraging a set of human-piloted demonstrations.
 %in using human-piloted demonstrations to develop a framework that enables autonomous UAV navigation over any trajectory with minimal knowledge of platform-specific dynamics.
 Formally, the problem we investigate in this work can be stated as:
@@ -378,7 +378,7 @@ The outputs of our training phase are \begin{itemize} %should I put Fig 2 and de
     \item The position of the system occupied during its motion, $\bm{p}(t)$
 \end{itemize}
 %\NB{here it's confusing. Be careful, we are mixing input with outputs.Inout is the distance, time and sequence of commands while the output is the intgeral of the commands, the steady stae teleop, and the state, position, covered by the system}
-The average command, in this case, provides information about the pilot's average in-flight velocity, and is obtained by taking the mean of all entries in $\bm{J_i}$\NB{be careful that it's $\bm{J}_i$ and not $\bm{J_i}$, i.e., the $i$ is not bold}. The integral, meanwhile, describes the area under the string of commands, as discussed in the previous section.
+The average command, in this case, provides information about the pilot's average in-flight velocity, and is obtained by taking the mean of all entries in $\bm{J}_i$. The integral, meanwhile, describes the area under the string of commands, as discussed in the previous section.
 
 \subsubsection{Offline Training Data}
 
@@ -577,7 +577,7 @@ In our work, the controller gains, $k_p$ and $k_i$, are static values that are s
 \end{align}
 \NB{I don't understand the $k_i$}
 
-where $\bar{j}_a$ is the average input from the open loop commands, and $\bm{J}_a(t)$ is the previously sent input command \NB{is this a scalar, matrix, vector? bold upper case letters usually indicate a matrix usually or a vector...we need to mention that it is the component at time t}. In \eqref{eq:ctrls}, $r_p$ and $r_i$ represent the ratios applied to each of the gains. These correction ratios depend on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions \NB{I don't understand how r is chosen} (i.e., different correction ratios may be desirable for indoor and outdoor flight due to disturbances and other effects). Using this controller, we are able to ensure that the error stays within the assigned threshold \NB{what threshold?} 
+where $\bar{j}_a$ is the average input from the open loop commands, and $\bm{J}_a(t)$ is the previously sent input command \NB{is this a scalar, matrix, vector? bold upper case letters usually indicate a matrix usually or a vector...we need to mention that it is the component at time t}. In \eqref{eq:ctrls}, $r_p$ and $r_i$ represent the ratios applied to each of the gains. These correction ratios depend on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions \NB{I don't understand how r is chosen} (i.e., different correction ratios may be desirable for indoor and outdoor flight due to disturbances and other effects). Using this controller, we are able to ensure that the position error stays within the assigned threshold $\delta_d$, from Section~\ref{sec:prob}.  %\NB{what threshold?} 
 
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
 
