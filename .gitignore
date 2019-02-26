@@ -38,3 +38,5 @@ root copy.tex
 *.fig
 
 *.fig
+
+*.pdf

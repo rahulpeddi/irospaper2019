@@ -282,8 +282,8 @@ Because the integral by itself may not be enough to characterize a unique behavi
 %\NB{the figure needs to be changed. jx(t) jy(t) should input into the plant and the output is x(t) y(t) and all goes as input to the Training. The figure is still blurry}
 %\NB{let's use power point fro the diagrams..it's blurry}
 
-Our approach, outlined in Fig.~\ref{fig:blockdiagram}, consists on a training phase with multiple demonstrations that are used to build a regression model to identify the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, from which a sequence of commands are synthesized to track a user-set target distance, $d_u$, in a time, $t_u$. The overall output of the regression is a sequence of joystick commands $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. These actions are however open-loop.Tracking error is reduced by closing the loop via a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. 
-Going back to the architecture in Fig.\~ref{fig:blockdiagram}, in the next few sections we will present details for each block beginning with the trajectory generations, next.
+Our approach, outlined in Fig.~\ref{fig:blockdiagram}, consists on a training phase with multiple demonstrations that are used to build a regression model to identify the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, from which a sequence of commands are synthesized to track a user-defined distance, $d_u$, in a time, $t_u$. The overall output of the regression is a sequence of commands having the same form of the inputs used for training which in our case are joystick teleoperation commands $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. These actions are however open-loop and prone to tracking errors. Tracking error is reduced by usiing a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. 
+Going back to the architecture in Fig.~\ref{fig:blockdiagram}, in the next few sections we will present details for each block beginning with the trajectory generation procedure.
 %
 %the very first step of the proposed framework is a trajectory decomposition which will be presented in
 %First, we will discuss the trajectory decomposition, as our problem ultimately is to accurately track any trajectory.
@@ -303,8 +303,10 @@ Going back to the architecture in Fig.\~ref{fig:blockdiagram}, in the next few s
  %\NB{in this section or before we need to stress and clarify that this approach allows us to figure out the actions for the system to follow autonomously any trajectory but we need still to close the loop. Technically is a 2 phase method:1) open loop actions and 2) corrections for closed loop}
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
 
-In this section, we discuss how a smooth trajectory is generated between waypoints, and how this trajectory is decomposed into $x$ and $y$ components. From the system dynamics, we know that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ and yaw can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. 
-
+In this section, we discuss how trajectories are generated in order to follow any trajectory.
+%a smooth trajectory is generated between waypoints, and how this trajectory is decomposed into $x$ and $y$ components. 
+From the system dynamics, input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ and yaw can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. Hence when considering a planar $x,y$ trajectory we perform a decomposition in the $x$ and $y$ directions and generate independent roll and pitch commands to follow simultaneously trajectories in the $x$ and $y$ directions, respectively. 
+%each trajectory simultaneously.
 %Because the using just roll and pitch commands is possible, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
 
 %\NB{this section needs to go before and needs to be explain better}.
@@ -312,37 +314,49 @@ In this section, we discuss how a smooth trajectory is generated between waypoin
 In order to generate a trajectory, we first select waypoints through which the UAV should travel. In order to determine the optimal path in our case, we generate a minimum snap trajectory. Minimum snap trajectories are associated with low control effort as they are based on the fourth derivative of position and ensure smoothness on quadrotors which have been proven to be 4th order systems \cite{minsnap}. The general equation for a minimum snap trajectory is as follows:
 %\NB{why? you need to explain better. Besides, we should use snap not jerk}
 \begin{equation} \label{eq:minjerkint}
-    \bm{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\ddddot{p},\dddot{p},\ddot{p},\dot{p},p,t)dt
+%    \bm{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\ddddot{p},\dddot{p},\ddot{p},\dot{p},p,t)dt
+    \bm{p}^*(t) = \argmin_{p(t)}\int_0^T(\ddddot{p})^2dt
 \end{equation}
-
+\NB{I've correct the expression above}
 Solving \eqref{eq:minjerkint}, we obtain the form:
 \begin{equation}
     \bm{p}^*(t) = c_7t^7 + c_6t^6 + c_5t^5 + c_4t^4 + c_3t^3 + c_2t^2 + c_1t + c_0 
 \end{equation}
-where $c_0,\ldots,c_7$ are constants associated with specific waypoints in the trajectory.
+where $c_0,\ldots,c_7$ are constants associated with specific waypoints in the trajectory.\NB{this is incorrect. Are you doing this in your simulation???}
 \NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
-Having obtained the smooth trajectory, we then discretize the trajectory into $n$ parts, each of which will have a time-step of $\delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over the interval $[\bm{p}^*(t_s), \bm{p}^*(t_{s+1})]$, where $t_s$ is the time at the start of a segment and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_s + \delta t$. 
+Having obtained the smooth trajectory, we then discretize the trajectory into $n$ parts, each of which will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$.
+% and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_s + \Delta t$. 
 %\NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
 %\NB{please write the mathematical expression for the x and y component from the trajectory otherwise this section is incomplete}
 %\NB{several? they are just 3...please ad the decomposition otherwise this section is useless}
-Some examples of decomposed trajectories are shown in Fig.\ref{fig:trajs}. All of the trajectories shown in Fig.\ref{fig:trajs} start at the world frame origin $(0,0)$.
+Some examples of decomposed trajectories are shown in Fig.~\ref{fig:trajs}. 
 
 \begin{figure}[h]
 	\centering
 	\subfigure[\label{fig:t1}]{\includegraphics[width=0.3\linewidth]{images/traj1.png}}
 	\subfigure[\label{fig:t2}]{\includegraphics[width=0.3\linewidth]{images/traj2.png}}
     \subfigure[\label{fig:t3}]{\includegraphics[width=0.3\linewidth]{images/traj3.png}}
-	\caption{Discretized Trajectories}
+	\caption{Examples of discretized trajectories. All of the trajectories start at the world frame origin $(0,0)$.}
 	\label{fig:trajs}
 \end{figure}
 
-From the discretized trajectory, we can obtain the $x$ and $y$ components of each leg of the trajectory. Each component is calculated as follows:
+From the discretized trajectory, we can obtain the $x$ and $y$ components of each leg of the trajectory. All components can then be composed in a sequence obtaining two trajectories in the $x$ and $y$ directions as follows:
 \begin{align}
-    c_{x}(t_s,t_{s+1}) = \bm{p_x}^*(t_{s+1}) - \bm{p_x}^*(t_{s}) \nonumber \\
-    c_{y}(t_s,t_{s+1}) = \bm{p_y}^*(t_{s+1}) - \bm{p_y}^*(t_{s})
+    \bm{p}_x^*&=\left[ \bm{p}_x^*(t_1), \bm{p}_x^*(t_2), \ldots, \bm{p}_x^*(t_n-1)\right] \nonumber \\
+    \bm{p}_y^*&=\left[ \bm{p}_y^*(t_1), \bm{p}_y^*(t_2), \ldots, \bm{p}_y^*(t_n-1)\right]
 \end{align}
-
-where $c_{x}(t_s,t_{s+1})$ and $c_{y}(t_s,t_{s+1})$ are the distances between each segment in $x$ and $y$ directions. These values are taken for each of the $n$ trajectory segments with the same time-step, $\delta t$, and are appended to one another to create the desired output for which we will generate input commands. In Fig.~\ref{fig:trajdec}, we show an example of a generated trajectory with its discretization and the $x$ and $y$ components that are stitched together.
+%Each component is calculated as follows:
+%\begin{align}
+%    c_{x}(t_s,t_{s+1}) = \bm{p_x}^*(t_{s+1}) - \bm{p_x}^*(t_{s}) \nonumber \\
+%    c_{y}(t_s,t_{s+1}) = \bm{p_y}^*(t_{s+1}) - \bm{p_y}^*(t_{s})
+%\end{align}
+%
+%where $c_{x}(t_s,t_{s+1})$ and $c_{y}(t_s,t_{s+1})$ are the distances between each segment in $x$ and $y$ directions. 
+%All components are then composed in a sequence obtaining two trajectories in the $x$ and $y$ directions
+%
+%
+%These values are taken for each of the $n$ trajectory segments with the same time-step, $\delta t$, and are appended to one another to create the desired output for which we will generate input commands. 
+Fig.~\ref{fig:trajdec}(a) shows an example of a generated trajectory with its discretization while Fig.~\ref{fig:trajdec}(b) displays the $x$ and $y$ components stitched together.
 \begin{figure}[h]
 	\centering
 	\subfigure[Discretized Trajectory\label{fig:t2dec}]{\includegraphics[width=0.48\linewidth]{images/traj2dec.png}}
@@ -351,8 +365,9 @@ where $c_{x}(t_s,t_{s+1})$ and $c_{y}(t_s,t_{s+1})$ are the distances between ea
 	\label{fig:trajdec}
 \end{figure}
 
-In Fig.~\ref{fig:tdec}, we show the components at each interval. These components, when executed simultaneously, correspond to the trajectory pictured in Fig.~\ref{fig:t2dec}. Having obtained the trajectory $x$ and $y$ components, we will now discuss the training and command generation procedures that we use to build a policy that enables autonomous tracking of the trajectory.
-
+%In Fig.~\ref{fig:tdec}, we show the components at each interval. 
+These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller is $\Delta t$ the better is the approximation of the smooth trajectory. Having obtained the $x$ and $y$ trajectory components, we will now discuss the training and command generation procedures that we use to build a policy that enables autonomous tracking of the trajectory.
+\NB{it may be better to show the trajectory generation later}
 
 \subsection{Regression Based Training and Evaluation} \label{sec:train}
 %\NB{what is this section about? Why do we need this section?}
