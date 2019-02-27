@@ -324,7 +324,7 @@ The average command, in this case, provides information about the pilot's averag
 
 Our training data in this work consists of multiple demonstrations of a human-pilot flying forward covering different distances with varying speeds.
 %at varying speeds for varying distances. 
-In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. In this case, we have training samples where the pilot flies forward and then stops, and these are shown in Fig.~\ref{fig:trajs}.
+In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. In Fig.~\ref{fig:traincmd}, we have the teleoperation commands send by the pilot, and in Fig.~\ref{fig:traintraj}, the corresponding trajectories are displayed.
 
 \begin{figure}[H]
 	\centering
@@ -333,7 +333,6 @@ In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. 
 	\caption{Training Set}
 	\label{fig:train}
 \end{figure}
-
 
 %\NB{use subfigures and place the fig files for each figure in the repository so we can edit the figures. As we have discussed in the previous paper, titles and text in the figrue needs to be big and clear and readable and figrues need to span the entire column }
 %\NB{rewrite stating that with these data we can train a model for trajectory starting and finishing with 0 speed. If the initial and final velocities are not 0...} 
@@ -442,7 +441,10 @@ where $\sigma_{d,est}$ and $\sigma_{t,est}$, are standard error values for dista
     x_i = d_i + \sigma_{d,est}t^*\cos{\theta} \nonumber \\
     y_i = t_i + \sigma_{t,est}t^*\sin{\theta} 
 \end{align}
-where $\theta$ is an angle in $[0,2\pi]$, and $i = 1,\ldots,m$ reflects each of the $m$ training samples. Fig.~\ref{fig:preds}, shows a pictorial representation of the standard error ellipses around each training point. Fig.~\ref{fig:predsur} is a modified version of Fig.~\ref{fig:integs} with a conforming boundary \cite{bounds} created by the ellipses on Fig.~\ref{fig:preds}.
+where $\theta$ is an angle in $[0,2\pi]$, and $i = 1,\ldots,m$ reflects each of the $m$ training samples.
+
+
+Fig.~\ref{fig:preds}, shows a pictorial representation of the standard error ellipses around each training point with its convex hull. Fig.~\ref{fig:predsur} is a modified version of Fig.~\ref{fig:integs} with the convex hull \cite{bounds} created from the ellipses on Fig.~\ref{fig:preds}.
 \begin{figure}[H]
 	\centering
 	\subfigure[Prediction Bounds \label{fig:preds}]{\includegraphics[width=0.49\linewidth]{images/predictionbds.png}}
