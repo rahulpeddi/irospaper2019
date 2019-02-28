@@ -563,7 +563,7 @@ In Fig.~\ref{fig:gensample}, each step of the command generation process is visu
 	\label{fig:gensample}
 \end{figure}
 
-From the autonomous command, the expected path of the vehicle can be generated. The integral of the final command string is taken at each time-step to determine the expected position at all times. Because we know the relationship between the integral and the distance travelled at all times, we are able to invert the equation from the TPS regression for the integral, \eqref{eq:integralfit}, such that the inputs are time and integral and the output is the distance travelled.
+From the autonomous command, the expected path of the vehicle is generated. The integral of the final command string is taken at each time-step to determine the expected position at all times. Because we know the relationship between the integral and the distance travelled at all times, we are able to invert the equation from the TPS regression for the integral, \eqref{eq:integralfit}, such that the inputs are time and integral and the output is the distance travelled.
 
 
 %\NB{where is the part of the text in which you show how to generate the prediction of the position occupied by the vehicle by following the determined sequence of inputs?}
