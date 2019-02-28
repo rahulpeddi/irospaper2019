@@ -105,7 +105,7 @@ We focus on off-the-shelf quadrotor UAVs which have a well studied dynamical and
     \label{fig:uavs}
 \end{figure}
 
-Different from other supervised learning approaches, in this work we leverage the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contribution of this work is a generalized framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles. 
+Different from other supervised learning approaches, in this work we leverage the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contribution of this work is a framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles. 
 %Besides a general framework for the generation of autonomous commands for any quadrotor, in this work we offer a scheme to integrate model-based and data-driven approaches 
 %\NB{need to reinforce this statement}
  
@@ -341,8 +341,8 @@ To expand the same data for this purpose, we train on portions of the training s
 %ewe can extract the aformentioned segments from the training set - cut in a way that way obtain the desired initial and final conditions listed above.
 \begin{figure}[H]
 	\centering
-	\subfigure[Training Intermediate Velocities \label{fig:traincmd}]{\includegraphics[width=0.49\linewidth]{finalfigs/trainelabvel.png}}
-	\subfigure[Training Intermediate Trajectories \label{fig:traintraj}]{\includegraphics[width=0.49\linewidth]{finalfigs/trainelabtraj.png}}
+	\subfigure[Training Intermediate Velocities \label{fig:trainvel}]{\includegraphics[width=0.49\linewidth]{finalfigs/trainelabvel.png}}
+	\subfigure[Training Intermediate Trajectories \label{fig:trainteltraj}]{\includegraphics[width=0.49\linewidth]{finalfigs/trainelabtraj.png}}
 	\caption{Training Set}
 	\label{fig:trainelab}
 \end{figure}
