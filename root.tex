@@ -502,16 +502,16 @@ Fig.~\ref{fig:t2dec} shows an example of a generated trajectory with its discret
 \end{figure}
 
 %In Fig.~\ref{fig:tdec}, we show the components at each interval. 
-These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. We alleviate this problem using Algorithm~\ref{alg:correct}.
+These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. We alleviate this problem using the following satisfiability problem:.
 
-\begin{algorithm}[ht!]
-\caption{Trajectory Correction} \label{alg:correct}
-\begin{algorithmic}[1]
-\IF{$\bm{p}_x^*(t_{i+1})-\bm{p}_x^*(t_{i}) \notin $}
-\STATE
-\ENDIF
-\end{algorithmic}
-\end{algorithm}
+%\begin{algorithm}[ht!]
+%\caption{Trajectory Correction} \label{alg:correct}
+%\begin{algorithmic}[1]
+%\IF{$\bm{p}_x^*(t_{i+1})-\bm{p}_x^*(t_{i}) \notin $}
+%\STATE
+%\ENDIF
+%\end{algorithmic}
+%\end{algorithm}
 
 Having obtained the $x$ and $y$ trajectory components, we will now discuss the command generation procedures that we use to build a policy that enables autonomous tracking of the trajectory.
 %\NB{it may be better to show the trajectory generation later}
@@ -530,7 +530,7 @@ $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \e
 \bm{J}^* = \bm{J}_i \in \bm{J}\vert e_i = \min_e(\bm{e})
 \end{equation}
 
-This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$ by performing bicubic interpolation, such that important features in the optimal command vector are not lost. Interpolation methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss \cite{bicfeatures}. Bicubic interpolation is the chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity \cite{biccomp}. The general form of a bicubic interpolation equation is: 
+This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$ by performing bicubic interpolation, so that important features in the optimal command vector are not lost. Interpolation methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss \cite{bicfeatures}. Bicubic interpolation is the chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity \cite{biccomp}. The general form of a bicubic interpolation equation is: 
 %\NB{there are too many ``This is done" in this section. They brake the flow of the paper...go to the point ...This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$ by performing...}
 
 \begin{equation} \label{eq:bicinter}
