@@ -238,7 +238,7 @@ Through observation of a single demonstrated trial, we are able to identify impo
 %\NB{make these figures long and short and aligned vertically }
 %\NB{we should show this picture in parallel with the speed and position of the vehicle to connect with the integral}
 In Fig. \ref{fig:samps}, we show data from a single flight demonstration on a Parrot BeBop 2 quadrotor, which is a hobby-grade quadrotor. The pilot flies the UAV forward over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which flies the UAV in the negative $y$-direction. The teleoperation command, in this case, adheres to desired pitch angles, but the user could be adjusting any value that affects motion of the system, such as acceleration, torque, or even voltage provided to the motors. The approach presented in this paper is able to connect any of these commands to the change in position and velocity of the system. 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\subfigure[Sample of a Single Demonstration\label{fig:sampleintegral}]{\includegraphics[width=1\linewidth]{sampleintegral.png}}
 	\subfigure[Sample Trajectory\label{fig:sampt}]{\includegraphics[width=1\linewidth]{sampletrajectory.png}}
@@ -384,7 +384,7 @@ Given the corresponding $z_i$ for each $(x_i,y_i)$ pair, we solve the following 
 
 where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, $P_i* = (1,x_i,y_i)$, $\bm{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\bm{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\bm{w} \in \mathbb{R}^{m\times1}$ and $\bm{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\bm{a}$ is the column vector with elements $a_1,a_x,a_y$.
 
-Given the general framework for performing the thin-plate spline, we develop two separate relationships for our specific application. In our work, the first regression is applied to $d$ (distance) and $t$ (time) as inputs to obtain the integral of the commands $g_i = f(d_i,t_i)$ while the second has the same inputs to obtain the average teleoperation command $\bar{j}_i = h(d_i,t_i)$. With the functions we have obtained, we are able to find an estimated integral and steady-state command, $g_u$ and $\bar{j}_u$, for any given desired distance and time, $d_u$ and $t_u$, respectively,
+Given the general framework for performing the thin-plate spline, we develop two separate relationships for our application. In our work, the first regression is applied to $d$ (distance) and $t$ (time) as inputs to obtain the integral of the commands $g_i = f(d_i,t_i)$ while the second has the same inputs to obtain the average teleoperation command $\bar{j}_i = h(d_i,t_i)$. With the functions we have obtained, we are able to find an estimated integral and average input command, $g_u$ and $\bar{j}_u$, for any given desired distance and time, $d_u$ and $t_u$, respectively,
 \begin{equation} \label{eq:integralfit}
 g_u = f(d_u,t_u)
 \end{equation}
@@ -467,11 +467,11 @@ In order to generate a trajectory, we first select waypoints through which the U
 %\end{equation}
 %where $c_0,\ldots,c_7$ are constants associated with specific waypoints in the trajectory.%\NB{this is incorrect. Are you doing this in your simulation???}
 \NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
-Having obtained a smooth trajectory, the trajectory is then discretized the trajectory into $n$ parts.
+The obtained smooth trajectory is then discretized into $n$ parts.
 
 
 
-To start, each will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$. 
+To start, each part will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$. 
 % and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_s + \Delta t$. 
 %\NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
 %\NB{please write the mathematical expression for the x and y component from the trajectory otherwise this section is incomplete}
@@ -570,13 +570,11 @@ where $g_J(t)$ is the integral of the string of generated commands at time $t$, 
 %\NB{where is the part of the text in which you show how to generate the prediction of the position occupied by the vehicle by following the determined sequence of inputs?}
 \subsection{Online Adaptation of Generated Commands} \label{sec:adapt}
 
-The commands generated in the previous section are generated and sent to the UAV in open-loop. While open-loop results generated in this manner may be reasonably accurate, we desire more assured trajectory tracking by controlling for any possible error, thereby closing the loop. While executing generated command string, $\bm{J_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$:
+The commands generated in the previous section are generated and sent to the UAV in open-loop. While the open-loop autonomous controls generated in this manner may be reasonably accurate, we desire more assured trajectory tracking by controlling for any possible error, thereby closing the loop. While executing the generated command string, $\bm{J_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$:
 \begin{equation}
     \xi(t) = \bm{p_r}(t)-\bm{p}(t)
 \end{equation}
-
-This error, $\xi(t)$, is attributed to the most recent command sent to the system. A a proportional controller is implemented to adjust the subsequent command, $\bm{J}_a(t+1)$, to obtain the closed-loop command $\bm{J}_c(t+1)$ as follows:
-
+This error, $\xi(t)$, is attributed to the most recent command sent to the system. A proportional controller is implemented to adjust the subsequent command, $\bm{J}_a(t+1)$, to obtain the closed-loop command $\bm{J}_c(t+1)$ as follows:
 \begin{equation}
     \bm{J}_c(t+1) = \bm{J}_a(t+1) + k_p\xi(t)
 \end{equation}
