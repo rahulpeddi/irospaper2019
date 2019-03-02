@@ -502,7 +502,7 @@ Fig.~\ref{fig:t2dec} shows an example of a generated trajectory with its discret
 \end{figure}
 
 %In Fig.~\ref{fig:tdec}, we show the components at each interval. 
-These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. The resolve this issue, we us an satisfiability modulo theory solver (SMT) to solve the following satisfiability/optimization problem: 
+These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. The resolve this issue, we us an satisfiability modulo theory solver (SMT) to solve the following satisfiability/optimization problem: %STEPS FOR REFERENCE: Check if distances for each component are attainable based on convex hull (x values in conv(M)). If not, rebuild or rediscretize trajectory. Check if all distance-time pairs are within the convex hull (x and y points BOTH in conv(M)).
 
 %\begin{algorithm}[ht!]
 %\caption{Trajectory Correction} \label{alg:correct}
