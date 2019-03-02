@@ -435,7 +435,7 @@ where $\sigma_{d,est}$ and $\sigma_{t,est}$, are standard error values for dista
     x_i = d_i + \sigma_{d,est}t^*\cos{\theta} \nonumber \\
     y_i = t_i + \sigma_{t,est}t^*\sin{\theta} 
 \end{align}
-where $\theta$ is an angle in $[0,2\pi]$, and $i = 1,\ldots,m$ reflects each of the $m$ training samples. A convex hull is then generated around the ellipses to provide a concise measure for the combination of distances and times that have low error when input into the TPS regression. This convex hull is generated using the Quickhull algorithm \cite{quickhull}, in which we take the outermost points of the set ellipses and form a boundary denoted $Conv(M)$, where $M$ represents the set of all points on the perimeters of all ellipses: $\{x_i,\ldots,x_m\},\{y_i,\ldots,y_m\}$.
+where $\theta$ is an angle from $[0,\ldots,2\pi]$, and $i = 1,\ldots,m$ reflects each of the $m$ training samples. A convex hull is then computed around the ellipses to provide a concise measure for the combination of distances and times that have low error when input into the TPS regression. This convex hull is generated using the Quickhull algorithm \cite{quickhull}, in which we take the outermost points of the set ellipses and form a boundary denoted $Conv(M)$, where $M$ represents the set of all points on the perimeters of all ellipses: $\{x_i,\ldots,x_m\},\{y_i,\ldots,y_m\}$.
 
 In Fig.~\ref{fig:preds}, the convex hull around standard error ellipses created with $t* = 0.5$ around each training point is depicted. Fig.~\ref{fig:predsur} is the TPS regression model for the integral \eqref{eq:integralfit} overlaid with the convex hull \cite{bounds} created from the ellipses on Fig.~\ref{fig:preds}.
 \begin{figure}[H]
@@ -493,7 +493,7 @@ From the discretized trajectory, we can obtain the $x$ and $y$ components of eac
 \end{align}
 
 Fig.~\ref{fig:t2dec} shows an example of a generated trajectory with its discretization while Fig.~\ref{fig:tdec} displays the $x$ and $y$ sequences together.
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\subfigure[Discretized Trajectory\label{fig:t2dec}]{\includegraphics[width=0.48\linewidth]{images/traj2dec.png}}
 	\subfigure[X and Y Components\label{fig:tdec}]{\includegraphics[width=0.48\linewidth]{images/trajdecomp.png}}
@@ -570,7 +570,7 @@ where $g_J(t)$ is the integral of the string of generated commands at time $t$, 
 %\NB{where is the part of the text in which you show how to generate the prediction of the position occupied by the vehicle by following the determined sequence of inputs?}
 \subsection{Online Adaptation of Generated Commands} \label{sec:adapt}
 
-The commands generated in the previous section are generated and sent to the UAV in open-loop. While open-loop results generated in this manner may be reasonably accurate, we desire more assured trajectory tracking by closing the loop by controlling for any possible error. While executing generated command string, $\bm{J_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$:
+The commands generated in the previous section are generated and sent to the UAV in open-loop. While open-loop results generated in this manner may be reasonably accurate, we desire more assured trajectory tracking by controlling for any possible error, thereby closing the loop. While executing generated command string, $\bm{J_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$:
 \begin{equation}
     \xi(t) = \bm{p_r}(t)-\bm{p}(t)
 \end{equation}
@@ -586,17 +586,17 @@ In our work, the controller gain, $k_p$, is a static value that is set based on 
     k_p = r_p\bar{j}_a
 \end{equation}
 
-where $\bar{j}_a$ is the average input from the open loop commands and $r_p$ is a ratio applied to the average input. The gain is chosen in this manner as to avoid drastic corrections that would affect the stability of the system. If the error at time $t$, $\xi(t)$, is very high, then having $r_p \geq 1$ could result in a drastic and unstable change in the control input. The set value of the correction ratio depends on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions, i.e., different correction ratios may be desirable for indoor and outdoor flight. Using this controller, the position error is lowered at every time step to ensure the UAV does indeed reach the generated waypoint as expected.  %\NB{what threshold?} 
+where $\bar{j}_a$ is the average input from the open loop commands and $r_p$ is a ratio applied to the average input. The gain is chosen in this manner as to avoid drastic corrections that would affect the stability of the system. If the error at time $t$, $\xi(t)$, is very high, then having $r_p \geq 1$ could result in a drastic and unstable change in the control input. The set value of the correction ratio depends on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions, i.e., different correction ratios may be desirable for indoor and outdoor flight. Using this controller, the position error is lowered to ensure that the UAV does indeed reach the generated waypoint as expected.  %\NB{what threshold?} 
 
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
 
 
 \section{Experiments} \label{sec:exper}
 
-The proposed approach was validated experimentally using a Parrot BeBop 2 quadrotor UAV, which is tuned and stable for teleoperation off-the-shelf. Since experiments were conducted indoors, a Vicon motion capture system was used to obtain the position and velocity of the vehicle. Alternatively, one could use GPS and IMU data to obtain similar features. 
+The proposed approach was validated experimentally using a Parrot BeBop 2 quadrotor UAV, which is tuned and stable for teleoperation off-the-shelf. Since experiments were conducted indoors, a Vicon motion capture system was used to obtain the position and velocity of the vehicle. Alternatively, one could use GPS and IMU data to obtain similar features in different conditions. 
 %The teleoperation was performed using a node written in the ROS environment.
 
-The training set was generated by having a human teleoperate the system $12$ times with motion that only consisted of forward pitch commands. The user was instructed to fly different distances with different speeds to diversify the training set. We were also able to use this same training set to generate roll commands for our UAV.
+The training set was generated by having a human teleoperate the system $12$ times with motion that only consisted of forward pitch commands. The user was instructed to fly different distances with different speeds to diversify the training set. We also used this same training set to generate roll commands for our UAV.
 
 The regression and error analysis was done in Matlab to obtain the surfaces pictured in Section \ref{sec:train}, and are shown in Figs.~\ref{fig:integs}, \ref{fig:joys}, and \ref{fig:bounds}. The experiments were conducted using ROS in conjunction with the Robotics System Toolbox in Matlab to interface our regression models and generated commands with the UAV.
 
@@ -615,16 +615,16 @@ These open-loop commands result in the trajectory pictured in Fig.~\ref{fig:1723
     \label{fig:1723open}
 \end{figure}
 
-To show the effectiveness of our adaptive controller, we ran the same experiment with our controller, and compared results obtained in open and closed loop systems. In Fig.~\ref{fig:1723controlled}, the real-time adapted inputs and the error associated with each of the trials in the $x$ and $y$ directions are shown.
+To show the effect of our adaptive controller, we ran the same experiment with our controller, and compared results obtained in open and closed loop systems. In Fig.~\ref{fig:1723controlled}, the real-time adapted inputs and the error associated with each of the trials in the $x$ and $y$ directions are shown. In Fig.~\ref{fig:x2traj}, we show the $x$ trajectory obtained with the commands pictured in blue from Fig.~\ref{fig:xcmds}, which are generated due to the error indicated in Fig.~\ref{fig:xerr}. The blue line in this figure indicates the error converges to $0$. In Figs.~\ref{fig:yerr},~\ref{fig:ycmds},~\ref{fig:y2traj}, the same results are shown for movement in the $y$ direction.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\subfigure[X Error \label{fig:xerr}]{\includegraphics[width=0.9\linewidth]{images/XERR.png}}
-    \subfigure[X Commands \label{fig:scmds}]{\includegraphics[width=0.9\linewidth]{images/CLOSEDXcmds.png}}
-    \subfigure[X Trajectories in Open and Closed Loop \label{fig:scmds}]{\includegraphics[width=0.9\linewidth]{images/Xtrajs.png}}
+    \subfigure[X Commands \label{fig:xcmds}]{\includegraphics[width=0.9\linewidth]{images/CLOSEDXcmds.png}}
+    \subfigure[X Trajectories in Open and Closed Loop \label{fig:x2traj}]{\includegraphics[width=0.9\linewidth]{images/Xtrajs.png}}
     \subfigure[Y Error \label{fig:yerr}]{\includegraphics[width=0.9\linewidth]{images/YERROR.png}}
     \subfigure[Y Commands \label{fig:ycmds}]{\includegraphics[width=0.9\linewidth]{images/CLOSEDYcmds.png}}
-    \subfigure[Y Trajectories in Open and Closed Loop \label{fig:scmds}]{\includegraphics[width=0.9\linewidth]{images/Ytrajs.png}}
+    \subfigure[Y Trajectories in Open and Closed Loop \label{fig:y2traj}]{\includegraphics[width=0.9\linewidth]{images/Ytrajs.png}}
 	\caption{Error and Control in the X and Y Directions}
 	\label{fig:1723controlled}
 \end{figure}
