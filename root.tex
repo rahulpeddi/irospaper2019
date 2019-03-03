@@ -523,18 +523,12 @@ These components, when executed simultaneously, correspond to the discretized tr
 \begin{equation}
     (\bm{p}_x^*(t_i),\Delta t) \wedge (\bm{p}_y^*(t_i),\Delta t) \in Conv(M)
 \end{equation}
-where $i = 1,\ldots,n$ and represents each decomposed part of the trajectory. If this condition is satisfied, then the trajectory is feasible. If not, the solver continues by adjusting the time and finds a solution tha satisfies the following conditions:
+where $i = 1,\ldots,n$ and represents each decomposed segment of the trajectory. If this condition is satisfied, then the trajectory is feasible. If not, the solver continues by adjusting the time-step $\Delta t$ for each segment of the trajectory and finds a solution that satisfies the following conditions:
 \begin{align}
-    
+     (\bm{p}_x^*(t_i),(t_{i+1}-t_i)) &\wedge (\bm{p}_y^*(t_i),(t_{i+1}-t_i)) \in Conv(M) \nonumber \\
+     \sum_{i=1}^n(t_{i+1}-t_i) &= T
 \end{align}
-
-
-
-%STEPS FOR REFERENCE: Check if distances for each component are attainable based on convex hull (x values in conv(M)). If not, rebuild or rediscretize trajectory. Check if all distance-time pairs are within the convex hull (x and y points BOTH in conv(M)).
-
-
-
-Having obtained the $x$ and $y$ trajectory components, we will now discuss the command generation procedures that we use to build a policy that enables autonomous tracking of the trajectory.
+These conditions ensure that the sum of the new time-steps, $t_{i+1}-t_i)$, where $i = 1,\ldots,n$, is $T$, the total time allotted for the trajectory, while also ensuring that any segment has a distance-time pair within the convex hull $Conv(M)$. If the solver still cannot obtain a result, it is indicative of an unattainable distance or distances within the trajectory, indicating that the trajectory as a whole is unattainable, and the waypoints need to be re-selected. Provided that all of the conditions for the SMT solver are met, we will have obtained the correct $x$ and $y$ trajectory components and their corresponding times, and we will now discuss the command generation procedures that we use to enable autonomous tracking of the trajectory.
 %\NB{it may be better to show the trajectory generation later}
 
 
