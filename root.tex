@@ -96,7 +96,7 @@ Generating autonomous flight behavior - subject of this paper -  however, can be
 
 On the other hand, data-driven machine learning techniques like neural networks, reinforcement learning, and regression techniques have recently emerged and have demonstrated to be effective to learn from training data. The main drawbacks of such procedures is that there is still not a clear reasoning about how these techniques work and typically large and dense training sets are required to obtain precise results.
 \begin{figure}[t]
-    \includegraphics[width=0.48\textwidth]{finalfigs/quads.png}
+    \includegraphics[width=0.48\textwidth]{images/quads.png}
     \vspace{-5pt}
     \caption{Some Examples of Off-the-Shelf UAVs, courtesy of the web}
     \label{fig:uavs}
@@ -194,7 +194,7 @@ Consider a pre-configured off-the shelf ready to fly UAV, with known model archi
 %\NB{in this section we need to show the dynamical model, and control model and architecture with teleoperation. We need to stress that everything is a gray box with known model but unknown params and that the inputs and outputs are known and used later to obtain a model for autonomous fly. We need to explain the relation between teleop and u1 u2 u3 and u4 and how increasing the joystick increase the inputs and thus the integral measures mobility in the system.}
 As hinted in the introduction, we use knowledge about the UAV dynamics and control architecture to extract useful information about the system to guide a regression approach for the generation of autonomous control commands for the UAV. We focus on off-the-shelf tuned and stable quadrotors that typically are ready for teleoperation but not for autonomous flight. The control architecture of the off-the-shelf quadrotor is shown in Fig.~\ref{fig:otsctrl}.
 \begin{figure}[ht]
-    \includegraphics[width=0.48\textwidth]{finalfigs/ctrler.png}
+    \includegraphics[width=0.48\textwidth]{images/ctrler.png}
     \caption{Off-the-Shelf UAV Teleoperation Control Architecture}
     \label{fig:otsctrl}
 \end{figure}
@@ -350,8 +350,8 @@ To expand the same data for this purpose, we train on portions of the training s
 %ewe can extract the aformentioned segments from the training set - cut in a way that way obtain the desired initial and final conditions listed above.
 \begin{figure}[H]
 	\centering
-	\subfigure[Training Intermediate Velocities \label{fig:trainvel}]{\includegraphics[width=0.49\linewidth]{finalfigs/trainelabvel.png}}
-	\subfigure[Training Intermediate Trajectories \label{fig:trainteltraj}]{\includegraphics[width=0.49\linewidth]{finalfigs/trainelabtraj.png}}
+	\subfigure[Training Intermediate Velocities \label{fig:trainvel}]{\includegraphics[width=0.49\linewidth]{images/trainelabvel.png}}
+	\subfigure[Training Intermediate Trajectories \label{fig:trainteltraj}]{\includegraphics[width=0.49\linewidth]{images/trainelabtraj.png}}
 	\caption{Training Set}
 	\label{fig:trainelab}
 \end{figure}
