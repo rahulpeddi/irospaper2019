@@ -364,6 +364,7 @@ The offline training data is applied to a thin-plate spline (TPS) surface regres
     f(x,y) = a_1 + a_xx + a_yy + \sum_{i=1}^mw_iU(||(x_i,y_i)-(x,y)||)
 \end{equation}
 %\NB{what you mean with average velocity?}
+\NB{chnage x and y with new letters that you don't use in the paper for other variables.}
 where $a_1,a_x,\text{and}~a_y$ are scalar coefficients, $w_i$ is a coefficient that corresponds to each specific trial\NB{what is this w term? it's not clear. what does it mean that is specific to each trial?}, subject to the following smoothing condition: \begin{equation}
 \sum_{i=1}^mw_i=\sum_{i=1}^mw_ix_i=\sum_{i=1}^mw_iy_i=0
 \end{equation}
@@ -413,13 +414,13 @@ In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represen
 \end{figure}
 
 \subsubsection{Regression Error Analysis}
-While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases \cite{regress}. In order to quantify this, we take the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression \cite{stdereg} with known values, which are our training points:
+While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases \cite{regress}. To deal with this problem, we consider the {\em standard error} of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression \cite{stdereg} with known values, which are our training points:
 
 \begin{equation} \label{eq:stderr}
     \sigma_{est} \approx \frac{s}{\sqrt{m}}
 \end{equation}
 
-where $s$ is the sample standard deviation of all of the points in the training set and $m$ is the number of training samples. The standard error, $\sigma_{est}$, is then used to determine the t-statistic for different test values \cite{tstat}. The t-statistic is defined as the ratio of the distance between a test point from a known training point to the standard error and is computed as follows:
+where $s$ is the sample standard deviation of all of the points in the training set and $m$ is the number of training samples. The standard error, $\sigma_{est}$, is then used to determine the {\em t-statistic} for different test values \cite{tstat}. The t-statistic is defined as the ratio of the distance between a test point from a known training point to the standard error and is computed as follows:
 \begin{equation} \label{eq:tstat}
 t_{\hat{\beta}} = \frac{|\hat{\beta}-\bar{\beta}|}{\sigma_{est}}    
 \end{equation}
@@ -438,6 +439,7 @@ In our case, there are two inputs we are primarily concerned about for predictio
 \begin{equation}
     \bigg(\frac{x}{\sigma_{d,est}t^*}\bigg)^2 + \bigg(\frac{y}{\sigma_{t,est}t^*}\bigg)^2 = 1
 \end{equation}
+\NB{what is x and y here?}
 where $\sigma_{d,est}$ and $\sigma_{t,est}$, are standard error values for distance and time, representing the $x$ and $y$ axes of the TPS regression, respectively. The ellipses at each point in our training data are calculated using the following equations:
 \begin{align} \label{eq:bounds}
     x_i = d_i + \sigma_{d,est}t^*\cos{\theta} \nonumber \\
@@ -453,12 +455,16 @@ In Fig.~\ref{fig:preds}, the convex hull around standard error ellipses created 
 	\caption{Prediction Intervals and Bounds}
 	\label{fig:bounds}
 \end{figure}
-An alternate method would have been to use standard error rectangles\cite{stdellipse} instead, which create rectangular intervals around each data point, but these are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by the TPS regression. The prediction bounds presented here satisfy the smoothness condition of our regression and are used to generate trajectories, which is discussed in the next section. 
+An alternate method would have been to use standard error rectangles\cite{stdellipse} instead, which create rectangular intervals around each data point, but these are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by the TPS regression. 
+
+\NB{so what's the punchline here? We need to say what you obtain with this analysis and perhaps connect with the SMT Solver later}
+
+The prediction bounds presented here satisfy the smoothness condition of our regression and are used to generate trajectories, which is discussed in the next section. 
 %\NB{we need to state what we do if they are not good}\NB{you mention this later. You need to anticipate the reviewer reaction. Here you need to mention that in the next section we show what to do if the result of this test is negative or you need to present here directly}
 
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
-In this section, we discuss how we generate smooth trajectories, and discretize and decompose the trajectories, subject to the regression analysis of the training data.
-Relating back to the system dynamics, we have established that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ and yaw can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. Hence when considering a planar $x,y$ trajectory we perform a decomposition in the $x$ and $y$ directions and generate independent roll and pitch commands to follow simultaneously trajectories in the $x$ and $y$ directions, respectively. 
+In this section, we discuss how we generate, discretize, and decompose smooth trajectories, subject to the regression analysis of the training data.
+Relating back to the system dynamics, we have established that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ and yaw \NB{symbol here} can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. Hence when considering a planar $x,y$ trajectory we perform a decomposition in the $x$ and $y$ directions and generate independent roll and pitch commands to follow simultaneously trajectories in the $x$ and $y$ directions, respectively. 
 %each trajectory simultaneously.
 %Because the using just roll and pitch commands is possible, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
 %\NB{this section needs to go before and needs to be explain better}.
@@ -510,7 +516,7 @@ Fig.~\ref{fig:t2dec} shows an example of a generated trajectory with its discret
 \end{figure}
 
 %In Fig.~\ref{fig:tdec}, we show the components at each interval. 
-These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. The resolve this issue, we us a satisfiability modulo theory solver (SMT) to solve the following satisfiability/optimization problem: %STEPS FOR REFERENCE: Check if distances for each component are attainable based on convex hull (x values in conv(M)). If not, rebuild or rediscretize trajectory. Check if all distance-time pairs are within the convex hull (x and y points BOTH in conv(M)).
+These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. To resolve this issue, we us a satisfiability modulo theory solver (SMT) to solve the following satisfiability/optimization problem: %STEPS FOR REFERENCE: Check if distances for each component are attainable based on convex hull (x values in conv(M)). If not, rebuild or rediscretize trajectory. Check if all distance-time pairs are within the convex hull (x and y points BOTH in conv(M)).
 
 %\begin{algorithm}[ht!]
 %\caption{Trajectory Correction} \label{alg:correct}
@@ -533,19 +539,19 @@ $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \e
 \begin{equation}
  e_i = \vert g_i-g_u \vert , ~i= 1,\ldots,m
 \end{equation}
- The lowest error in $\bm{e} = \{e_1,\ldots,e_m\}$ then found and is paired with the appropriate pre-trained sample, $\bm{J}^*$, %\NB{show $\bm{e}$}
+ The lowest error in $\bm{e} = \{e_1,\ldots,e_m\}$ is then found and paired with the appropriate pre-trained sample, $\bm{J}^*$, %\NB{show $\bm{e}$}
 \begin{equation}
 \bm{J}^* = \bm{J}_i \in \bm{J}\vert e_i = \min_e(\bm{e})
 \end{equation}
 
-This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$ by performing bicubic interpolation, so that important features in the optimal command vector are not lost. Interpolation methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss \cite{bicfeatures}. Bicubic interpolation is the chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity \cite{biccomp}. The general form of a bicubic interpolation equation is: 
+This optimal pre-trained \NB{what you mean optimal? Isn't this the closest? How is this optimal?} sample is then adjusted to reflect the user-set time, $t_u$ by performing bicubic interpolation, so that important features in the optimal command vector are not lost. Interpolation methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss \cite{bicfeatures}. Bicubic interpolation is the chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity \cite{biccomp}. The general form of a bicubic interpolation equation is: 
 %\NB{there are too many ``This is done" in this section. They brake the flow of the paper...go to the point ...This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$ by performing...}
 
 \begin{equation} \label{eq:bicinter}
     b(x) = \sum_{i=0}^3a_ij^i
 \end{equation}
 
-where $j$ is an entry in vector $\bm{J}^*$ and $a_i$ represents the coefficients of the best-fit cubic function at each point. %\NB{no clue what this means...what are these coefficients? coefficients of the cubic best fit to find the values that would go in between each entry}.
+where $j$ is an entry in vector $\bm{J}^*$ and $a_i$ \NB{you have already used $a$...change this term} represents the coefficients of the best-fit cubic function at each point. %\NB{no clue what this means...what are these coefficients? coefficients of the cubic best fit to find the values that would go in between each entry}.
 Bicubic interpolation takes the weighted sum of the four nearest neighbors of each entry in the command vector in order to identify a function for the intermediate points around each entry in $\bm{J}^*$. This method is a result from \cite{bicfeatures}, where it is described in more detail. After resizing, the time adjusted input vector $\bm{J}'$ is obtained.
 
 The next step is to adjust the input vector such that the system reaches the waypoint at distance $d_u$ by leveraging the average input command information $\bar{j}_u$. Because we have identified in Section~\ref{sec:sysdyn} that distance is a function of this average input command and time, the time-adjusted vector $\bm{J}'$ is scaled such that its mean is equivalent to $\bar{j}_u$:
@@ -569,7 +575,7 @@ In Fig.~\ref{fig:gensample}, each step of the command generation process is visu
 	\label{fig:gensample}
 \end{figure}
 
-From the autonomous command, the expected path of the vehicle is generated. The integral of the final command string is taken at each time-step to determine the expected position at all times. Because we know the relationship between the integral and the distance travelled at all times, we are able to invert the equation from the TPS regression for the integral, \eqref{eq:integralfit}, such that the inputs are time and integral and the output is the distance travelled:
+From the autonomous command, the expected path of the vehicle is generated. The integral of the final command string is taken at each time-step to determine the expected position at all times \NB{how? not clear...elaborate}. Because we know the relationship between the integral and the distance travelled at all times, we are able to invert the equation from the TPS regression for the integral, \eqref{eq:integralfit}, such that the inputs are time and integral and the output is the distance travelled \NB{this sentence doesn't make sense}:
 \begin{equation} \label{eq:distresult}
 d_J(t) = f^{-1}(g_J(t),t)
 \end{equation}
