@@ -414,10 +414,9 @@ where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for any t
 
 In our case, there are two inputs we are primarily concerned about for prediction; distance and time, as in \eqref{eq:integralfit} and \eqref{eq:ssvelfit}. The distance and time values are used together as input pairs, so we use the convex hull around standard error ellipses to connect the two together \cite{stdellipse}. The standard error ellipse, in general, is computed as follows: %\NB{this section is too long..just go to the point. State that we are using this method to compute error region or whatever they are called} %\NB{I don't understand this..why are you separating this values? because we obtain a height and a length of these ellipses}
 \begin{equation}
-    \bigg(\frac{\bm{d}}{\sigma_{d,est}t^*}\bigg)^2 + \bigg(\frac{\bm{t}}{\sigma_{t,est}t^*}\bigg)^2 = 1
+    \bigg(\frac{d}{\sigma_{d,est}t^*}\bigg)^2 + \bigg(\frac{t}{\sigma_{t,est}t^*}\bigg)^2 = 1
 \end{equation}
-
-where $\bm{d}$ and $\bm{t}$ represent values corresponding to the axes for distance and time, respectively, and $\sigma_{d,est}$ and $\sigma_{t,est}$, are standard error values for distance and time, representing the $x$ and $y$ axes of the TPS regression, respectively. The ellipses at each point in our training data are calculated using the following equations:
+where $d$ and $t$ represent values corresponding to the axes for distance and time, respectively, and $\sigma_{d,est}$ and $\sigma_{t,est}$, are standard error values for distance and time, representing the $x$ and $y$ axes of the TPS regression, respectively. The ellipses at each point in our training data are calculated using the following equations:
 \begin{align} \label{eq:bounds}
     \bm{d}_i = d_i + \sigma_{d,est}t^*\cos{\theta} \nonumber \\
     \bm{t}_i = t_i + \sigma_{t,est}t^*\sin{\theta} 
