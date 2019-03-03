@@ -554,11 +554,11 @@ From the autonomous command, the expected path of the vehicle is generated. The 
 \begin{equation}
     g_J(t) = \int_0^t\bm{J}_a dt
 \end{equation}
-Because we know the relationship between the integral and the distance travelled at all times, we are able to leverage the equation from the TPS regression for the integral, \eqref{eq:integralfit}, such that the inputs are time elapsed and integral of the autonomous command string and the output is the distance: %\NB{this sentence doesn't make sense}:
+Because we know the relationship between the integral and the distance travelled at all times, we are able to leverage the equation from the TPS regression for the integral, \eqref{eq:integralfit}, such that the inputs are time elapsed and integral of the autonomous command string and the output is the distance traveled: %\NB{this sentence doesn't make sense}:
 \begin{equation} \label{eq:distresult}
 d_J(t) = f^{-1}(g_J(t),t)
 \end{equation}
-where $g_J(t)$ is the integral of the string of generated commands at time $t$, and $d_J(t)$ is the resultant distance travelled at that time. As the command string progresses, the integral increases, and as a result the distance travelled also increases.
+where $g_J(t)$ is the integral of the string of generated commands at time $t$, and $d_J(t)$ is the resultant distance travelled at $t$.
 
 %\NB{where is the part of the text in which you show how to generate the prediction of the position occupied by the vehicle by following the determined sequence of inputs?}
 \subsection{Online Adaptation of Generated Commands} \label{sec:adapt}
@@ -573,19 +573,18 @@ This error at time $t$, $\xi(t)$, is attributed to the most recent command sent 
 \begin{equation}
     \bm{J}_c(t+1) = \bm{J}_a(t+1) + k_p\xi(t)
 \end{equation}
-%\NB{mention why you are doing this that is because in this way the corrective action is not too high and tailored based on the command that on average it should receive and hus do not overshoot}
+%\NB{mention why you are doing this that is because in this way the corrective action is not too high and tailored based on the command that on average it should receive and thus do not overshoot}
 In our work, the controller gain, $k_p$, is a static value that is set based on the input being provided to the system as follows:
 \begin{equation} \label{eq:ctrls}
     k_p = r_p\bar{j}_a
 \end{equation}
-
 where $\bar{j}_a$ is the average input from the open loop commands and $r_p$ is a ratio applied to the average input. The gain is chosen in this manner as to avoid drastic corrections that would affect the stability of the system. If the error at time $t$, $\xi(t)$, is very high, then having $r_p \geq 1$ could result in a drastic and unstable change in the control input. The set value of the correction ratio depends on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions, i.e., different correction ratios may be desirable for indoor and outdoor flight. Using this controller, the position error is lowered to ensure that the UAV does indeed reach the generated waypoint as expected.  %\NB{what threshold?} 
 
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
 
 
 \section{Experiments} \label{sec:exper}
-\NB{we need the overlapped sequence of pictures for the different experiments besides the UVA one. }
+%\NB{we need the overlapped sequence of pictures for the different experiments besides the UVA one. }
 The proposed approach was validated experimentally using a Parrot BeBop 2 quadrotor UAV, which is tuned and stable for teleoperation off-the-shelf. Since experiments were conducted indoors, a Vicon motion capture system was used to obtain the position and velocity of the vehicle. Alternatively, one could use GPS and IMU data to obtain similar features in different conditions. 
 %The teleoperation was performed using a node written in the ROS environment.
 
@@ -628,11 +627,12 @@ The resultant diagonal trajectory is shown in Fig.~\ref{fig:1723trajs}, and \ref
     \caption{Closed Loop Diagonal Trajectory}
     \label{fig:1723trajs}
 \end{figure}
-%\begin{figure}[h]
-%    \includegraphics[width = 0.48\textwidth]{images/diagquad.png}
-%    \caption{Caption}
-%    \label{fig:diagquad}
-%\end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width = 7cm,height = 5cm]{images/diagquad2.png}
+    \caption{Diagonal Trajectory Experiment}
+    \label{fig:diagquad}
+\end{figure}
 To further validate the approach, a square-shaped trajectory was tested, and the experimental data is shown in Fig.~\ref{fig:sqr}. The Parrot BeBop 2 quadrotor experiments are pictured in Fig.~\ref{fig:sqrquad}.
 
 \begin{figure}[ht!]
