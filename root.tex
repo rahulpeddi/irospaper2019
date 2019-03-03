@@ -367,7 +367,7 @@ The offline training data is applied to a thin-plate spline (TPS) surface regres
 \end{equation}
 %\NB{what you mean with average velocity?}
 \NB{chnage x and y with new letters that you don't use in the paper for other variables.}
-where $a_1,a_x,\text{and}~a_y$ are scalar coefficients, $w_i$ is a coefficient that corresponds to each specific trial\NB{what is this w term? it's not clear. what does it mean that is specific to each trial?}, subject to the following smoothing condition: \begin{equation}
+where $a_1,a_x,\text{and}~a_y$ are scalar coefficients, $w_i$ is a coefficient that corresponds to each data point, subject to the following smoothing condition: \begin{equation}
 \sum_{i=1}^mw_i=\sum_{i=1}^mw_ix_i=\sum_{i=1}^mw_iy_i=0
 \end{equation}
 and the function $U$ is of the form
@@ -375,7 +375,7 @@ and the function $U$ is of the form
   U(r) = r^2\log{r} 
 \end{equation}
 where $r=||(x_i,y_i)-(x,y)||$.
-Given the corresponding $z_i$ \NB{What is $z$?} for each $(x_i,y_i)$ pair, we solve the following linear system to obtain the coefficients $w_i,\ldots,w_m$ and $a_1,a_x,a_y$,
+Given the corresponding $z_i$ for each $(x_i,y_i)$ pair, we solve the following linear system to obtain the coefficients $w_i,\ldots,w_m$ and $a_1,a_x,a_y$,
 
 \begin{equation}
     \begin{bmatrix}
@@ -392,7 +392,7 @@ Given the corresponding $z_i$ \NB{What is $z$?} for each $(x_i,y_i)$ pair, we so
     \end{bmatrix}
 \end{equation}
 
-where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, each $i$ row of $P$ is $(1,x_i,y_i)$, $\bm{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\bm{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\bm{w} \in \mathbb{R}^{m\times1}$ and $\bm{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\bm{a}$ is the column vector with elements $a_1,a_x,a_y$.
+where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, each $i^{th}$ row of $P$ is $(1,x_i,y_i)$, $\bm{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\bm{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\bm{w} \in \mathbb{R}^{m\times1}$ and $\bm{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\bm{a}$ is the column vector with elements $a_1,a_x,a_y$.
 %\NB{$P_i*$ does not appear in the equation}
 Given the general framework for performing the thin-plate spline, we develop two separate relationships for our application. In our work, the first regression is applied to $d$ (distance) and $t$ (time) as inputs to obtain the integral of the commands $g_i = f(d_i,t_i)$ while the second has the same inputs to obtain the average teleoperation command $\bar{j}_i = h(d_i,t_i)$. With the functions we have obtained, we are able to find an estimated integral and average input command, $g_u$ and $\bar{j}_u$, for any given desired distance and time, $d_u$ and $t_u$, respectively,
 \begin{equation} \label{eq:integralfit}
@@ -466,7 +466,7 @@ With this analysis, we are able to provide boundary conditions for our training 
 
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
 In this section, we discuss how we generate, discretize, and decompose smooth trajectories, subject to the regression error analysis, which is verified with an SMT solver.
-Relating back to the system dynamics, we have established that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ and yaw \NB{symbol here} can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. Hence when considering a planar $x,y$ trajectory we perform a decomposition in the $x$ and $y$ directions and generate independent roll and pitch commands to follow simultaneously trajectories in the $x$ and $y$ directions, respectively. 
+Relating back to the system dynamics, we have established that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ and $\psi$ can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. Hence when considering a planar $x,y$ trajectory we perform a decomposition in the $x$ and $y$ directions and generate independent roll and pitch commands to follow simultaneously trajectories in the $x$ and $y$ directions, respectively. 
 %each trajectory simultaneously.
 %Because the using just roll and pitch commands is possible, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
 %\NB{this section needs to go before and needs to be explain better}.
