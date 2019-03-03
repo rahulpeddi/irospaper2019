@@ -1134,7 +1134,6 @@
 % IEEE does not use extra spacing after punctuation
 \frenchspacing
 
-
 % we want to maintain textheight as an integer multiple of
 % \baselineskip.  Keep \topsep in with this game plan too.
 \topskip=\baselineskip
