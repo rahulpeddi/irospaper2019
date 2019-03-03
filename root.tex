@@ -588,11 +588,13 @@ The commands generated in the previous section are generated and sent to the UAV
 \begin{equation}
     \xi(t) = \bm{p_r}(t)-\bm{p}(t)
 \end{equation}
+\NB{is $\xi$ a vector?}
+
 This error, $\xi(t)$, is attributed to the most recent command sent to the system. A proportional controller is implemented to adjust the subsequent command, $\bm{J}_a(t+1)$, to obtain the closed-loop command $\bm{J}_c(t+1)$ as follows:
 \begin{equation}
     \bm{J}_c(t+1) = \bm{J}_a(t+1) + k_p\xi(t)
 \end{equation}
-
+%\NB{mention why you are doing this that is because in this way the corrective action is not too high and tailored based on the command that on average it should receive and hus do not overshoot}
 In our work, the controller gain, $k_p$, is a static value that is set based on the input being provided to the system as follows:
 \begin{equation} \label{eq:ctrls}
     k_p = r_p\bar{j}_a
@@ -604,7 +606,7 @@ where $\bar{j}_a$ is the average input from the open loop commands and $r_p$ is 
 
 
 \section{Experiments} \label{sec:exper}
-
+\NB{we need the overlapped sequence of pictures for the different experiments besides the UVA one. }
 The proposed approach was validated experimentally using a Parrot BeBop 2 quadrotor UAV, which is tuned and stable for teleoperation off-the-shelf. Since experiments were conducted indoors, a Vicon motion capture system was used to obtain the position and velocity of the vehicle. Alternatively, one could use GPS and IMU data to obtain similar features in different conditions. 
 %The teleoperation was performed using a node written in the ROS environment.
 
