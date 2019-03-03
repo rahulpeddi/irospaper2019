@@ -391,7 +391,7 @@ In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represen
     \label{fig:joys}
 \end{figure}
 \subsubsection{Regression Error Analysis}
-While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases \cite{regress}. To deal with this problem, we consider the {\em standard error} of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression \cite{stdereg} with known values, which are our training points:
+While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases \cite{regress}. To deal with this problem, we consider the {\em standard error} of the estimate, which is a statistic that can be used to measure the accuracy of predictions given a certain type of regression \cite{stdereg} with known values, which are our training points:
 
 \begin{equation} \label{eq:stderr}
     \sigma_{est} \approx \frac{s}{\sqrt{m}}
@@ -414,15 +414,15 @@ where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for any t
 
 In our case, there are two inputs we are primarily concerned about for prediction; distance and time, as in \eqref{eq:integralfit} and \eqref{eq:ssvelfit}. The distance and time values are used together as input pairs, so we use the convex hull around standard error ellipses to connect the two together \cite{stdellipse}. The standard error ellipse, in general, is computed as follows: %\NB{this section is too long..just go to the point. State that we are using this method to compute error region or whatever they are called} %\NB{I don't understand this..why are you separating this values? because we obtain a height and a length of these ellipses}
 \begin{equation}
-    \bigg(\frac{x}{\sigma_{d,est}t^*}\bigg)^2 + \bigg(\frac{y}{\sigma_{t,est}t^*}\bigg)^2 = 1
+    \bigg(\frac{\bm{d}}{\sigma_{d,est}t^*}\bigg)^2 + \bigg(\frac{\bm{t}}{\sigma_{t,est}t^*}\bigg)^2 = 1
 \end{equation}
-\NB{what is x and y here?}
-where $\sigma_{d,est}$ and $\sigma_{t,est}$, are standard error values for distance and time, representing the $x$ and $y$ axes of the TPS regression, respectively. The ellipses at each point in our training data are calculated using the following equations:
+
+where $\bm{d}$ and $\bm{t}$ represent values corresponding to the axes for distance and time, respectively, and $\sigma_{d,est}$ and $\sigma_{t,est}$, are standard error values for distance and time, representing the $x$ and $y$ axes of the TPS regression, respectively. The ellipses at each point in our training data are calculated using the following equations:
 \begin{align} \label{eq:bounds}
-    x_i = d_i + \sigma_{d,est}t^*\cos{\theta} \nonumber \\
-    y_i = t_i + \sigma_{t,est}t^*\sin{\theta} 
+    \bm{d}_i = d_i + \sigma_{d,est}t^*\cos{\theta} \nonumber \\
+    \bm{t}_i = t_i + \sigma_{t,est}t^*\sin{\theta} 
 \end{align}
-where $\theta$ is an angle from $[0,\ldots,2\pi]$, and $i = 1,\ldots,m$ reflects each of the $m$ training samples. A convex hull is then computed around the ellipses to provide a concise measure for the combination of distances and times that have low error when input into the TPS regression. This convex hull is generated using the Quickhull algorithm \cite{quickhull}, in which we take the outermost points of the set ellipses and form a boundary denoted $Conv(M)$, where $M$ represents the set of all points on the perimeters of all ellipses: $\{x_i,\ldots,x_m\},\{y_i,\ldots,y_m\}$.
+where $\theta$ is an angle from $[0,\ldots,2\pi]$, and $i = 1,\ldots,m$ reflects each of the $m$ training samples, and $\bm{d}_i$ and $\bm{t}_i$ are all of the points on the perimeter of the ellipse of training point $i$. A convex hull is then computed around the ellipses to provide a concise measure for the combination of distances and times that have low error when input into the TPS regression. This convex hull is generated using the Quickhull algorithm \cite{quickhull}, in which we take the outermost points of the set ellipses and form a boundary denoted $Conv(M)$, where $M$ represents the set of all points on the perimeters of all ellipses: $\{\bm{d}_i,\ldots,\bm{d}_m\},\{\bm{t}_i,\ldots,\bm{t}_m\}$.
 
 In Fig.~\ref{fig:preds}, the convex hull around standard error ellipses created with $t^* = 0.5$ around each training point is depicted. Fig.~\ref{fig:predsur} is the TPS regression model for the integral \eqref{eq:integralfit} overlaid with the convex hull \cite{bounds} created from the ellipses on Fig.~\ref{fig:preds}.
 \begin{figure}[H]
