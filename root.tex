@@ -98,14 +98,14 @@ On the other hand, data-driven machine learning techniques like neural networks,
 \begin{figure}[t]
     \includegraphics[width=0.48\textwidth]{finalfigs/quads.png}
     \vspace{-5pt}
-    \caption{Some Examples of Off-the-Shelf UAVs, curtesy of the web}
+    \caption{Some Examples of Off-the-Shelf UAVs, courtesy of the web}
     \label{fig:uavs}
     \vspace{-15pt}
 \end{figure}
 \NB{I've changed the figure. We need also one that show what we are doing here. I'll help with the figures}
-Different from other supervised learning approaches, in this work we leverage the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contribution of this work is a framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles. We also provide a framework to assess the quality of the training data with respect to the output decision from the regression.\NB{need to add more}\NB{highlight that in tho=is paper we use parrot }
+Different from other supervised learning approaches, in this work we leverage the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contribution of this work is a framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles. We also provide a framework to assess the quality of the training data with respect to the output decision from the regression.\NB{need to add more}\NB{highlight that in this paper we use parrot }
 In this work we propose a novel approach that leverages both model-based and data-driven theories to generate autonomous flight behavior for an aerial vehicle from few user teleoperation demonstrations. 
-We focus on off-the-shelf quadrotor UAVs which have a well studied dynamical and control architecture and are by far the most common UAVs because of the growing hobby and DIY community. Even if the application  focus of this paper is on quadrotors, our framework can scale and apply to any other teleoperated aerial vehicle. Fig. \ref{fig:uavs} shows some examples of such quadrotors focus of this paper, all characterized by having the same shape but different motors, propellers, boom size, and electronics and hence different dynamic and control models.
+We focus on off-the-shelf quadrotor UAVs which have a well studied dynamical and control architecture and are by far the most common UAVs because of the growing hobby and DIY community. Even if the application focus of this paper is on quadrotors, our framework can scale and apply to any other teleoperated aerial vehicle. Fig. \ref{fig:uavs} shows some examples of such quadrotors focus of this paper, all characterized by having the same shape but different motors, propellers, boom size, and electronics and hence different dynamic and control models.
 
 
 
@@ -247,13 +247,12 @@ In this work, the goal is to generate control inputs for autonomous flight when 
 In Fig. \ref{fig:samps}, we show data from a single flight demonstration on a Parrot BeBop 2 quadrotor -- the hobby-grade quadrotor used in this paper to verify our results. The UAV was teleoperated forward manually over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which flies the UAV in the negative $y$-direction. The teleoperation command, in this case, adheres to desired pitch angles, but the user could be adjusting any value that affects motion of the system, such as acceleration, torque, or even voltage provided to the motors depending on the factory setting. The approach presented in this paper is able to connect any of these commands to the change in position and velocity of the system. 
 \begin{figure}[ht]
 	\centering
-	\subfigure[Sample of a Single Demonstration\label{fig:sampleintegral}]{\includegraphics[width=1\linewidth]{sampleintegral.png}}
-	\subfigure[Sample Trajectory\label{fig:sampt}]{\includegraphics[width=1\linewidth]{sampletrajectory.png}}
-	\subfigure[Sample Velocity\label{fig:sampv}]{\includegraphics[width=1\linewidth]{samplevelocity.png}}
+	\subfigure[Sample of a Single Demonstration\label{fig:sampleintegral}]{\includegraphics[width=1\linewidth]{images/sampleintegral.png}}
+	\subfigure[Sample Position\label{fig:sampt}]{\includegraphics[width=1\linewidth]{images/sampletrajectory.png}}
+	\subfigure[Sample Velocity\label{fig:sampv}]{\includegraphics[width=1\linewidth]{images/samplevelocity.png}}
 	\caption{Sample Demonstration, Trajectory, and Velocity}
 	\label{fig:samps}
 \end{figure}
-\NB{the axis labels are wrong...please be careful. most of the axis labels are incorrect}\NB{also the x axis of the fist figrue are up to 5 whiel the next two are up to 4.5. They need to be consistent and perfectly aligned!}
 From \eqref{eq:cinputs}, we observe that the inputs $u_2$ and $u_3$ for roll and pitch rely on the change in the desired Euler roll, $\phi_c$, and pitch, $\theta_c$, angles, and these desired roll and pitch angles are a function of the desired positions and velocities which are provided by the user, in our case. 
 Hence, each stroke in the joystick transforms into motion of the vehicle which, in turn, affects its changes in the global $x$ and $y$ position. Our first goal here is to understand this mapping between user inputs and distance traveled by the quadrotor to build an autonomous behavior. Instead of using the entire string of commands, which could be large, not uniform, and computationally expensive, in this work we use the integral of the commands, in other words the area underneath the time series of commands which is a compact and representative measure for training a model. The shaded area in Fig.~\ref{fig:sampleintegral} represents this integral. 
 
