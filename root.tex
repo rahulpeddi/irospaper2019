@@ -107,7 +107,7 @@ We focus on off-the-shelf quadrotor UAVs which have a well studied dynamical and
 \NB{this figure is sad. We need a better one. We need also one that show what we are doing here. I'll help with those figrues}
 Different from other supervised learning approaches, in this work we leverage the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contribution of this work is a framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles. We also provide a framework to assess the quality of the training data with respect to the output decision from the regression.\NB{need to add more}
 
-The remainder of the paper is oragnized as follows: In Section \ref{sec:relatedwork}, we present some work related to ours. In Section \ref{sec:sysdyn}, we discuss the system dynamics and controller architecture, which is then followed by an overview of our methodology in Section \ref{sec:approach}. We then discuss in detail each part of our approach with training in Section \ref{sec:train}, trajectogry generation in Section \ref{sec:traj}, autonomous control generation in Section \ref{sec:generate}, and lastly the online adaptation of controls in Section \ref{sec:adapt}. Finally, we end with a discussion about our experimental validation in Section \ref{sec:exper}, and we have our conclusions and a discussion on future work in Section \ref{sec:conc}.
+The remainder of the paper is organized as follows: In Section \ref{sec:relatedwork}, we present some work related to ours. In Section \ref{sec:sysdyn}, we discuss the system dynamics and controller architecture, which is then followed by an overview of our methodology in Section \ref{sec:approach}. We then discuss in detail each part of our approach with training in Section \ref{sec:train}, trajectogry generation in Section \ref{sec:traj}, autonomous control generation in Section \ref{sec:generate}, and lastly the online adaptation of controls in Section \ref{sec:adapt}. Finally, we end with a discussion about our experimental validation in Section \ref{sec:exper}, and we have our conclusions and a discussion on future work in Section \ref{sec:conc}.
 
 
 %Besides a general framework for the generation of autonomous commands for any quadrotor, in this work we offer a scheme to integrate model-based and data-driven approaches 
@@ -354,7 +354,7 @@ To expand the same data for this purpose, we train on portions of the training s
 %Training on not only trajectories that start and end with a velocity of $0$, but also on segments enables more specific command generation based on where the system is in relation to the provided trajectory. For example, if the command for the middle of the trajectory (i.e., between two points that are neither the start nor end of the trajectory) needs to be generated, then the training from the trajectories in Fig.~\ref{fig:trainelab} is used.
 
 %\NB{you are not explaining well how you are doing this}
-\subsubsection{Thin-Plate Spline Regression Analysis}
+\subsubsection{Thin-Plate Spline Regression}
 
 The offline training data is applied to a thin-plate spline (TPS) surface regression to describe the relationship between training inputs and integral and average input command. The general form of a thin-plate spline equation is 
 \begin{equation}
@@ -409,6 +409,7 @@ In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represen
     \label{fig:joys}
 \end{figure}
 
+\subsubsection{Regression Error Analysis}
 While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases \cite{regress}. In order to quantify this, we take the standard error of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression \cite{stdereg} with known values, which are our training points:
 
 \begin{equation} \label{eq:stderr}
