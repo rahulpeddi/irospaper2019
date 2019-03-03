@@ -253,6 +253,7 @@ In Fig. \ref{fig:samps}, we show data from a single flight demonstration on a Pa
 	\caption{Sample Demonstration, Trajectory, and Velocity}
 	\label{fig:samps}
 \end{figure}
+\NB{the axis labels are wrong...please be careful. most of the axis labels are incorrect}
 From \eqref{eq:cinputs}, we observe that the inputs $u_2$ and $u_3$ for roll and pitch rely on the change in the desired Euler roll, $\phi_c$, and pitch, $\theta_c$, angles, and these desired roll and pitch angles are a function of the desired positions and velocities which are provided by the user, in our case. 
 Hence, each stroke in the joystick transforms into motion of the vehicle which, in turn, affects its changes in the global $x$ and $y$ position. Our first goal here is to understand this mapping between user inputs and distance traveled by the quadrotor to build an autonomous behavior. Instead of using the entire string of commands, which could be large, not uniform, and computationally expensive, in this work we use the integral of the commands, in other words the area underneath the time series of commands which is a compact and representative measure for training a model. The shaded area in Fig.~\ref{fig:sampleintegral} represents this integral. 
 
