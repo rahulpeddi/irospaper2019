@@ -519,13 +519,14 @@ Fig.~\ref{fig:t2dec} shows an example of a generated trajectory with its discret
 \end{figure}
 
 %In Fig.~\ref{fig:tdec}, we show the components at each interval. 
-These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. To resolve this issue, we use an SMT solver, which is a verification tool that solves a first order satisfiability problem. In our work, the condition we want to satisfy is that each of the distances and corresponding time to traverse each distance is within the convex hull, $Conv(M)$. Using the SMT solver, we check if all the distances in either component $\bm{p}_x^*(t_1)$ and $\bm{p}_y^*(t_1)$ are attainable in time-step $\Delta t$,
-
+These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. To resolve this issue, we use an SMT solver, which is a verification tool that solves a first order satisfiability problem. In our work, the condition we want to satisfy is that each of the distances and corresponding time for each distance is within the convex hull, $Conv(M)$. Using the SMT solver, we check if all the distances in either component $\bm{p}_x^*(t_1)$ and $\bm{p}_y^*(t_1)$ are attainable in time-step $\Delta t$ subject to $Conv(M)$:
 \begin{equation}
-    (\bm{p}_x^*(t_1),\Delta t) \And (\bm{p}_y^*(t_1),\Delta t) \in Conv(M)
+    (\bm{p}_x^*(t_i),\Delta t) \wedge (\bm{p}_y^*(t_i),\Delta t) \in Conv(M)
 \end{equation}
-
-If this condition is satisfied, then the trajectory is feasible.
+where $i = 1,\ldots,n$ and represents each decomposed part of the trajectory. If this condition is satisfied, then the trajectory is feasible. If not, the solver continues by adjusting the time and finds a solution tha satisfies the following conditions:
+\begin{align}
+    
+\end{align}
 
 
 
