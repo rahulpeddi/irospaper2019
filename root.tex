@@ -95,17 +95,19 @@ Generating autonomous flight behavior - subject of this paper -  however, can be
 %, and knowledge of that model is required to generate autonomous flight. Extracting this model is time demanding
 
 On the other hand, data-driven machine learning techniques like neural networks, reinforcement learning, and regression techniques have recently emerged and have demonstrated to be effective to learn from training data. The main drawbacks of such procedures is that there is still not a clear reasoning about how these techniques work and typically large and dense training sets are required to obtain precise results.
-
-In this work we propose a novel approach that leverages both model-based and data-driven theories to generate autonomous flight behavior for an aerial vehicle from few user teleoperation demonstrations. 
-We focus on off-the-shelf quadrotor UAVs which have a well studied dynamical and control architecture and are by far the most common UAVs because of the growing hobby and DIY community. Even if the application  focus of this paper is on quadrotors, our framework can scale and apply to any other teleoperated aerial vehicle. Fig. \ref{fig:uavs} shows some examples of such quadrotors focus of this paper, all characterized by having the same shape but different motors, propellers, boom size, and electronics and hence different dynamic and control models.
-
-\begin{figure}[ht]
+\begin{figure}[t]
     \includegraphics[width=0.48\textwidth]{finalfigs/quads.png}
+    \vspace{-5pt}
     \caption{Some Examples of Off-the-Shelf UAVs, curtesy of the web}
     \label{fig:uavs}
+    \vspace{-15pt}
 \end{figure}
 \NB{I've changed the figure. We need also one that show what we are doing here. I'll help with the figures}
 Different from other supervised learning approaches, in this work we leverage the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contribution of this work is a framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles. We also provide a framework to assess the quality of the training data with respect to the output decision from the regression.\NB{need to add more}\NB{highlight that in tho=is paper we use parrot }
+In this work we propose a novel approach that leverages both model-based and data-driven theories to generate autonomous flight behavior for an aerial vehicle from few user teleoperation demonstrations. 
+We focus on off-the-shelf quadrotor UAVs which have a well studied dynamical and control architecture and are by far the most common UAVs because of the growing hobby and DIY community. Even if the application  focus of this paper is on quadrotors, our framework can scale and apply to any other teleoperated aerial vehicle. Fig. \ref{fig:uavs} shows some examples of such quadrotors focus of this paper, all characterized by having the same shape but different motors, propellers, boom size, and electronics and hence different dynamic and control models.
+
+
 
 The remainder of the paper is organized as follows: In Section \ref{sec:relatedwork}, we present some work related to ours \NB{no we need to say that we present the state of the art in the literature}. \NB{what about section 3?}In Section \ref{sec:sysdyn}, we discuss the system dynamics and controller architecture, which is then followed by an overview of our methodology in Section \ref{sec:approach}. We then discuss in detail each part of our approach with training in Section \ref{sec:train}, trajectogry generation in Section \ref{sec:traj}, autonomous control generation in Section \ref{sec:generate}, and lastly the online adaptation of controls in Section \ref{sec:adapt}\NB{no need to list all subsections just list teh main section details}. Finally, we end with a discussion about our experimental validation in Section \ref{sec:exper}, and we have our conclusions and a discussion on future work in Section \ref{sec:conc}.
 
