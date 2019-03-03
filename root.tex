@@ -107,7 +107,9 @@ We focus on off-the-shelf quadrotor UAVs which have a well studied dynamical and
 \NB{this figure is sad. We need a better one. We need also one that show what we are doing here. I'll help with those figrues}
 Different from other supervised learning approaches, in this work we leverage the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contribution of this work is a framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles. We also provide a framework to assess the quality of the training data with respect to the output decision from the regression.\NB{need to add more}
 
-The remainder of the rest of the paper is ....\NB{complete}
+The remainder of the paper is oragnized as follows: In Section \ref{sec:relatedwork}, we present some work related to ours. In Section \ref{sec:sysdyn}, we discuss the system dynamics and controller architecture, which is then followed by an overview of our methodology in Section \ref{sec:approach}. We then discuss in detail each part of our approach with training in Section \ref{sec:train}, trajectogry generation in Section \ref{sec:traj}, autonomous control generation in Section \ref{sec:generate}, and lastly the online adaptation of controls in Section \ref{sec:adapt}. Finally, we end with a discussion about our experimental validation in Section \ref{sec:exper}, and we have our conclusions and a discussion on future work in Section \ref{sec:conc}.
+
+
 %Besides a general framework for the generation of autonomous commands for any quadrotor, in this work we offer a scheme to integrate model-based and data-driven approaches 
 %\NB{need to reinforce this statement}
  
@@ -138,7 +140,7 @@ The remainder of the rest of the paper is ....\NB{complete}
 
 %The rest of this paper is organized as follows: In Section \ref{sec:traj}, we discuss how we generate and decompose smooth trajectories for our UAV to follow. Next, we discuss the training data and regression analysis in Section \ref{sec:train}. This is then followed by discussing how the autonomous commands are generated in Section \ref{sec:generate}, which is followed by the online adaptation and correction in Section \ref{sec:adapt}. Lastly, we describe and demonstrate our experimental results in Section \ref{sec:exper}, and we conclude our work and discuss future work in \ref{sec:conc}.
 
-\section{Related Work}
+\section{Related Work} \label{sec:relatedwork}
 %\NB{we need to stress how different this work is in comparison with the rest of the literature on learning from demonstration. We need to show our contribution clearly}
 \NB{skipping related work for now}
 
