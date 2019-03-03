@@ -250,7 +250,7 @@ In Fig. \ref{fig:samps}, we show data from a single flight demonstration on a Pa
 	\subfigure[Sample of a Single Demonstration\label{fig:sampleintegral}]{\includegraphics[width=1\linewidth]{images/sampleintegral.png}}
 	\subfigure[Sample Distance Traveled\label{fig:sampt}]{\includegraphics[width=1\linewidth]{images/sampletrajectory.png}}
 	\subfigure[Sample Velocity\label{fig:sampv}]{\includegraphics[width=1\linewidth]{images/samplevelocity.png}}
-	\caption{Sample Demonstration, Trajectory, and Velocity}
+	\caption{Sample Demonstration, Distance Traveled, and Velocity}
 	\label{fig:samps}
 \end{figure}
 From \eqref{eq:cinputs}, we observe that the inputs $u_2$ and $u_3$ for roll and pitch rely on the change in the desired Euler roll, $\phi_c$, and pitch, $\theta_c$, angles, and these desired roll and pitch angles are a function of the desired positions and velocities which are provided by the user, in our case. 
@@ -260,10 +260,9 @@ Hence, each stroke in the joystick transforms into motion of the vehicle which, 
 %Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the integral. i.e. the total area, under the string of commands. Because the pitch is proportional to the linear velocity in the $y$-direction, we know that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled 
 %\NB{here show that because u2 depends on $\phi_c$ and $\phi_c$ depends on x then this integral represents motion but what you really need to stress is that it is a compact measure without having to use the entire string of commands for learning}.
 
-Because the integral by itself may not be enough to characterize a unique behavior of the UAV, as the same integral can be achieved with commands strings for different traveling distances and velocities, the average input command is also of interest since \eqref{eq:cinputs} impacts changes in traveling velocity in \eqref{eq:quadrotor_dynamics}. By using the combination of integral and average input commands, we will present an approach to generate autonomous commands during a mission defined by traveling a multiple waypoint at specified distances and times.
+Because the integral by itself may not be enough to characterize a unique behavior of the UAV, as the same integral can be achieved with commands strings for different traveling distances and velocities, the average input command is also of interest since \eqref{eq:cinputs} impacts changes in traveling velocity in \eqref{eq:quadrotor_dynamics}. By using the combination of integral and average input commands, we will present an approach to generate autonomous commands during a mission defined by traveling through multiple waypoints at specified distances and times.
 
 \section{Methodology} \label{sec:approach}
-
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/blocks.PNG}
     \caption{Block Diagram of Proposed Approach}
@@ -271,8 +270,7 @@ Because the integral by itself may not be enough to characterize a unique behavi
 \end{figure}
 %\NB{the figure needs to be changed. jx(t) jy(t) should input into the plant and the output is x(t) y(t) and all goes as input to the Training. The figure is still blurry}
 %\NB{let's use power point fro the diagrams..it's blurry}
-
-Our approach, outlined in Fig.~\ref{fig:blockdiagram}, consists on a training phase with multiple demonstrations that are used to build a regression model to identify the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, from which a sequence of commands are synthesized to track a user-defined distance, $d_u$, in a time, $t_u$. The overall output of the regression is a sequence of commands having the same form of the inputs used for training which in our case are joystick teleoperation commands $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. These actions are, however, open-loop and prone to tracking errors. Tracking error is reduced by using a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. 
+Our approach, outlined in Fig.~\ref{fig:blockdiagram}, consists of a training phase with multiple demonstrations that are used to build a regression model to identify the desired integral of the input commands, $g_u$, and desired average teleoperation input command, $\bar{j}_u$, from which a sequence of commands are synthesized to track a user-defined distance, $d_u$, in a time, $t_u$. The overall output of the regression is a sequence of commands having the same form of the inputs used for training which in our case are joystick teleoperation commands $\mathbf{J}_x(t)$ and $\mathbf{J}_y(t)$, needed by the system to follow the given trajectory. These actions are, however, open-loop and prone to tracking errors. Tracking error is reduced by using a robust control approach to correct and adjust future inputs $\mathbf{J}_x(t+1)$ and $\mathbf{J}_y(t+1)$ to obtain closed loop input commands $\mathbf{J}_{cx}(t+1)$ and $\mathbf{J}_{cy}(t+1)$. 
 Going back to the diagram in Fig.~\ref{fig:blockdiagram}, in the next few sections we will present details for each block beginning with the training and regression analysis procedures.
 %
 %the very first step of the proposed framework is a trajectory decomposition which will be presented in
@@ -291,7 +289,7 @@ Going back to the diagram in Fig.~\ref{fig:blockdiagram}, in the next few sectio
 
 %\NB{introduce next section... the paper reads like independent sections}
  %\NB{in this section or before we need to stress and clarify that this approach allows us to figure out the actions for the system to follow autonomously any trajectory but we need still to close the loop. Technically is a 2 phase method:1) open loop actions and 2) corrections for closed loop}
-\subsection{Regression Based Training and Evaluation} \label{sec:train}
+\subsection{Regression Training Set} \label{sec:train}
 In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ teleoperated trials $i=1,\ldots,m$. As our goal is to track any trajectory, we are interested in training on the distance traveled in the demonstrated trajectory $d_i$, the time $t_i$ needed by the pilot to traverse the $i^{th}$ trajectory, and the associated sequence of user teleoperation input commands $\bm{J_i}$.
 %: $\{d_i,t_i,\bm{J_i}\}$, respectively, where $i=1,\ldots,m$ reflects the number of demonstrations. %\NB{what is $i$?}\NB{the reasoning here doesn't make sense. you write that because we need to track a trajectory, we use d and j. This is not intuitive. Why?}.
 The outputs of our training phase are \begin{itemize} %should I put Fig 2 and description here instead? It may make more sense, but it's separated from the dynamical model, and that connection is important.
@@ -373,14 +371,13 @@ Given the corresponding $z_i$ for each $(x_i,y_i)$ pair, we solve the following 
 where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, each $i^{th}$ row of $P$ is $(1,x_i,y_i)$, $\bm{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\bm{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\bm{w} \in \mathbb{R}^{m\times1}$ and $\bm{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\bm{a}$ is the column vector with elements $a_1,a_x,a_y$.
 %\NB{$P_i*$ does not appear in the equation}
 
-Given the general framework for performing the thin-plate spline, we develop two separate relationships for our application. In our work, the first regression is applied to $d$ (distance) and $t$ (time) as inputs to obtain the integral of the commands $g_i = f(d_i,t_i)$ while the second has the same inputs to obtain the average teleoperation command $\bar{j}_i = h(d_i,t_i)$. With the functions we have obtained, we are able to find an estimated integral and average input command, $g_u$ and $\bar{j}_u$, for any given desired distance and time, $d_u$ and $t_u$, respectively,
+Given the general framework for performing the thin-plate spline, we develop two separate relationships for our application. In our work, the first regression is applied to $d$ (distance traveled) and $t$ (time) as inputs to obtain the integral of the commands $g_i = f(d_i,t_i)$ while the second has the same inputs to obtain the average teleoperation command $\bar{j}_i = h(d_i,t_i)$. With the functions we have obtained, we are able to find an estimated integral and average input command, $g_u$ and $\bar{j}_u$, for any given desired distance and time, $d_u$ and $t_u$, respectively,
 \begin{equation} \label{eq:integralfit}
 g_u = f(d_u,t_u)
 \end{equation}
 \begin{equation} \label{eq:ssvelfit}
 \bar{j}_u = h(d_u,t_u)
 \end{equation}
-
 In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represent the two functions $g_i = f(d_i,t_i)$ and $\bar{j}_i = h(d_i,t_i)$, respectively. The points in these figures represent actual training data points, all of which lay on the surface created with the thin-plate splines just introduced.
 
 \begin{figure}[ht]
@@ -393,7 +390,6 @@ In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represen
     \caption{Average Teleoperation Input Command vs Distance and Time}
     \label{fig:joys}
 \end{figure}
-
 \subsubsection{Regression Error Analysis}
 While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases \cite{regress}. To deal with this problem, we consider the {\em standard error} of the estimate, which is a statistic used to measure the accuracy of predictions given a certain type of regression \cite{stdereg} with known values, which are our training points:
 
@@ -428,7 +424,7 @@ where $\sigma_{d,est}$ and $\sigma_{t,est}$, are standard error values for dista
 \end{align}
 where $\theta$ is an angle from $[0,\ldots,2\pi]$, and $i = 1,\ldots,m$ reflects each of the $m$ training samples. A convex hull is then computed around the ellipses to provide a concise measure for the combination of distances and times that have low error when input into the TPS regression. This convex hull is generated using the Quickhull algorithm \cite{quickhull}, in which we take the outermost points of the set ellipses and form a boundary denoted $Conv(M)$, where $M$ represents the set of all points on the perimeters of all ellipses: $\{x_i,\ldots,x_m\},\{y_i,\ldots,y_m\}$.
 
-In Fig.~\ref{fig:preds}, the convex hull around standard error ellipses created with $t* = 0.5$ around each training point is depicted. Fig.~\ref{fig:predsur} is the TPS regression model for the integral \eqref{eq:integralfit} overlaid with the convex hull \cite{bounds} created from the ellipses on Fig.~\ref{fig:preds}.
+In Fig.~\ref{fig:preds}, the convex hull around standard error ellipses created with $t^* = 0.5$ around each training point is depicted. Fig.~\ref{fig:predsur} is the TPS regression model for the integral \eqref{eq:integralfit} overlaid with the convex hull \cite{bounds} created from the ellipses on Fig.~\ref{fig:preds}.
 \begin{figure}[H]
 	\centering
 	\subfigure[Prediction Bounds \label{fig:preds}]{\includegraphics[width=0.49\linewidth]{images/predictionbds.png}}
