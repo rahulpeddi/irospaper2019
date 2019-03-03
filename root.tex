@@ -394,6 +394,7 @@ Given the corresponding $z_i$ for each $(x_i,y_i)$ pair, we solve the following 
 
 where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, each $i^{th}$ row of $P$ is $(1,x_i,y_i)$, $\bm{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\bm{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\bm{w} \in \mathbb{R}^{m\times1}$ and $\bm{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\bm{a}$ is the column vector with elements $a_1,a_x,a_y$.
 %\NB{$P_i*$ does not appear in the equation}
+
 Given the general framework for performing the thin-plate spline, we develop two separate relationships for our application. In our work, the first regression is applied to $d$ (distance) and $t$ (time) as inputs to obtain the integral of the commands $g_i = f(d_i,t_i)$ while the second has the same inputs to obtain the average teleoperation command $\bar{j}_i = h(d_i,t_i)$. With the functions we have obtained, we are able to find an estimated integral and average input command, $g_u$ and $\bar{j}_u$, for any given desired distance and time, $d_u$ and $t_u$, respectively,
 \begin{equation} \label{eq:integralfit}
 g_u = f(d_u,t_u)
@@ -655,13 +656,21 @@ The resultant diagonal trajectory is shown in Fig.~\ref{fig:1723trajs}.
     \label{fig:1723trajs}
 \end{figure}
 
-To further validate the approach, a square-shaped trajectory was tested, and this is shown in Fig.~\ref{fig:sqr}
+To further validate the approach, a square-shaped trajectory was tested, and the experimental data is shown in Fig.~\ref{fig:sqr}. The Parrot BeBop 2 quadrotor experiments are pictured in Fig.~\ref{fig:sqrquad}.
 \begin{figure}[ht!]
 	\centering
 	\subfigure[Open Loop Square \label{fig:clsquare}]{\includegraphics[width=0.48\columnwidth]{images/OPENsquare.png}}
     \subfigure[Closed Loop Square \label{fig:opensquare}]{\includegraphics[width=0.48\columnwidth]{images/CLOSEDsquare.png}}
 	\caption{Square-Shaped Trajectory in Open and Closed Loop}
 	\label{fig:sqr}
+\end{figure}
+
+\begin{figure}[ht!]
+	\centering
+	\subfigure[Open Loop Square \label{fig:clsquareq}]{\includegraphics[width=0.48\columnwidth]{images/square_open_quad.png}}
+    \subfigure[Closed Loop Square \label{fig:opensquareq}]{\includegraphics[width=0.48\columnwidth]{images/square_closed_quad.png}}
+	\caption{Square-Shaped Trajectory Experiments}
+	\label{fig:sqrquad}
 \end{figure}
 
 Lastly, the letters U, V, and A were created with the UAV. The planned trajectories were created using minimum snap trajectories and discretized, as discussed in Section~\ref{sec:traj}. The actual trajectories travelled by the UAV are shown in Fig.~\ref{fig:UVA}.
