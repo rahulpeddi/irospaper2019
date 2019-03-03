@@ -440,7 +440,8 @@ With this analysis, we are able to provide boundary conditions for our training 
 %\NB{we need to state what we do if they are not good}\NB{you mention this later. You need to anticipate the reviewer reaction. Here you need to mention that in the next section we show what to do if the result of this test is negative or you need to present here directly}
 
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
-In this section, we discuss how we generate, discretize, and decompose smooth trajectories, subject to the regression error analysis, which is verified with an SMT solver.
+In this section, we discuss how we generate, discretize, and decompose smooth trajectories, subject to the regression error analysis presented in the previous section.
+%, which is verified with an SMT solver.
 Relating back to the system dynamics, we have established that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ and $\psi$ can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. Hence when considering a planar $x,y$ trajectory we perform a decomposition in the $x$ and $y$ directions and generate independent roll and pitch commands to follow simultaneously trajectories in the $x$ and $y$ directions, respectively. 
 %each trajectory simultaneously.
 %Because the using just roll and pitch commands is possible, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
@@ -458,11 +459,11 @@ In order to generate a trajectory, we first select waypoints through which the U
 %\end{equation}
 %where $c_0,\ldots,c_7$ are constants associated with specific waypoints in the trajectory.%\NB{this is incorrect. Are you doing this in your simulation???}
 \NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
-The obtained smooth trajectory is then discretized into $n$ parts.
+The obtained smooth trajectory is then discretized into $n$ segments.
 
 
 
-To start, each part will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$. 
+Each segmnet will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$. 
 % and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_s + \Delta t$. 
 %\NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
 %\NB{please write the mathematical expression for the x and y component from the trajectory otherwise this section is incomplete}
