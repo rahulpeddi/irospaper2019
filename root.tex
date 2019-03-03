@@ -109,9 +109,10 @@ We focus on off-the-shelf quadrotor UAVs which have a well studied dynamical and
 
 
 
-The remainder of the paper is organized as follows: In Section \ref{sec:relatedwork}, we present some work related to ours \NB{no we need to say that we present the state of the art in the literature}. \NB{what about section 3?}In Section \ref{sec:sysdyn}, we discuss the system dynamics and controller architecture, which is then followed by an overview of our methodology in Section \ref{sec:approach}. We then discuss in detail each part of our approach with training in Section \ref{sec:train}, trajectogry generation in Section \ref{sec:traj}, autonomous control generation in Section \ref{sec:generate}, and lastly the online adaptation of controls in Section \ref{sec:adapt}\NB{no need to list all subsections just list teh main section details}. Finally, we end with a discussion about our experimental validation in Section \ref{sec:exper}, and we have our conclusions and a discussion on future work in Section \ref{sec:conc}.
+The remainder of the paper is organized as follows: In Section \ref{sec:relatedwork}, we present the state of the art in the literature. In Section \ref{sec:prob}, we formulate our problem statement. In Section \ref{sec:sysdyn}, we discuss the system dynamics and controller architecture, which is then followed by an overview of our methodology in Section \ref{sec:approach}. Finally, we end with a discussion about our experimental validation in Section \ref{sec:exper}, and we have our conclusions and a discussion on future work in Section \ref{sec:conc}.
 
-
+%We then discuss in detail each part of our approach with training in Section \ref{sec:train}, trajectory generation in Section \ref{sec:traj}, autonomous control generation in Section \ref{sec:generate}, and lastly the online adaptation of controls in Section \ref{sec:adapt}.
+%\NB{no need to list all subsections just list teh main section details}
 %Besides a general framework for the generation of autonomous commands for any quadrotor, in this work we offer a scheme to integrate model-based and data-driven approaches 
 %\NB{need to reinforce this statement}
  
@@ -210,7 +211,7 @@ The presented structure is a gray box model, where the only information known ar
 where $\bm{p}=[x \; y \; z]^{\mathsf{T}}$ is the world frame position, $v_{x}$, $v_{y}$ and $v_z$ are the world frame velocities, $\phi$, $\theta$ and $\psi$ are the roll, pitch and yaw Euler angles and $\omega_{x}$, $\omega_{y}$ and $\omega_{z}$ are the body frame angular velocities.
 
 The dynamics of the vehicle are then described as follows \cite{esencite}:
-\begin{equation}
+\begin{equation} \label{eq:quadrotor_dynamics} 
 	\begin{aligned}
 	%\begin{bmatrix}\dot{x} \\ \dot{y} \\ \dot{z} \end{bmatrix} &= \begin{bmatrix}v_x \\ v_y \\ v_z\end{bmatrix}\\
 	\dot{\bm{p}}^{\mathsf{T}} &= \begin{bmatrix}v_x & v_y & v_z\end{bmatrix}\\
@@ -220,7 +221,6 @@ The dynamics of the vehicle are then described as follows \cite{esencite}:
 	\begin{bmatrix}\dot{\phi} \\ \dot{\theta} \\ \dot{\psi}\end{bmatrix} &= \begin{bmatrix}1 & \sin\phi \tan\theta & \cos\phi \tan\theta\\ 0 & \cos\phi & -\sin\phi \\ 0 & \sin\phi \sec\theta & \cos\phi \sec\theta \end{bmatrix} \begin{bmatrix}\omega_{x} \\ \omega_{y} \\ \omega_{z} \end{bmatrix}\\
 	\begin{bmatrix}\dot{\omega}_{x} \\ \dot{\omega}_{y} \\ \dot{\omega}_{z}\end{bmatrix} &= \begin{bmatrix}\frac{I_{yy} - I_{zz}}{I_{xx}} \omega_{y}\omega_{z}\\ \frac{I_{zz} - I_{xx}}{I_{yy}} \omega_{x}\omega_{z} \\ \frac{I_{xx} - I_{yy}}{I_{zz}} \omega_{x}\omega_{y} \end{bmatrix} +  \begin{bmatrix}\frac{1}{I_{xx}} & 0 & 0\\ 0 & \frac{1}{I_{yy}} & 0\\ 0 & 0 & \frac{1}{I_{zz}}\end{bmatrix} \begin{bmatrix}u_{2} \\ u_{3} \\ u_{4} \end{bmatrix}
 	\end{aligned}
-	\label{eq:quadrotor_dynamics} 
 \end{equation} 
 
 This dynamical model consists of many platform-specific parameters that are also difficult to identify, much like the controller gains discussed above. Moreover, these parameters often vary a lot between UAVs, and that further complicates the identification problem. The model and architecture above assume that the quadrotor is moving at a constant $z$ level with a zero yaw constraint, and therefore, we are primarily concerned with two of the inputs, $u_2$ and $u_3$. The equations for these two control inputs are as follows:
@@ -262,7 +262,7 @@ Hence, each stroke in the joystick transforms into motion of the vehicle which, 
 %Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the integral. i.e. the total area, under the string of commands. Because the pitch is proportional to the linear velocity in the $y$-direction, we know that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled 
 %\NB{here show that because u2 depends on $\phi_c$ and $\phi_c$ depends on x then this integral represents motion but what you really need to stress is that it is a compact measure without having to use the entire string of commands for learning}.
 
-Because the integral by itself may not be enough to characterize a unique behavior of the UAV, as the same integral can be achieved with commands strings for different traveling distances and velocities, the average input command is also of interest since \eqref{eq:cinputs} inpacats changes in traveling velocity in \eqref{eq:quadrotor_dynamics}. By using the combination of integral and average input commands, we will present an approach to generate autonomous commands during a mission defined by traveling a multiple waypoint at specified distances and times.
+Because the integral by itself may not be enough to characterize a unique behavior of the UAV, as the same integral can be achieved with commands strings for different traveling distances and velocities, the average input command is also of interest since \eqref{eq:cinputs} impacts changes in traveling velocity in \eqref{eq:quadrotor_dynamics}. By using the combination of integral and average input commands, we will present an approach to generate autonomous commands during a mission defined by traveling a multiple waypoint at specified distances and times.
 
 %can improve precision during the process of generating autonomous commands during a mission, which consists of selecting a certain distance and time.
 
@@ -393,8 +393,8 @@ Given the corresponding $z_i$ \NB{What is $z$?} for each $(x_i,y_i)$ pair, we so
     \end{bmatrix}
 \end{equation}
 
-where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, $P_i* = (1,x_i,y_i)$\NB{$P_i*$ does not appear in the equation}, $\bm{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\bm{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\bm{w} \in \mathbb{R}^{m\times1}$ and $\bm{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\bm{a}$ is the column vector with elements $a_1,a_x,a_y$.
-
+where $K_{ij} = U(||(x_i,y_i)-(x_j,y_j)||)$, each $i$ row of $P$ is $(1,x_i,y_i)$, $\bm{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\bm{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\bm{w} \in \mathbb{R}^{m\times1}$ and $\bm{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $z_i$, respectively, and $\bm{a}$ is the column vector with elements $a_1,a_x,a_y$.
+%\NB{$P_i*$ does not appear in the equation}
 Given the general framework for performing the thin-plate spline, we develop two separate relationships for our application. In our work, the first regression is applied to $d$ (distance) and $t$ (time) as inputs to obtain the integral of the commands $g_i = f(d_i,t_i)$ while the second has the same inputs to obtain the average teleoperation command $\bar{j}_i = h(d_i,t_i)$. With the functions we have obtained, we are able to find an estimated integral and average input command, $g_u$ and $\bar{j}_u$, for any given desired distance and time, $d_u$ and $t_u$, respectively,
 \begin{equation} \label{eq:integralfit}
 g_u = f(d_u,t_u)
@@ -460,13 +460,13 @@ In Fig.~\ref{fig:preds}, the convex hull around standard error ellipses created 
 \end{figure}
 An alternate method would have been to use standard error rectangles\cite{stdellipse} instead, which create rectangular intervals around each data point, but these are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by the TPS regression. 
 
-\NB{so what's the punchline here? We need to say what you obtain with this analysis and perhaps connect with the SMT Solver later}
-
-The prediction bounds presented here satisfy the smoothness condition of our regression and are used to generate trajectories, which is discussed in the next section. 
+With this analysis, we are able to provide boundary conditions for our training set, when determining what kind of trajectories we can follow. In the next section, we discuss how we build trajectories and how we use these boundaries with a satisfiability modulo theories (SMT) solver to ensure that our UAV can indeed track generated trajectories.
+%\NB{so what's the punchline here? We need to say what you obtain with this analysis and perhaps connect with the SMT Solver later}
+%The prediction bounds presented here satisfy the smoothness condition of our regression and are used to generate trajectories, which is discussed in the next section. 
 %\NB{we need to state what we do if they are not good}\NB{you mention this later. You need to anticipate the reviewer reaction. Here you need to mention that in the next section we show what to do if the result of this test is negative or you need to present here directly}
 
 \subsection{Trajectory Generation and Decomposition} \label{sec:traj}
-In this section, we discuss how we generate, discretize, and decompose smooth trajectories, subject to the regression analysis of the training data.
+In this section, we discuss how we generate, discretize, and decompose smooth trajectories, subject to the regression error analysis, which is verified with an SMT solver.
 Relating back to the system dynamics, we have established that input commands are responsible for specific motions of the system. Roll enables lateral motion while pitch enables longitudinal motion. Therefore, any planar motion assuming constant $z$ and yaw \NB{symbol here} can be represented as a combination of roll and pitch commands, or commands that move the vehicle along the global $x$ and $y$ coordinates. Hence when considering a planar $x,y$ trajectory we perform a decomposition in the $x$ and $y$ directions and generate independent roll and pitch commands to follow simultaneously trajectories in the $x$ and $y$ directions, respectively. 
 %each trajectory simultaneously.
 %Because the using just roll and pitch commands is possible, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
@@ -519,16 +519,13 @@ Fig.~\ref{fig:t2dec} shows an example of a generated trajectory with its discret
 \end{figure}
 
 %In Fig.~\ref{fig:tdec}, we show the components at each interval. 
-These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. To resolve this issue, we us a satisfiability modulo theory solver (SMT) to solve the following satisfiability/optimization problem: %STEPS FOR REFERENCE: Check if distances for each component are attainable based on convex hull (x values in conv(M)). If not, rebuild or rediscretize trajectory. Check if all distance-time pairs are within the convex hull (x and y points BOTH in conv(M)).
+These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. To resolve this issue, we use a satisfiability modulo theory solver (SMT). An SMT solver is a verification tool that solves a first order satisfiability problem. 
 
-%\begin{algorithm}[ht!]
-%\caption{Trajectory Correction} \label{alg:correct}
-%\begin{algorithmic}[1]
-%\IF{$\bm{p}_x^*(t_{i+1})-\bm{p}_x^*(t_{i}) \notin $}
-%\STATE
-%\ENDIF
-%\end{algorithmic}
-%\end{algorithm}
+
+
+%STEPS FOR REFERENCE: Check if distances for each component are attainable based on convex hull (x values in conv(M)). If not, rebuild or rediscretize trajectory. Check if all distance-time pairs are within the convex hull (x and y points BOTH in conv(M)).
+
+
 
 Having obtained the $x$ and $y$ trajectory components, we will now discuss the command generation procedures that we use to build a policy that enables autonomous tracking of the trajectory.
 %\NB{it may be better to show the trajectory generation later}
@@ -547,7 +544,7 @@ $g_u$ and $\bar{j}_u$ are obtained using equations \eqref{eq:integralfit} and \e
 \bm{J}^* = \bm{J}_i \in \bm{J}\vert e_i = \min_e(\bm{e})
 \end{equation}
 
-This optimal pre-trained \NB{what you mean optimal? Isn't this the closest? How is this optimal?} sample is then adjusted to reflect the user-set time, $t_u$ by performing bicubic interpolation, so that important features in the optimal command vector are not lost. Interpolation methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss \cite{bicfeatures}. Bicubic interpolation is the chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity \cite{biccomp}. The general form of a bicubic interpolation equation is: 
+This closest pre-trained sample is then adjusted to reflect the user-set time, $t_u$ by performing bicubic interpolation, so that important features in the optimal command vector are not lost. Interpolation methods are often used for re-sizing complex images, and have shown effectiveness in minimizing feature loss \cite{bicfeatures}. Bicubic interpolation is the chosen method for re-sizing, as it performs better than nearest-neighbor and bilinear interpolation methods, while only marginally increasing computational complexity \cite{biccomp}. The general form of a bicubic interpolation equation is: 
 %\NB{there are too many ``This is done" in this section. They brake the flow of the paper...go to the point ...This optimal pre-trained sample is then adjusted to reflect the user-set time, $t_u$ by performing...}
 
 \begin{equation} \label{eq:bicinter}
@@ -578,7 +575,7 @@ In Fig.~\ref{fig:gensample}, each step of the command generation process is visu
 	\label{fig:gensample}
 \end{figure}
 
-From the autonomous command, the expected path of the vehicle is generated. The integral of the final command string is taken at each time-step to determine the expected position at all times \NB{how? not clear...elaborate}. Because we know the relationship between the integral and the distance travelled at all times, we are able to invert the equation from the TPS regression for the integral, \eqref{eq:integralfit}, such that the inputs are time and integral and the output is the distance travelled \NB{this sentence doesn't make sense}:
+From the autonomous command, the expected path of the vehicle is generated. The integral of the final command string is taken at each time-step to determine the expected position at all times \NB{how? not clear...elaborate}. Because we know the relationship between the integral and the distance travelled at all times, we are able to leverage the equation from the TPS regression for the integral, \eqref{eq:integralfit}, such that the inputs are time and integral and the output is the distance travelled \NB{this sentence doesn't make sense}:
 \begin{equation} \label{eq:distresult}
 d_J(t) = f^{-1}(g_J(t),t)
 \end{equation}
@@ -591,9 +588,9 @@ The commands generated in the previous section are generated and sent to the UAV
 \begin{equation}
     \xi(t) = \bm{p_r}(t)-\bm{p}(t)
 \end{equation}
-\NB{is $\xi$ a vector?}
+%\NB{is $\xi$ a vector?}
 
-This error, $\xi(t)$, is attributed to the most recent command sent to the system. A proportional controller is implemented to adjust the subsequent command, $\bm{J}_a(t+1)$, to obtain the closed-loop command $\bm{J}_c(t+1)$ as follows:
+This error at time $t$, $\xi(t)$, is attributed to the most recent command sent to the system. A proportional controller is implemented to adjust the subsequent command, $\bm{J}_a(t+1)$, to obtain the closed-loop command $\bm{J}_c(t+1)$ as follows:
 \begin{equation}
     \bm{J}_c(t+1) = \bm{J}_a(t+1) + k_p\xi(t)
 \end{equation}
