@@ -245,7 +245,7 @@ This dynamical model consists of many platform-specific parameters that are also
     u_3 &= k_{p,\theta}(\theta_c-\theta) + k_{d,\theta}(\dot{\theta}_c - \dot{\theta}) \nonumber \\
     \theta_c &= -\frac{1}{g}(\ddot{y}_{des} + k_{d,y}(\dot{y}_{des}-\dot{y}) + k_{p,y}(y_{des}-y))
 \end{align}
-where $\phi_c$ and $\theta_c$ are the desired roll and pitch angles, respectively, and $x_{des},~\dot{x}_{des},~\ddot{x}_{des}$ refer to the desired position, velocity, and acceleration in the $x$ direction, while $y_{des},~\dot{y}_{des},~\ddot{y}_{des}$ refer to the desired position, velocity, and acceleration in the $x$ direction, respectively.
+where $\phi_c$ and $\theta_c$ are the desired roll and pitch angles, respectively, and $x_{des},~\dot{x}_{des},~\ddot{x}_{des}$ refer to the desired position, velocity, and acceleration in the $x$ direction, while $y_{des},~\dot{y}_{des},~\ddot{y}_{des}$ refer to the desired position, velocity, and acceleration in the $y$ direction, respectively.
 
 In this work, the goal is to generate control inputs for autonomous flight when the only information available for training comes from human-piloted demonstrations. Given these user demonstrations, we assume that the inputs and outputs for the UAV are visible, i.e., we can obtain position and velocity of the system during training as well as the input commands sent to the vehicles from the user teleoperation. 
 %\NB{this part needs to be rewritten and generalized. We can mention later that in our case we use a MOCAP but here we just need to say that we assume that we can obtain position and velocity of the system during training as well as the commands sent to the vehicles as a result of the user teleop}
