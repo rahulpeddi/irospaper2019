@@ -70,3 +70,5 @@ root copy 2.tex
 *.pdf
 
 root.pdf
+
+*.pptx
