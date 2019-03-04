@@ -327,9 +327,6 @@ In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. 
 	\caption{Training Set}
 	\label{fig:train}
 \end{figure}
-%\NB{fix this figure axis...they are labeled wrong}\NB{Did you postprocess the axis and changed the values? The x axis is cut short..for example on the right the x axis should continue probably until 12 or 13...please use the matlab plot}\NB{change the title of the plots from Trajectories to Traveled Distances///trajectories are not only distances, they are a combination of dist, vel, acceleration etc}
-%\NB{use subfigures and place the fig files for each figure in the repository so we can edit the figures. As we have discussed in the previous paper, titles and text in the figrue needs to be big and clear and readable and figrues need to span the entire column }
-%\NB{rewrite stating that with these data we can train a model for trajectory starting and finishing with 0 speed. If the initial and final velocities are not 0...} 
 With this data, we can train a model for trajectories that start and end with $0$ speed. This training would only be effective if trajectories involved stopping intermittently throughout the trajectory. Although in this work for ease of discussion, we focus on $0$ initial and final velocities, if a continuous motion throughout a trajectory is needed, then training can be executed on smooth trajectories by segmenting the existing training data to include trajectories for demonstrations where the velocity does not start and end at $0$ speed. Three separate types of segments will need to be evaluated in this case:
 \begin{itemize}
     \item[a.] Start Trajectory, where the segment begins with a velocity of $0$ and ends with a given nonzero velocity $v$
