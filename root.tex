@@ -575,9 +575,9 @@ where $g_J(t)$ is the integral of the string of generated commands at time $t$, 
 %\NB{where is the part of the text in which you show how to generate the prediction of the position occupied by the vehicle by following the determined sequence of inputs?}
 \subsection{Online Adaptation of Generated Commands} \label{sec:adapt}
 
-The commands generated in the previous section are generated and sent to the UAV in open-loop. While the open-loop autonomous controls generated in this manner may be reasonably accurate, we desire more assured trajectory tracking by controlling for any possible error, thereby closing the loop. While executing the generated command string, $\bm{J_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$:
+The commands generated in the previous section are generated and sent to the UAV in open-loop. While the open-loop autonomous controls generated in this manner may be reasonably accurate when there is no noise and disturbance, we desire more assured trajectory tracking by controlling for any possible error, thereby closing the loop. While executing the generated command string, $\bm{J}_a(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p}_r(t)$:
 \begin{equation}
-    \xi(t) = ||\bm{p_r}(t)-\bm{p}(t)||
+    \xi(t) = ||\bm{p}_r(t)-\bm{p}(t)||
 \end{equation}
 %\NB{is $\xi$ a vector?}
 
@@ -590,7 +590,7 @@ In our work, the controller gain, $k_p$, is a static value that is set based on 
 \begin{equation} \label{eq:ctrls}
     k_p = r_p\bar{j}_a
 \end{equation}
-where $\bar{j}_a$ is the average input from the open loop commands and $r_p$ is a ratio applied to the average input. The gain is chosen in this manner as to avoid drastic corrections that would affect the stability of the system. If the error at time $t$, $\xi(t)$, is very high, then having $r_p \geq 1$ could result in a drastic and unstable change in the control input. The set value of the correction ratio depends on the amount of adjustment desired by the user, which depends on certain constraints, such as flight time and flight conditions, i.e., different correction ratios may be desirable for indoor and outdoor flight. Using this controller, the position error is lowered to ensure that the UAV does indeed reach the generated waypoint as expected.  %\NB{what threshold?} 
+where $\bar{j}_a$ is the average input from the open loop commands and $r_p$ is a constant value applied to the average input. The gain is chosen in this manner as to avoid drastic corrections that would affect the stability of the system. If the error at time $t$, $\xi(t)$, is very high, then having $r_p \geq 1$ could result in a drastic and unstable change in the control input. The set value of the correction ratio depends on the amount of adjustment desired by the user, which depends on constraints, such as flight time and flight conditions, i.e., different correction ratios may be desirable for indoor and outdoor flight. Using this controller, the position error is lowered to ensure that the UAV does indeed reach the generated waypoint as expected.  %\NB{what threshold?} 
 
 %where $t_u$ refers to the user-set time, and adjusts the update of $k_p$ such that the rate of increase is controlled for iteration time. If the rate of increase is not controlled in this manner, it would suggest that the controller is controlling for error over the entire remaining string of commands, rather than the first subsequent command. Each subsequent command is adjusted because our positional liveness constraint is defined as maintaining a certain distance between actual and reference positions at all times, from \eqref{eq:positlive}. If the constraint was for the UAV to reach the goal at a certain time immaterial of the path/trajectory, adjusting the entire remaining portion of the command string would be ideal.
 
@@ -669,7 +669,7 @@ Lastly, the letters U, V, and A were created and tracked with the UAV. using the
 In this work, we have presented an approach that enables autonomous flight on off-the-shelf quadrotors that are primarily tuned for teleoperation. Our approach shows that we can use a small training set along with a regression analysis to generate commands for any trajectory, along with adapting and closing the loop in real-time to reduce tracking error. Besides a framework for generating commands for autonomous operations, we have also proposed a statistical approach to estimate the error in the prediction and an SMT-based technique to minimize this error and generate safe inputs. Our experimental results show that the generated commands in open loop can get very close to the desired behavior but as expected they are not enough to guarantee robust tracking due to noise and disturbances at run-time. By adding a corrective procedure, however we demonstrated that we can achieve good trajectory tracking. 
 
 This work brings together data driven and model based approaches and leverages both worlds to speed-up the learning and the deployment of autonomous vehicles.
-In our current and future work we plan to use machine vision techniques to enable autonomous flight and predict and bound future estimate about the reachable states of the system. More experiments with smoother trajectories are also in our agenda.
+In our current and future work we plan to use onboard cameras and leverage machine vision techniques to enable autonomous flight and predict and bound future estimate about the reachable states of the system. The online adaptation part will be also expanded to consider safety critical situations like obstacle avoidance. More experiments with smoother trajectories are also in our agenda.
 
 
 
