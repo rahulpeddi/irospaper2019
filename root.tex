@@ -514,7 +514,7 @@ If this condition is satisfied, then the trajectory is feasible. If not, and if 
 %     (\bm{p}_x^*(t_i),(t_{i+1}-t_i)) &\wedge (\bm{p}_y^*(t_i),(t_{i+1}-t_i)) \in Conv(M) \nonumber \\
      \sum_{i=1}^n(t_{i+1}-t_i) = T
 \end{align}
-to ensure that the sum of the new time-steps is the total time allotted for the trajectory $T$, while also ensuring that any segment has a distance-time pair within the convex hull $Conv(M)$. If the solver still cannot obtain a result, it is indicative of an unattainable distance or distances within the trajectory, indicating that the trajectory as a whole is unattainable, and the waypoints need to be changed for example by increasing $n$ and reducing $\Delta t$. Provided that all of the conditions for the SMT solver are met, we can obtain the correct $x$ and $y$ trajectory components and their corresponding times. We now discuss the command generation procedures that we use to enable autonomous tracking of trajectories.
+to ensure that the sum of the new time-steps is the total time allotted for the trajectory $T$, while also ensuring that any segment has a distance-time pair within the convex hull $Conv(M)$. If the solver still cannot obtain a result, it is indicative of an unattainable distance or distances within the trajectory, meaning that the trajectory as a whole is unattainable, and the waypoints need to be changed for example by increasing $n$ and reducing $\Delta t$. Provided that all of the conditions for the SMT solver are met, we can obtain the correct $x$ and $y$ trajectory components and their corresponding times. We now discuss the command generation procedures that we use to enable autonomous tracking of trajectories.
 %\NB{it may be better to show the trajectory generation later}
 
 
