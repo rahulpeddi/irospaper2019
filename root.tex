@@ -445,7 +445,7 @@ Relating back to the system dynamics, we have established that input commands ar
 %each trajectory simultaneously.
 %Because the using just roll and pitch commands is possible, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
 %\NB{this section needs to go before and needs to be explain better}.
-In order to generate a trajectory, we first select waypoints through which the UAV should travel. In order to determine the optimal path in our case, we generate a minimum snap trajectory. Minimum snap trajectories are associated with low control effort as they are based on the fourth derivative of position and ensure smoothness on quadrotors which have been proven to be 4th order systems \cite{minsnap}. The general equation for a minimum snap trajectory is as follows:
+In order to generate a trajectory, we first select waypoints through which the UAV should travel. The optimal path is then determined by using a minimum snap trajectory. Minimum snap trajectories are associated with low control effort as they are based on the fourth derivative of position and ensure smoothness on quadrotors which have been proven to be 4th order systems \cite{minsnap}. The general equation for a minimum snap trajectory is the solution of the following functional:
 %\NB{why? you need to explain better. Besides, we should use snap not jerk}
 \begin{equation} \label{eq:minjerkint}
 %    \bm{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\ddddot{p},\dddot{p},\ddot{p},\dot{p},p,t)dt
@@ -493,16 +493,18 @@ Fig.~\ref{fig:t2dec} shows an example of a generated trajectory with its discret
 \end{figure}
 
 %In Fig.~\ref{fig:tdec}, we show the components at each interval. 
-These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. To resolve this issue, we use an SMT solver, which is a verification tool that solves a first order satisfiability problem. In our work, the condition we want to satisfy is that each of the distances and corresponding time for each distance is within the convex hull, $Conv(M)$. Using the SMT solver, we check if all the distances in either component $\bm{p}_x^*(t_1)$ and $\bm{p}_y^*(t_1)$ are attainable in time-step $\Delta t$ subject to $Conv(M)$:
-\begin{equation}
-    (\bm{p}_x^*(t_i),\Delta t) \wedge (\bm{p}_y^*(t_i),\Delta t) \in Conv(M)
+These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. To resolve this issue, we use an SMT solver, which is a verification tool that solves a first order satisfiability problem. In our work, the condition that we want to satisfy is that each of the distances and their corresponding time is within the convex hull, $Conv(M)$ presented in Section~\ref{sec}. Using an SMT solver, we check if all the distances in both components $\bm{d}_{x,i}=||\bm{p}_x^*(t_i+1)-\bm{p}_x^*(t_i)||$ and $\bm{d}_{y,i}=||\bm{p}_y^*(t_i+1)-\bm{p}_y^*(t_i)||$ are attainable in time-step $\Delta t$ subject to $Conv(M)$ : 
+\begin{equation}\label{eq:smt}
+%    (\bm{p}_x^*(t_i),\Delta t) \wedge (\bm{p}_y^*(t_i),\Delta t) \in Conv(M)
+    (\bm{d}_{x,i},\Delta t) \wedge (\bm{d}_{y,i},\Delta t) \in Conv(M), \;\; \textrm{with}\, i = 1,\ldots,n-1
 \end{equation}
-where $i = 1,\ldots,n$ and represents each decomposed segment of the trajectory. If this condition is satisfied, then the trajectory is feasible. If not, the solver continues by adjusting the time-step $\Delta t$ for each segment of the trajectory and finds a solution that satisfies the following conditions:
+%where $i = 1,\ldots,n-1$. 
+If this condition is satisfied, then the trajectory is feasible. If not, and if there exists a solution, the solver returns a time-step $\Delta t^*$ for each segment of the trajectory that satisfies the condition in \eqref{eq:smt} together with the following constraint
 \begin{align}
-     (\bm{p}_x^*(t_i),(t_{i+1}-t_i)) &\wedge (\bm{p}_y^*(t_i),(t_{i+1}-t_i)) \in Conv(M) \nonumber \\
-     \sum_{i=1}^n(t_{i+1}-t_i) &= T
+%     (\bm{p}_x^*(t_i),(t_{i+1}-t_i)) &\wedge (\bm{p}_y^*(t_i),(t_{i+1}-t_i)) \in Conv(M) \nonumber \\
+     \sum_{i=1}^n(t_{i+1}-t_i) = T
 \end{align}
-These conditions ensure that the sum of the new time-steps, $t_{i+1}-t_i)$, where $i = 1,\ldots,n$, is $T$, the total time allotted for the trajectory, while also ensuring that any segment has a distance-time pair within the convex hull $Conv(M)$. If the solver still cannot obtain a result, it is indicative of an unattainable distance or distances within the trajectory, indicating that the trajectory as a whole is unattainable, and the waypoints need to be re-selected. Provided that all of the conditions for the SMT solver are met, we will have obtained the correct $x$ and $y$ trajectory components and their corresponding times, and we will now discuss the command generation procedures that we use to enable autonomous tracking of the trajectory.
+to ensure that the sum of the new time-steps is the total time allotted for the trajectory $T$, while also ensuring that any segment has a distance-time pair within the convex hull $Conv(M)$. If the solver still cannot obtain a result, it is indicative of an unattainable distance or distances within the trajectory, indicating that the trajectory as a whole is unattainable, and the waypoints need to be changed for example by increasing $n$ and redusing $\Delta t$. Provided that all of the conditions for the SMT solver are met, we can obtain the correct $x$ and $y$ trajectory components and their corresponding times. We now discuss the command generation procedures that we use to enable autonomous tracking of trajectories.
 %\NB{it may be better to show the trajectory generation later}
 
 
