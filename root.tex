@@ -390,7 +390,7 @@ In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represen
     \caption{Average Teleoperation Input Command vs Distance and Time}
     \label{fig:joys}
 \end{figure}
-\subsubsection{Regression Error Analysis}
+\subsubsection{Regression Error Analysis} \label{sec:regerror}
 While a thin-plate spline is continuous, and a result can be obtained with any combination of distance and time as an input pair, the accuracy of the results of any pair $(d_u,t_u)$ can suffer as the distance between evaluation points and training points increases \cite{regress}. To deal with this problem, we consider the {\em standard error} of the estimate, which is a statistic that can be used to measure the accuracy of predictions given a certain type of regression \cite{stdereg} with known values, which are our training points:
 
 \begin{equation} \label{eq:stderr}
@@ -460,9 +460,7 @@ In order to generate a trajectory, we first select waypoints through which the U
 \NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
 The obtained smooth trajectory is then discretized into $n$ segments.
 
-
-
-Each segmnet will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$. 
+Each segment will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$. 
 % and $t_{s+1}$ is the end of the segment, defined as: $t_{s+1} = t_s + \Delta t$. 
 %\NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
 %\NB{please write the mathematical expression for the x and y component from the trajectory otherwise this section is incomplete}
@@ -493,10 +491,10 @@ Fig.~\ref{fig:t2dec} shows an example of a generated trajectory with its discret
 \end{figure}
 
 %In Fig.~\ref{fig:tdec}, we show the components at each interval. 
-These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. To resolve this issue, we use an SMT solver, which is a verification tool that solves a first order satisfiability problem. In our work, the condition that we want to satisfy is that each of the distances and their corresponding time is within the convex hull, $Conv(M)$ presented in Section~\ref{sec}. Using an SMT solver, we check if all the distances in both components $\bm{d}_{x,i}=||\bm{p}_x^*(t_i+1)-\bm{p}_x^*(t_i)||$ and $\bm{d}_{y,i}=||\bm{p}_y^*(t_i+1)-\bm{p}_y^*(t_i)||$ are attainable in time-step $\Delta t$ subject to $Conv(M)$ : 
+These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. To resolve this issue, we use an SMT solver, which is a verification tool that solves a first order satisfiability problem. In our work, the condition that we want to satisfy is that each of the distances and their corresponding time is within the convex hull, $Conv(M)$ presented in Section~\ref{sec:regerror}. Using an SMT solver, we check if all the distances in both components $\bm{d}_{x,i}=||\bm{p}_x^*(t_i+1)-\bm{p}_x^*(t_i)||$ and $\bm{d}_{y,i}=||\bm{p}_y^*(t_i+1)-\bm{p}_y^*(t_i)||$ are attainable in time-step $\Delta t$ subject to $Conv(M)$ : 
 \begin{equation}\label{eq:smt}
 %    (\bm{p}_x^*(t_i),\Delta t) \wedge (\bm{p}_y^*(t_i),\Delta t) \in Conv(M)
-    (\bm{d}_{x,i},\Delta t) \wedge (\bm{d}_{y,i},\Delta t) \in Conv(M), \;\; \textrm{with}\, i = 1,\ldots,n-1
+    (\bm{d}_{x,i},\Delta t) \wedge (\bm{d}_{y,i},\Delta t) \in Conv(M), ~\textrm{with}\, i = 1,\ldots,n-1
 \end{equation}
 %where $i = 1,\ldots,n-1$. 
 If this condition is satisfied, then the trajectory is feasible. If not, and if there exists a solution, the solver returns a time-step $\Delta t^*$ for each segment of the trajectory that satisfies the condition in \eqref{eq:smt} together with the following constraint
