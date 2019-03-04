@@ -349,7 +349,7 @@ To expand the same data for this purpose, we train on portions of the training s
 %\NB{you are not explaining well how you are doing this}
 \subsubsection{Thin-Plate Spline Regression}
 
-The offline training data is applied to a thin-plate spline (TPS) surface regression to describe the relationship between training inputs and integral and average input command. Given two inputs $\mathbf{x},\mathbf{y}$, and the output $\mathbf{z}$ ($\mathbf{x}$, $\mathbf{y}$, and $\mathbf{z}$ here are axis notations), the general form of a thin-plate spline equation is 
+The offline training data is applied to a thin-plate spline (TPS) \cite{TPS} surface regression to describe the relationship between training inputs and integral and average input command. Given two inputs $\mathbf{x},\mathbf{y}$, and the output $\mathbf{z}$ ($\mathbf{x}$, $\mathbf{y}$, and $\mathbf{z}$ here are axis notations), the general form of a thin-plate spline equation is 
 \begin{equation}
     f(\mathbf{x},\mathbf{y}) = a_1 + a_{\mathbf{x}}\mathbf{x} + a_{\mathbf{y}}\mathbf{y} + \sum_{i=1}^mw_iU(||(\mathbf{x}_i,\mathbf{y}_i)-(\mathbf{x},\mathbf{y})||)
 \end{equation}
