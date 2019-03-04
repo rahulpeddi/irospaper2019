@@ -433,7 +433,7 @@ In Fig.~\ref{fig:preds}, the convex hull around standard error ellipses created 
 \end{figure}
 An alternate method would have been to use standard error rectangles\cite{stdellipse} instead, which create rectangular intervals around each data point, but these are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by the TPS regression. 
 
-With this analysis, we are able to provide boundary conditions for our training set, when determining what kind of trajectories we can follow. In the next section, we discuss how we build trajectories and how we use these boundaries with a satisfiability modulo theories (SMT) solver to ensure that our UAV can indeed track generated trajectories.
+With this analysis, we are able to provide boundary conditions for our training set, when determining what kind of trajectories we can follow. In the next section, we discuss how we build trajectories and how we use these boundaries with a satisfiability modulo theories (SMT) solver \cite{smt} to ensure that our UAV can indeed track generated trajectories.
 %\NB{so what's the punchline here? We need to say what you obtain with this analysis and perhaps connect with the SMT Solver later}
 %The prediction bounds presented here satisfy the smoothness condition of our regression and are used to generate trajectories, which is discussed in the next section. 
 %\NB{we need to state what we do if they are not good}\NB{you mention this later. You need to anticipate the reviewer reaction. Here you need to mention that in the next section we show what to do if the result of this test is negative or you need to present here directly}
