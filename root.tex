@@ -576,7 +576,7 @@ where $g_J(t)$ is the integral of the string of generated commands at time $t$, 
 
 The commands generated in the previous section are generated and sent to the UAV in open-loop. While the open-loop autonomous controls generated in this manner may be reasonably accurate, we desire more assured trajectory tracking by controlling for any possible error, thereby closing the loop. While executing the generated command string, $\bm{J_a}(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p_r}(t)$:
 \begin{equation}
-    \xi(t) = \bm{p_r}(t)-\bm{p}(t)
+    \xi(t) = ||\bm{p_r}(t)-\bm{p}(t)||
 \end{equation}
 %\NB{is $\xi$ a vector?}
 
