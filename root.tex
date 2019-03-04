@@ -107,8 +107,16 @@ On the other hand, data-driven machine learning techniques like neural networks,
 Different from other supervised learning approaches, in this work we leverage the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contributions of this work are: 1) a framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles, 2) a statistical approach to evaluate the learning error from which a satisfiability modulo theories (SMT) solver is also leveraged to minimize the error in the generated commands for autonomous flight, and 3) a robust control technique to correct the generated commands and minimize tracking error at run-time.
 
 %assess the quality of the training data with an error analysis of our regression model that impacts decisions we make in terms of UAV trajectory and autonomous control generation.
+\begin{figure}[b]
+    \vspace{-10pt}
+    \includegraphics[width=0.48\textwidth]{images/motivation.png}
+    \vspace{-5pt}
+    \caption{Motivational representation of the proposed work}
+    \label{fig:motiv}
+    \vspace{-15pt}
+\end{figure}
 
-In this work we propose a novel approach that leverages both model-based and data-driven theories to generate autonomous flight behavior for an aerial vehicle from few user teleoperation demonstrations. 
+In this work we propose a novel approach that leverages both model-based and data-driven theories to generate autonomous flight behavior for an aerial vehicle from few user teleoperation demonstrations as motivated in Fig.~\ref{fig:motiv}. 
 We focus on off-the-shelf quadrotor UAVs which have a well studied dynamical and control architecture and are by far the most common UAVs because of the growing hobby and DIY community. Even if the application focus of this paper is on quadrotors, our framework can scale and apply to any other teleoperated aerial vehicle. Fig. \ref{fig:uavs} shows some examples of such quadrotors focus of this paper, all characterized by having the same shape but different motors, propellers, boom size, and electronics and hence different dynamic and control models.
 
 
@@ -295,7 +303,7 @@ These actions are, however, open-loop and prone to tracking errors. A statistica
 
 %\NB{introduce next section... the paper reads like independent sections}
  %\NB{in this section or before we need to stress and clarify that this approach allows us to figure out the actions for the system to follow autonomously any trajectory but we need still to close the loop. Technically is a 2 phase method:1) open loop actions and 2) corrections for closed loop}
-\subsection{Regression Training Set} \label{sec:train}
+\subsection{Regression Training from Demonstrations} \label{sec:train}
 In order to build the appropriate policy for autonomous command generation, we perform offline training on data collected over $m$ teleoperated trials $i=1,\ldots,m$. As our goal is to track any trajectory, we are interested in training on the distance traveled in the demonstrated trajectory $d_i$, the time $t_i$ needed by the pilot to traverse the $i^{th}$ trajectory, and the associated sequence of user teleoperation input commands $\bm{J}_i$.
 %: $\{d_i,t_i,\bm{J_i}\}$, respectively, where $i=1,\ldots,m$ reflects the number of demonstrations. %\NB{what is $i$?}\NB{the reasoning here doesn't make sense. you write that because we need to track a trajectory, we use d and j. This is not intuitive. Why?}.
 The outputs of our training phase are \begin{itemize} %should I put Fig 2 and description here instead? It may make more sense, but it's separated from the dynamical model, and that connection is important.
@@ -451,7 +459,7 @@ Relating back to the system dynamics, we have established that input commands ar
 %each trajectory simultaneously.
 %Because the using just roll and pitch commands is possible, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
 %\NB{this section needs to go before and needs to be explain better}.
-In order to generate a trajectory, we first select waypoints through which the UAV should travel. The optimal path is then determined by using a minimum snap trajectory. Minimum snap trajectories are associated with low control effort as they are based on the fourth derivative of position and ensure smoothness on quadrotors which have been proven to be 4th order systems \cite{minsnap}. The general equation for a minimum snap trajectory is the solution of the following functional:
+In order to generate a trajectory, we first select waypoints through which the UAV should travel. The optimal path is then determined by using a minimum snap trajectory. Minimum snap trajectories are associated with low control effort as they are based on the fourth derivative of position and ensure smoothness on quadrotors which have been proven to be 4th order systems \cite{minsnap}. The general equation for a minimum snap trajectory is the solution of the following functional \cite{minsnap}:
 %\NB{why? you need to explain better. Besides, we should use snap not jerk}
 \begin{equation} \label{eq:minjerkint}
 %    \bm{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\ddddot{p},\dddot{p},\ddot{p},\dot{p},p,t)dt
@@ -463,7 +471,7 @@ In order to generate a trajectory, we first select waypoints through which the U
 %    \bm{p}^*(t) = c_7t^7 + c_6t^6 + c_5t^5 + c_4t^4 + c_3t^3 + c_2t^2 + c_1t + c_0 
 %\end{equation}
 %where $c_0,\ldots,c_7$ are constants associated with specific waypoints in the trajectory.%\NB{this is incorrect. Are you doing this in your simulation???}
-\NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
+%\NB{we need to think if these equations are really necessary here. for now leave them but keep the comment}
 The obtained smooth trajectory is then discretized into $n$ segments.
 
 Each segment will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the total amount of time allotted for the full trajectory. The discretization is done using linear interpolation within the trajectory over each interval $[\bm{p}^*(t_i), \bm{p}^*(t_i+\Delta t)]$, where $t_i$ is the time at the start of a segment $i=1, \ldots, n-1$. Here $t_1=0$ and $t_n=T$. 
@@ -471,16 +479,16 @@ Each segment will have a time-step of $\Delta t = \frac{T}{n}$, where $T$ is the
 %\NB{why so complicated this description...please simplify you are just doing a discretization. Also correct gramamr }.
 %\NB{please write the mathematical expression for the x and y component from the trajectory otherwise this section is incomplete}
 %\NB{several? they are just 3...please ad the decomposition otherwise this section is useless}
-Some examples of discretized trajectories are shown in Fig.~\ref{fig:trajs}. 
-\begin{figure}[h]
-	\centering
-	\subfigure[\label{fig:t1}]{\includegraphics[width=0.3\linewidth]{images/traj1.png}}
-	\subfigure[\label{fig:t2}]{\includegraphics[width=0.3\linewidth]{images/traj2.png}}
-    \subfigure[\label{fig:t3}]{\includegraphics[width=0.3\linewidth]{images/traj3.png}}
-	\caption{Examples of discretized trajectories. All of the trajectories start at the world frame origin $(0,0)$.}
-	\label{fig:trajs}
-\end{figure}
-\NB{this figures captions are impossible to see}
+%Some examples of discretized trajectories are shown in Fig.~\ref{fig:trajs}. 
+%\begin{figure}[h]
+%	\centering
+%	\subfigure[\label{fig:t1}]{\includegraphics[width=0.3\linewidth]{images/traj1.png}}
+%	\subfigure[\label{fig:t2}]{\includegraphics[width=0.3\linewidth]{images/traj2.png}}
+%    \subfigure[\label{fig:t3}]{\includegraphics[width=0.3\linewidth]{images/traj3.png}}
+%	\caption{Examples of discretized trajectories. All of the trajectories start at the world frame origin $(0,0)$.}
+%	\label{fig:trajs}
+%\end{figure}
+%\NB{this figures captions are impossible to see}
 From the discretized trajectory, we can obtain the $x$ and $y$ components of each leg of the trajectory. All components can then be composed in a sequence obtaining two trajectories in the $x$ and $y$ directions as follows:
 \begin{align}
     \bm{p}_x^*&=\left[ \bm{p}_x^*(t_1), \bm{p}_x^*(t_2), \ldots, \bm{p}_x^*(t_{n})\right] \nonumber \\
@@ -549,9 +557,9 @@ In Fig.~\ref{fig:gensample}, each step of the command generation process is visu
 
 \begin{figure}[h]
 	\centering
-	\subfigure[Original String \label{fig:ogstring}]{\includegraphics[width=0.48\linewidth]{images/ogstring.png}}
-	\subfigure[Time Adjustment \label{fig:timeadj}]{\includegraphics[width=0.48\linewidth]{images/timeadj.png}}
-    \subfigure[Final Commands \label{fig:fullyadj}]{\includegraphics[width=0.48\linewidth]{images/fullyadj.png}}
+	\subfigure[Original String \label{fig:ogstring}]{\includegraphics[width=0.32\linewidth]{images/ogstring.png}}
+	\subfigure[Time Adjustment \label{fig:timeadj}]{\includegraphics[width=0.32\linewidth]{images/timeadj.png}}
+    \subfigure[Final Commands \label{fig:fullyadj}]{\includegraphics[width=0.32\linewidth]{images/fullyadj.png}}
 	\caption{Command Generation Process}
 	\label{fig:gensample}
 \end{figure}
@@ -600,15 +608,16 @@ The regression and error analysis was done in Matlab to obtain the surfaces pict
 
 The first experiment consisted of tracking a diagonal path, to validate that $x$ and $y$ components can be attained accurately, as discussed in Section~\ref{sec:traj}. Starting from the world frame origin (0,0), we set the target goal to $(-1.7,2.3)$. The time set for this trajectory was $5.25$s. Using the regression training, we obtained the open-loop commands for the $x$ and $y$ directions, which are pictured in red in Figs.~\ref{fig:xcmds} and \ref{fig:ycmds}, respectively. The open-loop commands yield the trajectory in Fig.~\ref{fig:1723open}.
 
-To show the effect of our adaptive controller, we ran the same experiment with our controller, and compared results obtained in open and closed loop systems. In Fig.~\ref{fig:1723controlled}, the real-time adapted inputs and the error associated with each of the trials in the $x$ and $y$ directions are shown. Using the real-time adapted commands, we obtain the trajectory pictured in Fig.~\ref{fig:1723closed}, where it is clear that the UAV reaches the target goal. In Fig.~\ref{fig:1723exp}, we have a picture of the Parrot BeBop 2 quadrotor accurately tracking the diagonal trajectory.
+To show the effect of the proposed online adaptation procedure, we ran the same experiment with our controller, and compared results obtained in open and closed loop systems. In Fig.~\ref{fig:1723controlled}, the adapted inputs and the error associated with each of the trials in the $x$ and $y$ directions are shown. Using the adapted commands, we obtain the trajectory pictured in Fig.~\ref{fig:1723closed}, where it is clear that the UAV reaches the target goal. Fig.~\ref{fig:1723exp}, show the overlayed sequence of snapshots for the closed loop diagonal experiments in Fig.~\ref{fig:1723closed}.
+% of the Parrot BeBop 2 quadrotor accurately tracking the diagonal trajectory.
 
 \begin{figure}[ht]
 	\centering
-	\subfigure[$x$ Error \label{fig:xerr}]{\includegraphics[width=0.48\linewidth]{images/XERR.png}}
-    \subfigure[$x$ Commands \label{fig:xcmds}]{\includegraphics[width=0.48\linewidth]{images/CLOSEDXcmds.png}}
+	    \subfigure[$x$ Commands \label{fig:xcmds}]{\includegraphics[width=0.48\linewidth]{images/CLOSEDXcmds.png}}
+	    \subfigure[$x$ Error \label{fig:xerr}]{\includegraphics[width=0.48\linewidth]{images/XERR.png}}
+ \subfigure[$y$ Commands \label{fig:ycmds}]{\includegraphics[width=0.48\linewidth]{images/CLOSEDYcmds.png}}
     \subfigure[$y$ Error \label{fig:yerr}]{\includegraphics[width=0.48\linewidth]{images/YERROR.png}}
-    \subfigure[$y$ Commands \label{fig:ycmds}]{\includegraphics[width=0.48\linewidth]{images/CLOSEDYcmds.png}}
-	\caption{Error and Control in the $x$ and $y$ Directions}
+   	\caption{The generated commands and the error in the $x$ and $y$ Directions}
 	\label{fig:1723controlled}
 \end{figure}
 
@@ -620,7 +629,8 @@ To show the effect of our adaptive controller, we ran the same experiment with o
     \caption{Diagonal Experiment Results}
 \end{figure}
 
-To further validate the approach, a square-shaped trajectory was tested, and the experimental data is shown in Fig.~\ref{fig:sqr}. The Parrot BeBop 2 quadrotor experiments are pictured in Fig.~\ref{fig:sqrquad}.
+To further validate the approach, a square-shaped trajectory was tested, and the experimental data and actual quadrotor experiments are shown in Fig.~\ref{fig:sqr} and Fig.~\ref{fig:sqrquad}, respectively.
+%. The Parrot BeBop 2 quadrotor experiments are pictured in 
 
 \begin{figure}[ht!]
 	\centering
@@ -638,7 +648,8 @@ To further validate the approach, a square-shaped trajectory was tested, and the
 	\label{fig:sqrquad}
 \end{figure}
 
-Lastly, the letters U, V, and A were created with the UAV. The planned trajectories were created using minimum snap trajectories and discretized, as discussed in Section~\ref{sec:traj}. The actual trajectories travelled by the UAV are shown in Fig.~\ref{fig:UVA}.
+Lastly, the letters U, V, and A were created and tracked with the UAV. using the same approach and the results are demonstrated in Fig.~\ref{fig:UVA}. For all of our tests we recorded a maximum error of ...when running our approach in open loop and ...when closing the loop. 
+%The planned trajectories were created using minimum snap trajectories and discretized, as discussed in Section~\ref{sec:traj}. The actual trajectories travelled by the UAV are shown in Fig.~\ref{fig:UVA}.
 
 \begin{figure*}[t]
 \subfigure[Planned U Trajectory]{\label{ex0}
@@ -657,8 +668,15 @@ Lastly, the letters U, V, and A were created with the UAV. The planned trajector
 \label{fig:UVA}
 \end{figure*}
 
-\section{Conclusions} \label{sec:conc}
-In this work, we have presented an approach that enables autonomous flight on off-the-shelf quadrotors that are primarily tuned for teleoperation. Our approach shows that we can use a small training set along with a regression analysis to generate commands for any trajectory, along with adapting and closing the loop in real-time to reduce tracking error. Our results have shown that we are able to enable autonomous trajectory-tracking on a UAV with no knowledge of dynamic model and controller parameters. For future work, we plan to diversify some of our results by potentially using an on-board camera or IMU sensors to obtain the position of the vehicle, instead of the Vicon system. 
+\section{Conclusions and Future Work} \label{sec:conc}
+In this work, we have presented an approach that enables autonomous flight oF off-the-shelf quadrotors that are primarily tuned for teleoperation. Our approach shows that we can use a small training set along with a regression analysis to generate commands for any trajectory, along with adapting and closing the loop in real-time to reduce tracking error. Besides a framework for generating commands for autonomous operations, we have also proposed a statistical approach to estimate the error in the prediction and an SMT-based technique to minimize this error and generate safe inputs. Our experimental results show that the generated commands in open loop are close to the desired behavior but as expected not enough to guarantee robust tracking due to noise and disturbances at run-time. By adding a corrective procedure, however we demonstrate that we can achieve good trajectory tracking. 
+
+This work brings together data driven and model based approaches and leverages both worlds to speed-up the learning and the deployment of autonomous vehicles.
+In our current and future work we plan to use machine vision techniques to enable autonomous flight and predict and bound future estimate about the reachable states of the system. More experiments with smoother trajectories are also in our agenda.
+
+
+
+% we are able to enable autonomous trajectory-tracking on a UAV with no knowledge of dynamic model and controller parameters. For future work, we plan to diversify some of our results by potentially using an on-board camera or IMU sensors to obtain the position of the vehicle, instead of the Vicon system. 
 
 
 
