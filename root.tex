@@ -78,7 +78,7 @@ Parameter-free Regression-based Autonomous Control of Off-the-shelf Quadrotor UA
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-Autonomous flight in unmanned aerial vehicles (UAVs) generally requires platform-specific knowledge of the dynamical parameters and control architecture. Recently, UAVs have become more accessible with off-the-shelf options that are well-tuned and stable for user teleoperation but with unknown model parameters and typically nor ready for autonomous oeprations. In this paper, we develop a method to enable autonomous flight on vehicles that are designed for teleoperation with minimal knowledge of the dyanmical and controller parameters. The proposed method uses a basic knowledge of the control and dynamic architecture along with human teleoperated trajectories demonstrations to train a thin-plate spline (TPS) regression model, which is then used to manipulate the pre-trained commands to generate new autonomous input commands for autonomous navigation over new trajectories. A statistical approach is also presented together with a satisfiability modulo theories (SMT) solver to assess the learned prediction error and correct to minimize errors in the input generation. A robust control-based strategy is also proposed to adjust autonomous input commands during run-time for closed loop trajectory tracking. Finally, we validate the proposed approach with trajectory-following experiments on a quadrotor UAV.
+Autonomous flight in unmanned aerial vehicles (UAVs) generally requires platform-specific knowledge of the dynamical parameters and control architecture. Recently, UAVs have become more accessible with off-the-shelf options that are well-tuned and stable for user teleoperation but with unknown model parameters and typically nor ready for autonomous oeprations. In this paper, we develop a method to enable autonomous flight on vehicles that are designed for teleoperation with minimal knowledge of the dyanmical and controller parameters. The proposed method uses a basic knowledge of the control and dynamic architecture along with human teleoperated trajectories as demonstrations to train a thin-plate spline (TPS) regression model, which is then used to manipulate the pre-trained commands to generate new autonomous input commands for autonomous navigation over new trajectories. A statistical approach is also presented together with a satisfiability modulo theories (SMT) solver to assess the learned prediction error and correct to minimize errors in the input generation. A robust control-based strategy is also proposed to adjust autonomous input commands during run-time for closed loop trajectory tracking. Finally, we validate the proposed approach with trajectory-following experiments on a quadrotor UAV.
 
 \end{abstract}
 
@@ -270,7 +270,7 @@ Because the integral by itself may not be enough to characterize a unique behavi
 
 \section{Methodology} \label{sec:approach}
 \begin{figure}[ht]
-    \includegraphics[width=0.48\textwidth]{images/blocks4.PNG}
+    \includegraphics[width=0.48\textwidth]{images/blocks4.png}
     \caption{Block Diagram of the proposed framework}
     \label{fig:blockdiagram}
 \end{figure}
@@ -640,7 +640,7 @@ To further validate the approach, a square-shaped trajectory was tested, and the
 
 Lastly, the letters U, V, and A were created with the UAV. The planned trajectories were created using minimum snap trajectories and discretized, as discussed in Section~\ref{sec:traj}. The actual trajectories travelled by the UAV are shown in Fig.~\ref{fig:UVA}.
 
-\begin{figure*}[t] \label{fig:UVA}
+\begin{figure*}[t]
 \subfigure[Planned U Trajectory]{\label{ex0}
 \includegraphics[width=0.3\textwidth]{images/DESIRE_U.png}}\hfill
 \subfigure[Planned V Trajectory]{\label{ex1}
@@ -653,6 +653,8 @@ Lastly, the letters U, V, and A were created with the UAV. The planned trajector
 \includegraphics[width=0.3\textwidth]{images/FINAL_V.png}}\hfill
 \subfigure[Real A Trajectory]{\label{ex6}
 \includegraphics[width=0.3\textwidth]{images/FINAL_A.png}}\\
+\caption{U, V, A Trajectory Experiments}
+\label{fig:UVA}
 \end{figure*}
 
 \section{Conclusions} \label{sec:conc}
