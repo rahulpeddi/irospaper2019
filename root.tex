@@ -121,7 +121,7 @@ We focus on off-the-shelf quadrotor UAVs which have a well studied dynamical and
 
 
 
-The remainder of the paper is organized as follows: In Section \ref{sec:relatedwork}, we provide a review of the state of the art in the literature on imitation and supervised learning. In Section \ref{sec:prob}, we formulate our problem statement. In Section \ref{sec:sysdyn}, we discuss the system dynamics and controller architecture, which is then followed by an overview of our methodology in Section \ref{sec:approach}. Finally, we end with a discussion about our experimental validation in Section \ref{sec:exper}, and draw conclusions and a discussion on future work in Section \ref{sec:conc}.
+The remainder of the paper is organized as follows: In Section \ref{sec:relatedwork}, we provide a review of the state of the art in the literature on imitation and supervised learning. In Section \ref{sec:prob}, we formulate our problem statement. In Section \ref{sec:sysdyn}, we discuss the system dynamics and controller architecture, which is then followed by our methodology in Section \ref{sec:approach}. Finally, we end with a discussion about our experimental validation in Section \ref{sec:exper}, and draw conclusions and a discussion on future work in Section \ref{sec:conc}.
 
 %We then discuss in detail each part of our approach with training in Section \ref{sec:train}, trajectory generation in Section \ref{sec:traj}, autonomous control generation in Section \ref{sec:generate}, and lastly the online adaptation of controls in Section \ref{sec:adapt}.
 %\NB{no need to list all subsections just list teh main section details}
@@ -418,7 +418,6 @@ t_{\hat{\beta}} = \frac{|\hat{\beta}-\bar{\beta}|}{\sigma_{est}}
 where $\hat{\beta}$ is the test point and $\bar{\beta}$ is the nearest training point. In equation \eqref{eq:tstat}, $t_{\hat{\beta}} \geq 1$ indicates that the test point $\hat{\beta}$ propagates an error higher than the standard error. Therefore, it is desirable to have $t_{\hat{\beta}} < 1$. 
 %\NB{what you mean with known? Do you mean training point?}
 After selecting a desired set-point for the t-statistic, $t^*$, the maximum allowable departure from known points is $\sigma_{est}t^*$.
-
 This maximum departure, $\sigma_{est}t^*$, is used to set the bounds for each training data point, for example:
 \begin{align}
     \beta_{\min} = \bar{\beta} - \sigma_{est}t^* \nonumber \\
