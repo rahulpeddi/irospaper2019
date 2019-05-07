@@ -565,13 +565,12 @@ From the autonomous command, the expected path of the vehicle is generated. The 
 \begin{equation}
     g_J(t) = \int_0^t\bm{J}_a dt
 \end{equation}
-Because we know the relationship between the integral and the distance travelled at all times, we are able to leverage the equation from the TPS regression for the integral, \eqref{eq:integralfit}, such that the inputs are time elapsed and integral of the autonomous command string and the output is the distance traveled: %\NB{this sentence doesn't make sense}:
+Because we know the relationship between the integral and the distance travelled at all times, we are able to leverage the equation from the TPS regression for the integral, \eqref{eq:integralfit}, such that the inputs are time elapsed and integral of the autonomous command string and the output is the distance traveled: 
 \begin{equation} \label{eq:distresult}
 d_J(t) = f^{-1}(g_J(t),t)
 \end{equation}
-where $g_J(t)$ is the integral of the string of generated commands at time $t$, and $d_J(t)$ is the resultant distance travelled at $t$.
+where $g_J(t)$ is the integral of the string of generated commands at time $t$, and $d_J(t)$ is the resultant distance travelled at $t$. The operation outlined in this section is performed twice to obtain autonomous command strings for each input that we are controlling, $u_2$ and $u_3$, which represent roll and pitch, respectively.
 
-%\NB{where is the part of the text in which you show how to generate the prediction of the position occupied by the vehicle by following the determined sequence of inputs?}
 \subsection{Online Adaptation of Generated Commands} \label{sec:adapt}
 
 The commands generated in the previous section are generated and sent to the UAV in open-loop. While the open-loop autonomous controls generated in this manner may be reasonably accurate when there is no noise and disturbance, we desire more assured trajectory tracking by controlling for any possible error, thereby closing the loop. While executing the generated command string, $\bm{J}_a(t)$, we monitor the error between the position of the vehicle, $\bm{p}(t)$ and the reference position as per the generated trajectory, $\bm{p}_r(t)$:
