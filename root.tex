@@ -106,13 +106,13 @@ On the other hand, data-driven machine learning techniques like neural networks,
 Different from other supervised learning approaches, in this work we leverage the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contributions of this work are: 1) a framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles, 2) a statistical approach to evaluate the learning error from which a satisfiability modulo theories (SMT) solver is also leveraged to minimize the error in the generated commands for autonomous flight, and 3) a robust control technique to correct the generated commands and minimize tracking error at run-time.
 
 %assess the quality of the training data with an error analysis of our regression model that impacts decisions we make in terms of UAV trajectory and autonomous control generation.
-\begin{figure}[b]
-    \vspace{-10pt}
+\begin{figure}[h]
+    \vspace{-5pt}
     \includegraphics[width=0.48\textwidth]{images/motivation2.png}
     \vspace{-5pt}
     \caption{Motivational representation of the proposed work}
     \label{fig:motiv}
-    \vspace{-15pt}
+    \vspace{-5pt}
 \end{figure}
 
 In this work we propose a novel approach that leverages both model-based and data-driven theories to generate autonomous flight behavior for an aerial vehicle from few user teleoperation demonstrations as motivated in Fig.~\ref{fig:motiv}. 
@@ -133,16 +133,6 @@ The remainder of the paper is organized as follows: In Section \ref{sec:relatedw
 %architecture (note that parameters are unknown)
 %extracting the rule for open loop trajectory tracking and correcting to minimize tracking error
 
-
-%here the vehicle doesn't only repeat what the user is teaching and the training set can be smaller because knowledge bout the system model is used to guide the input generation.
-
-%Both model-based and data-driven theories are leveraged to  
-
-
-%Traditionally, autonomous control of UAVs consists of four control inputs: thrust, roll, pitch, and yaw. For these control inputs to actually create motion, knowledge about the physical system (e.g., mass and moments of inertia) is required [CITE]. This information, however, can vary quite a lot for different systems [show image of two very different uavs here], and the specifics and parameters of the dynamic models are not always available.
-%
-%This need for platform-specific parameters, however, can be avoided if we can learn what control inputs to send to the vehicle in another way. The parameters are generally only necessary when generating autonomous flight, but when there is a human pilot, the controls are sent to the system in a different manner, usually via teleoperation commands. In this work, we are interested in transferring this knowledge from a human-piloted demonstrations for fast learning and generation of autonomous flight, all while being unaware of platform-specific parameters. It is, however, trivial to replicate the actions of the human pilot to generate the same action autonomously. As a result, we are interested in taking a library of a several demonstrations to enable the vehicle to follow any generated trajectory.
-%
 %To this end, we propose a framework that aim the solve the following challenges:
 %\begin{itemize}
 %    \item how to enable autonomous flight in aerial vehicles with minimal knowledge of vehicle dynamics
