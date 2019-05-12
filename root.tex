@@ -89,7 +89,7 @@ Unmanned Aerial Vehicles (UAVs) have become widespread for both civilian and mil
 
 The development of dedicated platforms for such autonomous tasks can be expensive and not necessary since hundreds of off-the-shelf UAVs are available nowadays and for low cost (Fig.~\ref{fig:uavs}). These platforms are usually well designed, very stable, and ready to fly out of the box but are typically restricted to teleoperation usage.
 
-Generating autonomous flight behavior -- subject of this paper --  however, can be difficult since every UAV has different dynamical parameters, which are typically not available, and reverse engineering to obtain an estimate of such parameters is often not possible. Model-based approaches that include system identification, model extraction, and control design are well known procedures to deal with this issue however they are time demanding and often not precise requiring a lot of tuning and testing \cite{modelbased1}. Even when these approaches are successful, among similar vehicles there can be model mismatch due to manufacturing error, different usage, physical alterations, or aging which can change parameters thus needing more tuning or sophisticated adaptive control architectures to guarantee safe and reliable control. 
+Generating autonomous flight behavior -- subject of this paper --  however, can be difficult since every UAV has different dynamical parameters, which are typically not available, and reverse engineering to obtain an estimate of such parameters is often not possible. Model-based approaches that include system identification, model extraction, and control design are well known procedures to deal with this issue, however they are time demanding and often not precise, requiring a lot of tuning and testing \cite{modelbased1}. Even when these approaches are successful, there can be model mismatch among similar vehicles due to manufacturing error, different usage, physical alterations, or aging, which can change parameters thus needing more tuning or sophisticated adaptive control architectures to guarantee safe and reliable control. 
 %While model driven procedures are time demanding, they
 %, and knowledge of that model is required to generate autonomous flight. Extracting this model is time demanding
 
@@ -103,7 +103,7 @@ On the other hand, data-driven machine learning techniques like neural networks,
 \end{figure}
 %\NB{I've changed the figure. We need also one that show what we are doing here. I'll help with the figures}
 
-Different from other supervised learning approaches, in this work we leverage the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contributions of this work are: 1) a framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles, 2) a statistical approach to evaluate the learning error from which a satisfiability modulo theories (SMT) solver is also leveraged to minimize the error in the generated commands for autonomous flight, and 3) a robust control technique to correct the generated commands and minimize tracking error at run-time.
+Different from other supervised learning approaches, in this work, we leverage the knowledge about the generalized architecture for the UAV dynamics and their controller and use regression-based techniques to extract a model for closed loop trajectory tracking. The main contributions of this work are: 1) a framework that combines both model-based and data-driven theories to generate autonomous control for aerial vehicles, 2) a statistical approach to evaluate the learning error from which a satisfiability modulo theories (SMT) solver is also leveraged to minimize the error in the generated commands for autonomous flight, and 3) a robust control technique to correct the generated commands and minimize tracking error at run-time.
 
 %assess the quality of the training data with an error analysis of our regression model that impacts decisions we make in terms of UAV trajectory and autonomous control generation.
 \begin{figure}[h]
@@ -120,7 +120,7 @@ We focus on off-the-shelf quadrotor UAVs which have a well studied dynamical and
 
 
 
-The remainder of the paper is organized as follows: In Section \ref{sec:relatedwork}, we provide a review of the state of the art in the literature on imitation and supervised learning. In Section \ref{sec:prob}, we formulate our problem statement. In Section \ref{sec:sysdyn}, we discuss the system dynamics and controller architecture, which is then followed by our methodology in Section \ref{sec:approach}. Finally, we end with a discussion about our experimental validation in Section \ref{sec:exper}, and draw conclusions and a discussion on future work in Section \ref{sec:conc}.
+The remainder of the paper is organized as follows: In Section \ref{sec:relatedwork}, we provide a review of the state of the art in the literature on imitation and supervised learning. In Section \ref{sec:prob}, we formulate our problem statement. In Section \ref{sec:sysdyn}, we discuss the system dynamics and controller architecture, which is then followed by our methodology in Section \ref{sec:approach}. Finally, we end with a discussion about our experimental validation in Section \ref{sec:exper}, and we draw conclusions and discuss future work in Section \ref{sec:conc}.
 
 %We then discuss in detail each part of our approach with training in Section \ref{sec:train}, trajectory generation in Section \ref{sec:traj}, autonomous control generation in Section \ref{sec:generate}, and lastly the online adaptation of controls in Section \ref{sec:adapt}.
 %\NB{no need to list all subsections just list teh main section details}
@@ -175,23 +175,8 @@ Consider a pre-configured off-the-shelf ready-to-fly UAV, with known model archi
     \end{equation}
     where $||\cdot||$ is the Euclidean norm.
 \end{problem}
-%    where $\bm{p_r}(t)$ is the reference position at time $t$, where $T$ represents an overall time horizon for the trajectory, and $\delta_d$ is a threshold for allowable deviation.
-%A UAV has the objective to track a trajectory $\bm{p_r}(t),~ t \in [0,T]$ without specific knowledge of its model parameters
-%
-%visit a set of $n$ goals, $\bm{g}\in\mathbb{R}^{n}$, at a set of $n$ target times, $\bm{t} \in\mathbb{R}^{n}$. Given $m$ human-piloted flight demonstrations, the aim is to find a policy that enables autonomous flight to generate and track a trajectory $\bm{p_r}(t),~ t \in [0,T]$ that visits the target goals $\bm{g}_i$ at the respective target times, $\bm{t}_i$, such that the following liveness requirements are met:
-%\begin{enumerate}
-%    \item  Position: The UAV should always stay within a certain distance of the generated trajectory:
-%    \begin{equation} \label{eq:positlive}
-%        ||\bm{p}(t)-\bm{p_r}(t)|| \leq \delta_d,~\forall t \in [0,T]
-%    \end{equation}
-%    where $\bm{p_r}(t)$ is the reference position at time $t$, where $T$ represents an overall time horizon for the trajectory, and $\delta_d$ is a threshold for allowable deviation.
-%    \item  Time: The UAV should always reach the target locations within a certain threshold of the target time for that goal:
-%    \begin{align}
-%        \tau = t\in[0,T]|\bm{p}(t)-\bm{g}_i \leq \delta_d \nonumber \\
-%        |\tau- \bm{t}_i| \leq \delta_t,~i=1,\ldots,n \label{eq:time_live}
-%    \end{align}
-%    where $\tau$ is a time at which the liveness condition is met for a specific goal and $\delta_t$ is the allowable deviation in time from the target.
-%\end{enumerate}
+
+
 \section{System Models} \label{sec:sysdyn}
 %\NB{in this section we need to show the dynamical model, and control model and architecture with teleoperation. We need to stress that everything is a gray box with known model but unknown params and that the inputs and outputs are known and used later to obtain a model for autonomous fly. We need to explain the relation between teleop and u1 u2 u3 and u4 and how increasing the joystick increase the inputs and thus the integral measures mobility in the system.}
 As hinted in the introduction, we use knowledge about the UAV dynamics and control architecture to extract useful information about the system to guide a regression approach for the generation of autonomous control commands for the UAV. We focus on off-the-shelf tuned and stable quadrotors that typically are ready for teleoperation but not for autonomous flight. The control architecture of the off-the-shelf quadrotor is shown in Fig.~\ref{fig:otsctrl}.
@@ -257,7 +242,7 @@ In Fig. \ref{fig:samps}, we show data from a single flight demonstration on a Pa
 	\label{fig:samps}
 \end{figure}
 From \eqref{eq:cinputs}, we observe that the inputs $u_2$ and $u_3$ for roll and pitch rely on the change in the desired Euler roll, $\phi_c$, and pitch, $\theta_c$, angles, and these desired roll and pitch angles are a function of the desired positions and velocities which are provided by the user, in our case. 
-Hence, each stroke in the joystick transforms into motion of the vehicle which, in turn, affects its changes in the global $x$ and $y$ position. Our first goal here is to understand this mapping between user inputs and distance traveled by the quadrotor to build an autonomous behavior. Instead of using the entire string of commands, which could be large, not uniform, and computationally expensive, in this work we use the {\em integral} of the commands, in other words, the area underneath the time series of commands which is a compact and representative measure for training a model. The shaded area in Fig.~\ref{fig:sampleintegral} represents this integral. 
+Hence, each stroke of the joystick transforms into motion of the vehicle which, in turn, affects its changes in the global $x$ and $y$ position. Our first goal here is to understand this mapping between user inputs and distance traveled by the quadrotor to build an autonomous behavior. Instead of using the entire string of commands, which could be large, not uniform, and computationally expensive, in this work we use the {\em integral} of the commands, in other words, the area underneath the time series of commands, which is a compact and representative measure for training a model. The shaded area in Fig.~\ref{fig:sampleintegral} represents this integral. 
 
 %In order to capture that that change in the desired angles, which are set by the human teleoperation, we take the area under the curve of the input commands. The shaded portion of Fig.\ref{fig:sampleintegral} represents this integral. Since these changes in roll and pitch affect the global $x$ and $y$ position of the vehicle, the integral that captures these changes is connected to the distance travelled by the vehicle. This integral is used as a compact measure for our training, and this removes the necessity to train on the entire string of commands, which could be large and more computationally intensive. 
 %Along with the string of commands sent, the shaded portion of Fig.\ref{fig:sampleintegral}, represents the integral. i.e. the total area, under the string of commands. Because the pitch is proportional to the linear velocity in the $y$-direction, we know that the command string is proportional to the velocity, and its integral, therefore, is proportional to the distance traveled 
@@ -305,7 +290,7 @@ The average command, in this case, provides information about the pilot's averag
 
 \subsubsection{Offline Training Data}
 
-The training data in this work consists of multiple demonstrations of a human-pilot flying forward covering different distances with varying speeds.
+The training data in this work consists of multiple demonstrations of a human-pilot flying forward, covering different distances with varying speeds.
 %at varying speeds for varying distances. 
 In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. Specifically, in Fig.~\ref{fig:traincmd}, we have the teleoperation commands sent by the pilot, and in Fig.~\ref{fig:traintraj}, the corresponding distances traveled are displayed.
 
@@ -317,7 +302,7 @@ In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. 
 	\caption{Training set.}
 	\label{fig:train}
 \end{figure}
-With this data, we can train a model for trajectories that start and end with $0$ speed. This training is only effective if trajectories involves stopping intermittently throughout an operation. Although in this work for ease of discussion, we focus on $0$ initial and final velocities, if a continuous motion throughout a trajectory is needed, then training can be executed on smooth trajectories by segmenting the existing training data to include trajectories for demonstrations where the velocity does not start and end at $0$ speed. Three separate types of segments will need to be evaluated in this case:
+With this data, we can train a model for trajectories that start and end with $0$ speed. This training is only effective if the desired trajectory involves stopping intermittently throughout an operation. Although in this work for ease of discussion, we focus on $0$ initial and final velocities, if a continuous motion throughout a trajectory is needed, then training can be executed on smooth trajectories by segmenting the existing training data to include trajectories for demonstrations where the velocity does not start and end at $0$ speed. Three separate types of segments will need to be evaluated in this case:
 \begin{itemize}
     \item[a.] Start Trajectory, where the segment begins with a velocity of $0$ and ends with a given nonzero velocity $v$
     \item[b.] Intermediate Trajectory, where the segment begins and end with $v$ velocity
@@ -413,7 +398,7 @@ This maximum departure, $\sigma_{est}t^*$, is used to set the bounds for each tr
 \end{align}
 where $\beta_{\min}$ and $\beta_{\max}$ are the lower and upper bounds for any training point $\bar{\beta}$. %\NB{so each new testing point gets a different bound? Is it based only on the closest training point? What if we have 100 points close by? How do you take into account this situation that is different from having only 1 point} Adding a new test point changes the size of these ellipses because the std error changes.
 
-In our case, there are two inputs we are primarily concerned about for prediction; distance and time, as in \eqref{eq:integralfit} and \eqref{eq:ssvelfit}. The distance and time values are used together as input pairs, so we use the convex hull around standard error ellipses to connect the two together \cite{stdellipse}. The standard error ellipse, in general, is computed as follows: %\NB{this section is too long..just go to the point. State that we are using this method to compute error region or whatever they are called} %\NB{I don't understand this..why are you separating this values? because we obtain a height and a length of these ellipses}
+In our case, there are two inputs we are primarily concerned about for prediction; distance and time, as in \eqref{eq:integralfit} and \eqref{eq:ssvelfit}. The distance and time values are used together as input pairs, so we take the convex hull around standard error ellipses to connect the two together \cite{stdellipse}. The standard error ellipse, in general, is computed as follows: %\NB{this section is too long..just go to the point. State that we are using this method to compute error region or whatever they are called} %\NB{I don't understand this..why are you separating this values? because we obtain a height and a length of these ellipses}
 \begin{equation}
     \bigg(\frac{d}{\sigma_{d,est}t^*}\bigg)^2 + \bigg(\frac{t}{\sigma_{t,est}t^*}\bigg)^2 = 1
 \end{equation}
