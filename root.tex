@@ -97,9 +97,9 @@ On the other hand, data-driven machine learning techniques like neural networks,
 \begin{figure}[t]
     \includegraphics[width=0.48\textwidth]{images/quads.png}
     \vspace{-5pt}
-    \caption{Some Examples of Off-the-Shelf UAVs, courtesy of the web}
+    \caption{Some examples of Off-the-Shelf UAVs, courtesy of the web.}
     \label{fig:uavs}
-    \vspace{-15pt}
+    \vspace{-18pt}
 \end{figure}
 %\NB{I've changed the figure. We need also one that show what we are doing here. I'll help with the figures}
 
@@ -107,12 +107,12 @@ Different from other supervised learning approaches, in this work we leverage th
 
 %assess the quality of the training data with an error analysis of our regression model that impacts decisions we make in terms of UAV trajectory and autonomous control generation.
 \begin{figure}[h]
-    \vspace{-5pt}
+    \vspace{-8pt}
     \includegraphics[width=0.48\textwidth]{images/motivation2.png}
-    \vspace{-5pt}
-    \caption{Motivational representation of the proposed work}
+    \vspace{-6pt}
+    \caption{Motivational representation of the proposed work. Photos courtesy of the web.}
     \label{fig:motiv}
-    \vspace{-5pt}
+    \vspace{-10pt}
 \end{figure}
 
 In this work we propose a novel approach that leverages both model-based and data-driven theories to generate autonomous flight behavior for an aerial vehicle from few user teleoperation demonstrations as motivated in Fig.~\ref{fig:motiv}. 
@@ -148,9 +148,9 @@ The remainder of the paper is organized as follows: In Section \ref{sec:relatedw
 %\NB{we need to stress how different this work is in comparison with the rest of the literature on learning from demonstration. We need to show our contribution clearly}
 %\NB{skipping related work for now}
 
-In recent years, we have had many advancements in unmanned aerial vehicles (UAVs). A very common and widely researched task for UAVs is motion and path planning. The authors in \cite{minsnap,waypts,tvec} provide well optimized approaches for UAV trajectory generation and tracking by utilizing near perfect knowledge of the controller and dynamical model parameters. Access to these parameters, as they are in our case, is often limited. In \cite{pso}, the authors leverage exact knowledge of the model dynamics an controller architecture to identify necessary parameters for trajectory tracking, and perform parameter estimation using particle swarm optimization, which can be a long and iterative process, which is the case for many other model-based parameter and system identification approaches \cite{modelbased1,modelbased2}.
+In recent years, we have had many advancements in unmanned aerial vehicles (UAVs). A very common and widely researched task for UAVs is motion and path planning. The authors in \cite{minsnap,waypts,tvec} provide well optimized approaches for UAV trajectory generation and tracking by utilizing near perfect knowledge of the controller and dynamical model parameters. Access to these parameters, as they are in our case, is often limited. In \cite{pso}, the authors leverage exact knowledge of the model dynamics and controller architecture to identify necessary parameters for trajectory tracking. The same authors perform parameter estimation using particle swarm optimization, which can be a long and iterative process, as for many other model-based parameter and system identification approaches \cite{modelbased1,modelbased2}.
 
-Some of the more recent advancements in this area feature machine learning and data-driven approaches, such as deep learning (DL), imitation learning (IL), and reinforcement learning (RL). In \cite{dln}, the authors use DL to learn driving models for ground vehicles by using large-scale video datasets, and in \cite{rlctrl}, the authors use RL over $1,000$ training samples for accurate quadrotor trajectory tracking. These methods are model and parameter free, but use extremely large datasets to resolve that issue. In \cite{uavrace}, the authors explore the idea of observational imitation learning (OIL), where learning is achieved from a relatively small number of demonstrations, but knowledge of the controller architecture is assumed and parameter estimation is performed, which can be a daunting task without knowledge of the controller architecture. The authors in \cite{abbeel} use apprenticeship learning, which is similar to IL, to train a UAV to perform trajectories with a very simplified model while assuming knowledge of several parameters, such as mass and moments of inertia. Despite having to learn certain parameters, the same authors show the ability to learn some maneuvers using only important information from only $20$ minutes of flight time, however, they they deal with an episodic task that takes a significant amount of testing for convergence. The understated desire for smaller training sets is prevalent in many of the works in this area. Some works, such as \cite{gppaper} use a stochastic method known as a Gaussian Process (GP) to accurately tune a simplified UAV controller. Use of stochastic or regression based methods, such as GPs have shown the ability to execute imitation learning with limited training sets and information \cite{imlerngp,imlernreg}.
+Some of the more recent advancements in this area feature machine learning and data-driven approaches, such as deep learning (DL), imitation learning (IL), and reinforcement learning (RL). In \cite{dln}, the authors use DL to learn driving models for ground vehicles by using large-scale video datasets, and in \cite{rlctrl}, the authors use RL over $1,000$ training samples for accurate quadrotor trajectory tracking. These methods are model and parameter free, but use very large datasets to resolve that issue. In \cite{uavrace}, the authors explore the idea of observational imitation learning (OIL), where learning is achieved from a relatively small number of demonstrations, but knowledge of the controller architecture is assumed and parameter estimation is performed, which can be a daunting task without knowledge of the controller architecture. The authors in \cite{abbeel} use apprenticeship learning, which is similar to IL, to train a UAV to perform trajectories with a very simplified model while assuming knowledge of several parameters, such as mass and moments of inertia. Despite having to learn certain parameters, the same authors show the ability to learn some maneuvers using only important information from only $20$ minutes of flight time, however, they deal with an episodic task that takes a significant amount of testing for convergence. The understated desire for smaller training sets is prevalent in many of the works in this area. Some works, such as \cite{gppaper} use a stochastic method known as a Gaussian Process (GP) to accurately tune a simplified UAV controller. Use of stochastic or regression based methods, such as GPs have shown the ability to execute imitation learning with limited training sets and information \cite{imlerngp,imlernreg}.
 
 Our work leverages knowledge about the system dynamics architecture combined with regression theory to learn to fly autonomously aerial vehicles.
 % abut not the paprametrsis largely based on combining the aforementioned apprenticeship learning theory with a regression method - we show how we can obtain and analyze important information from a relatively small number of demonstrations. 
@@ -197,12 +197,12 @@ Consider a pre-configured off-the-shelf ready-to-fly UAV, with known model archi
 As hinted in the introduction, we use knowledge about the UAV dynamics and control architecture to extract useful information about the system to guide a regression approach for the generation of autonomous control commands for the UAV. We focus on off-the-shelf tuned and stable quadrotors that typically are ready for teleoperation but not for autonomous flight. The control architecture of the off-the-shelf quadrotor is shown in Fig.~\ref{fig:otsctrl}.
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/ctrler2.png}
-    \caption{Off-the-Shelf UAV Teleoperation Control Architecture}
+    \caption{Off-the-Shelf UAV teleoperation control architecture.}
     \label{fig:otsctrl}
 \end{figure}
 %$\bm{J}_x$ and $\bm{J}_y$
 %\NB{this figure is too small...text need to be bigger}
-The presented structure is a gray box model, where the only information known include the teleoperation inputs, indicated by $\bm{J}=\left[thrust, roll, pitch, yaw\right]$, the output, which is the position of the vehicle, $\bm{p}(t)$, over time, and the basic model architecture. The low level controller usually consists of multiple PID loops \cite{esen}, which are already developed and tuned with certain specific control gains, which can be very difficult to identify by analyzing the output of the system. The quadrotor body dynamics can be modeled using a $12^{\text{th}}$ order state vector as follows:
+The presented structure is a gray box model, where the only information known include the teleoperation inputs, indicated by $\bm{J}=\left[thrust, roll, pitch, yaw\right]$, the output, which is the position of the vehicle, $\bm{p}(t)$, over time, and the basic model architecture (discussed below). The low level controller usually consists of multiple PID loops \cite{esen}, which are already developed and tuned with certain specific control gains, which can be very difficult to identify by analyzing the output of the system. The quadrotor body dynamics can be modeled using a $12^{\text{th}}$ order state vector as follows:
 %\NB{why q in $\bm{p}_q$? In the problem formulation there is not q}
 \begin{equation}
     \bm{q} = 
@@ -226,7 +226,7 @@ The dynamics of the vehicle are then described as follows \cite{esencite}:
 	\end{aligned}
 \end{equation} 
 
-This dynamical model and the control architecture consist of platform-specific parameters that are also difficult to identify, much like the controller parameters/gains discussed above. Moreover, these parameters often vary a lot between UAVs, and that further complicates the identification problem. The model and architecture above assume that the quadrotor is moving at a constant $z$ level with a zero yaw constraint, and therefore, we are primarily concerned with two of the inputs, $u_2$ and $u_3$. The equations for these two control inputs are as follows:
+This dynamical model and the control architecture consist of platform-specific parameters that are also difficult to identify, much like the controller parameters/gains discussed above. Moreover, these parameters often vary a lot between UAVs, further complicating the identification problem. The model and architecture above assume that the quadrotor is moving at a constant $z$ level with a zero yaw constraint, and therefore, we are primarily concerned with two of the inputs, $u_2$ and $u_3$. The equations for these two control inputs are as follows:
 \begin{align} \label{eq:cinputs}
     %u_1 &= m(g + \ddot{z}_{des} + k_{d,z}(\dot{z}_{des}  \dot{z}) + k_{p,z}(z_{des}-z)) \nonumber \\
     u_2 &= k_{p,\phi}(\phi_c-\phi) + k_{d,\phi}(\dot{\phi}_c - \dot{\phi}) \nonumber \\
@@ -247,13 +247,13 @@ In this work, the goal is to generate control inputs for autonomous flight when 
 %\NB{figures go after the explanation in the text}
 %\NB{make these figures long and short and aligned vertically }
 %\NB{we should show this picture in parallel with the speed and position of the vehicle to connect with the integral}
-In Fig. \ref{fig:samps}, we show data from a single flight demonstration on a Parrot BeBop 2 quadrotor -- the hobby-grade quadrotor used in this paper to verify our results. The UAV was teleoperated forward manually over a distance of approximately $3$ meters, with initial and final velocities of $0$. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which flies the UAV in the negative $y$-direction. The teleoperation command, in this case, adheres to desired pitch angles, but the user could be adjusting any value that affects motion of the system, such as acceleration, torque, or even voltage provided to the motors depending on the factory setting. The approach presented in this paper is able to correlate any of these commands to the change in position and velocity of the system.
+In Fig. \ref{fig:samps}, we show data from a single flight demonstration on a Parrot BeBop 2 quadrotor -- the hobby-grade quadrotor used in this paper to verify our results. The UAV was teleoperated forward manually over a distance of approximately $3$ meters, with 0 initial and final velocities. The teleoperation input command string, in this case, corresponds to pitch, where a command of $0$ would imply no pitch adjustment, and $1$ corresponds to the UAV's maximum allowable pitch. The minimum allowable pitch command is $-1$, which flies the UAV in the negative $y$-direction. The teleoperation command, in this case, adheres to desired pitch angles, but the user could be adjusting any value that affects motion of the system, such as acceleration, torque, or even voltage provided to the motors depending on the factory setting. The approach presented in this paper is able to correlate any of these commands to the change in position and velocity of the system.
 \begin{figure}[ht]
 	\centering
-	\subfigure[Sample of a Single Demonstration\label{fig:sampleintegral}]{\includegraphics[width=1\linewidth]{images/sampleintegral.png}}
-	\subfigure[Sample Distance Traveled\label{fig:sampt}]{\includegraphics[width=1\linewidth]{images/sampletrajectory.png}}
-	\subfigure[Sample Velocity\label{fig:sampv}]{\includegraphics[width=1\linewidth]{images/samplevelocity.png}}
-	\caption{Sample Demonstration, Distance Traveled, and Velocity}
+	\subfigure[Sample of a single demonstration.\label{fig:sampleintegral}]{\includegraphics[width=1\linewidth]{images/sampleintegral.png}}
+	\subfigure[Sample distance traveled.\label{fig:sampt}]{\includegraphics[width=1\linewidth]{images/sampletrajectory.png}}
+	\subfigure[Sample velocity.\label{fig:sampv}]{\includegraphics[width=1\linewidth]{images/samplevelocity.png}}
+	\caption{Sample demonstration, distance traveled, and velocity.}
 	\label{fig:samps}
 \end{figure}
 From \eqref{eq:cinputs}, we observe that the inputs $u_2$ and $u_3$ for roll and pitch rely on the change in the desired Euler roll, $\phi_c$, and pitch, $\theta_c$, angles, and these desired roll and pitch angles are a function of the desired positions and velocities which are provided by the user, in our case. 
@@ -268,7 +268,7 @@ Because the integral by itself may not be enough to characterize a unique behavi
 \section{Methodology} \label{sec:approach}
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/blocks4.png}
-    \caption{Block Diagram of the proposed framework}
+    \caption{Block diagram of the proposed framework.}
     \label{fig:blockdiagram}
 \end{figure}
 %\NB{the figure needs to be changed. jx(t) jy(t) should input into the plant and the output is x(t) y(t) and all goes as input to the Training. The figure is still blurry}
@@ -311,13 +311,13 @@ In Fig.~\ref{fig:train}, we show the raw data received from the demonstrations. 
 
 \begin{figure}[H]
 	\centering
-	\subfigure[Training Teleoperation Commands \label{fig:traincmd}]{\includegraphics[width=0.49\linewidth]{images/traincommand.png}}
-	\subfigure[Training Distances Travelled \label{fig:traintraj}]{\includegraphics[width=0.49\linewidth]{images/trajset.png}}
-	\caption{Training Set}
+	\subfigure[Training teleoperation commands. \label{fig:traincmd}]{\includegraphics[width=0.49\linewidth]{images/traincommand.png}}
+	\subfigure[Training distances travelled. \label{fig:traintraj}]{\includegraphics[width=0.49\linewidth]{images/trajset.png}}
+			\vspace{-15pt}
+	\caption{Training set.}
 	\label{fig:train}
-		\vspace{-15pt}
 \end{figure}
-With this data, we can train a model for trajectories that start and end with $0$ speed. This training would only be effective if trajectories involved stopping intermittently throughout the trajectory. Although in this work for ease of discussion, we focus on $0$ initial and final velocities, if a continuous motion throughout a trajectory is needed, then training can be executed on smooth trajectories by segmenting the existing training data to include trajectories for demonstrations where the velocity does not start and end at $0$ speed. Three separate types of segments will need to be evaluated in this case:
+With this data, we can train a model for trajectories that start and end with $0$ speed. This training is only effective if trajectories involves stopping intermittently throughout an operation. Although in this work for ease of discussion, we focus on $0$ initial and final velocities, if a continuous motion throughout a trajectory is needed, then training can be executed on smooth trajectories by segmenting the existing training data to include trajectories for demonstrations where the velocity does not start and end at $0$ speed. Three separate types of segments will need to be evaluated in this case:
 \begin{itemize}
     \item[a.] Start Trajectory, where the segment begins with a velocity of $0$ and ends with a given nonzero velocity $v$
     \item[b.] Intermediate Trajectory, where the segment begins and end with $v$ velocity
@@ -327,9 +327,9 @@ To expand the same data for this purpose, we train on portions of the training s
 %ewe can extract the aformentioned segments from the training set - cut in a way that way obtain the desired initial and final conditions listed above.
 \begin{figure}[H]
 	\centering
-	\subfigure[Training Intermediate Velocities \label{fig:trainvel}]{\includegraphics[width=0.49\linewidth]{images/trainelabvel.png}}
-	\subfigure[Training Intermediate Trajectories \label{fig:trainteltraj}]{\includegraphics[width=0.49\linewidth]{images/trainelabtraj.png}}
-	\caption{Intermediate Training Set}
+	\subfigure[Training intermediate velocities. \label{fig:trainvel}]{\includegraphics[width=0.49\linewidth]{images/trainelabvel.png}}
+	\subfigure[Training intermediate trajectories. \label{fig:trainteltraj}]{\includegraphics[width=0.49\linewidth]{images/trainelabtraj.png}}
+	\caption{Intermediate training set.}
 	\label{fig:trainelab}
 \end{figure}
 %change pic to be accurate
@@ -372,7 +372,7 @@ Given the corresponding $\mathbf{z}_i$ for each $(\mathbf{x}_i,\mathbf{y}_i)$ pa
 where $K_{ij} = U(||(\mathbf{x}_i,\mathbf{y}_i)-(\mathbf{x}_j,\mathbf{y}_j)||)$, each $i^{th}$ row of $P$ is $(1,\mathbf{x}_i,\mathbf{y}_i)$, $\bm{0}  \in \mathbb{R}^{3\times3}$ is a matrix of zeros, $\bm{o} \in \mathbb{R}^{3\times1}$ is a column vector of zeros, $\bm{w} \in \mathbb{R}^{m\times1}$ and $\bm{z} \in \mathbb{R}^{m\times1}$ are formed from $w_i$ and $\mathbf{z}_i$, respectively, and $\bm{a}$ is the column vector with elements $a_1,a_\mathbf{x},a_\mathbf{y}$.
 %\NB{$P_i*$ does not appear in the equation}
 
-Given the general framework for performing the thin-plate spline, we develop two separate relationships for our application. In our work, the first regression is applied to $d$ (distance traveled) and $t$ (time) as inputs to obtain the integral of the commands $g_i = f(d_i,t_i)$ while the second has the same inputs to obtain the average teleoperation command $\bar{j}_i = h(d_i,t_i)$. With the functions we have obtained, we are able to find an estimated integral and average input command, $g_u$ and $\bar{j}_u$, for any given desired distance and time, $d_u$ and $t_u$, respectively,
+Given the general framework for performing the thin-plate spline, we develop two separate relationships for our application. In our work, the first regression is applied to $d$ (distance traveled) and $t$ (time) as inputs to obtain the integral of the commands $g_i = f(d_i,t_i)$ while the second has the same inputs to obtain the average teleoperation command $\bar{j}_i = h(d_i,t_i)$. With the functions that we have obtained, we are able to find an estimated integral and average input command, $g_u$ and $\bar{j}_u$, for any given desired distance and time, $d_u$ and $t_u$, respectively,
 \begin{equation} \label{eq:integralfit}
 g_u = f(d_u,t_u)
 \end{equation}
@@ -383,12 +383,12 @@ In Figs.~\ref{fig:integs} and \ref{fig:joys}, we show the surfaces that represen
 
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/integs.png}
-    \caption{Integral vs Distance and Time}
+    \caption{Integral vs distance and time.}
     \label{fig:integs}
 \end{figure}
 \begin{figure}[ht]
     \includegraphics[width=0.48\textwidth]{images/joycmds.png}
-    \caption{Average Teleoperation Input Command vs Distance and Time}
+    \caption{Average teleoperation input command vs distance and time}
     \label{fig:joys}
 \end{figure}
 \subsubsection{Regression Error Analysis} \label{sec:regerror}
@@ -427,12 +427,12 @@ where $\theta$ is an angle from $[0,\ldots,2\pi]$, and $\bm{d}_i$ and $\bm{t}_i$
 In Fig.~\ref{fig:preds}, the convex hull around standard error ellipses created with $t^* = 0.5$ around each training point is depicted. Fig.~\ref{fig:predsur} is the TPS regression model for the integral \eqref{eq:integralfit} overlaid with the convex hull \cite{bounds} created from the ellipses on Fig.~\ref{fig:preds}.
 \begin{figure}[H]
 	\centering
-	\subfigure[Prediction Bounds \label{fig:preds}]{\includegraphics[width=0.49\linewidth]{images/predictionbds.png}}
-	\subfigure[Prediction Bounds on Surface \label{fig:predsur}]{\includegraphics[width=0.49\linewidth]{images/fulpredbds.png}}
-	\caption{Prediction Intervals and Bounds}
+	\subfigure[Prediction bounds. \label{fig:preds}]{\includegraphics[width=0.49\linewidth]{images/predictionbds.png}}
+	\subfigure[Prediction bounds on surface. \label{fig:predsur}]{\includegraphics[width=0.49\linewidth]{images/fulpredbds.png}}
+	\caption{Prediction intervals and bounds.}
 	\label{fig:bounds}
 \end{figure}
-An alternate method would have been to use standard error rectangles\cite{stdellipse} instead, which create rectangular intervals around each data point, but these are not necessarily accurate for smoothed surfaces, as rectangular regions would have non-differentiable corners, which are incongruous with smoothing conditions met by the TPS regression. 
+An alternate method would have been to use standard error rectangles\cite{stdellipse} instead, which create rectangular intervals around each data point. Rectangular regions are however not necessarily accurate for smoothed surfaces, as they have non-differentiable corners, which are incongruous with smoothing conditions met by the TPS regression. 
 
 With this analysis, we are able to provide boundary conditions for our training set, when determining what kind of trajectories we can follow. In the next section, we discuss how we build trajectories and how we use these boundaries with a satisfiability modulo theories (SMT) solver \cite{smt} to ensure that our UAV can indeed track generated trajectories.
 %\NB{so what's the punchline here? We need to say what you obtain with this analysis and perhaps connect with the SMT Solver later}
@@ -446,7 +446,7 @@ Relating back to the system dynamics, we have established that input commands ar
 %each trajectory simultaneously.
 %Because the using just roll and pitch commands is possible, we desire to decompose the trajectory into $x$ and $y$ components, as any smooth trajectory can be represented as a combination of these components.
 %\NB{this section needs to go before and needs to be explain better}.
-In order to generate a trajectory, we first select waypoints through which the UAV should travel. The optimal path is then determined by using a minimum snap trajectory. Minimum snap trajectories are associated with low control effort as they are based on the fourth derivative of position and ensure smoothness on quadrotors which have been proven to be 4th order systems \cite{minsnap}. The general equation for a minimum snap trajectory is the solution of the following functional \cite{minsnap}:
+In order to generate a trajectory, we first select waypoints through which the UAV should travel. The optimal path is then determined by using a minimum snap trajectory. Minimum snap trajectories are associated with low control effort as they are based on the fourth derivative of position and ensure smoothness on quadrotors which have been proven to be $4^{th}$ order systems \cite{minsnap}. The general equation for a minimum snap trajectory is the solution of the following functional \cite{minsnap}:
 %\NB{why? you need to explain better. Besides, we should use snap not jerk}
 \begin{equation} \label{eq:minjerkint}
 %    \bm{p}^*(t) = \argmin_{p(t)}\int_0^T\mathcal{L}(\ddddot{p},\dddot{p},\ddot{p},\dot{p},p,t)dt
@@ -487,12 +487,12 @@ Fig.~\ref{fig:t2dec} shows an example of a generated trajectory with its discret
 	\centering
 	\subfigure[Discretized Trajectory\label{fig:t2dec}]{\includegraphics[width=0.48\linewidth]{images/traj2dec.png}}
 	\subfigure[X and Y Components\label{fig:tdec}]{\includegraphics[width=0.48\linewidth]{images/trajdecomp.png}}
-	\caption{Example of a Generated Trajectory with its $x,y$ Decomposition}
+	\caption{Example of a generated trajectory with its $x,y$ decomposition.}
 	\label{fig:trajdec}
 \end{figure}
 
 %In Fig.~\ref{fig:tdec}, we show the components at each interval. 
-These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. To resolve this issue, we use an SMT solver, which is a verification tool that solves a first order satisfiability problem. In our work, the condition that we want to satisfy is that each of the distances and their corresponding time is within the convex hull, $Conv(M)$ presented in Section~\ref{sec:regerror}. Using an SMT solver, we check if all the distances in both components ${d}_{x,i}=||\bm{p}_x^*(t_i+1)-\bm{p}_x^*(t_i)||$ and ${d}_{y,i}=||\bm{p}_y^*(t_i+1)-\bm{p}_y^*(t_i)||$ are attainable in time-step $\Delta t$ subject to $Conv(M)$ : 
+These components, when executed simultaneously, correspond to the discretized trajectory pictured in Fig.~\ref{fig:t2dec}. The smaller $\Delta t$ is, the better is the approximation of the smooth trajectory. Each of the components are then evaluated with the prediction bounds from Fig.~\ref{fig:bounds}. If the error regions are violated, there is a possibility that the UAV will not reach the points in the discretized trajectory. To resolve this issue, we use an SMT solver, which is a verification tool that solves a first order satisfiability problem. In our work, the condition that we want to satisfy is that each of the distances and their corresponding time is within the convex hull, $Conv(M)$ presented in Section~\ref{sec:regerror}. Using an SMT solver, we check if all the distances in both components ${d}_{x,i}=||\bm{p}_x^*(t_i+1)-\bm{p}_x^*(t_i)||$ and ${d}_{y,i}=||\bm{p}_y^*(t_i+1)-\bm{p}_y^*(t_i)||$ are attainable in time-step $\Delta t$ subject to $Conv(M)$ : 
 \begin{equation}\label{eq:smt}
 %    (\bm{p}_x^*(t_i),\Delta t) \wedge (\bm{p}_y^*(t_i),\Delta t) \in Conv(M)
     ({d}_{x,i},\Delta t) \wedge ({d}_{y,i},\Delta t) \in Conv(M), ~\textrm{with}\, i = 1,\ldots,n-1
@@ -544,10 +544,10 @@ In Fig.~\ref{fig:gensample}, each step of the command generation process is visu
 
 \begin{figure}[h]
 	\centering
-	\subfigure[Original String \label{fig:ogstring}]{\includegraphics[width=0.32\linewidth]{images/ogstring3.png}}
-	\subfigure[Time Adjustment \label{fig:timeadj}]{\includegraphics[width=0.32\linewidth]{images/timeadj3.png}}
-    \subfigure[Final Commands \label{fig:fullyadj}]{\includegraphics[width=0.32\linewidth]{images/fullyadj3.png}}
-	\caption{Command Generation Process}
+	\subfigure[Original string. \label{fig:ogstring}]{\includegraphics[width=0.32\linewidth]{images/ogstring3.png}}
+	\subfigure[Time adjustment. \label{fig:timeadj}]{\includegraphics[width=0.32\linewidth]{images/timeadj3.png}}
+    \subfigure[Final commands. \label{fig:fullyadj}]{\includegraphics[width=0.32\linewidth]{images/fullyadj3.png}}
+	\caption{Command generation process.}
 	\label{fig:gensample}
 \end{figure}
 
@@ -599,10 +599,10 @@ To show the effect of the proposed online adaptation procedure, we ran the same 
 
 \begin{figure}[ht]
 	\centering
-	    \subfigure[$x$ Commands \label{fig:xcmds}]{\includegraphics[width=0.48\linewidth]{images/CLOSEDXcmds.png}}
-	    \subfigure[$x$ Error \label{fig:xerr}]{\includegraphics[width=0.48\linewidth]{images/XERR.png}}
- \subfigure[$y$ Commands \label{fig:ycmds}]{\includegraphics[width=0.48\linewidth]{images/CLOSEDYcmds.png}}
-    \subfigure[$y$ Error \label{fig:yerr}]{\includegraphics[width=0.48\linewidth]{images/YERROR.png}}
+	    \subfigure[$x$ commands. \label{fig:xcmds}]{\includegraphics[width=0.48\linewidth]{images/CLOSEDXcmds.png}}
+	    \subfigure[$x$ error. \label{fig:xerr}]{\includegraphics[width=0.48\linewidth]{images/XERR.png}}
+ \subfigure[$y$ commands. \label{fig:ycmds}]{\includegraphics[width=0.48\linewidth]{images/CLOSEDYcmds.png}}
+    \subfigure[$y$ error. \label{fig:yerr}]{\includegraphics[width=0.48\linewidth]{images/YERROR.png}}
    	\caption{The generated commands and the error in the $x$ and $y$ Directions}
 	\label{fig:1723controlled}
 \end{figure}
@@ -620,31 +620,31 @@ To further validate the approach, a square-shaped trajectory was tested, and the
 
 \begin{figure}[ht!]
 	\centering
-	\subfigure[Open Loop Square \label{fig:clsquare}]{\includegraphics[width=0.48\columnwidth]{images/OPENsquare.png}}
-    \subfigure[Closed Loop Square \label{fig:opensquare}]{\includegraphics[width=0.48\columnwidth]{images/CLOSEDsquare.png}}
-	\caption{Square-Shaped Trajectory in Open and Closed Loop}
+	\subfigure[Open loop square. \label{fig:clsquare}]{\includegraphics[width=0.48\columnwidth]{images/OPENsquare.png}}
+    \subfigure[Closed loop square. \label{fig:opensquare}]{\includegraphics[width=0.48\columnwidth]{images/CLOSEDsquare.png}}
+	\caption{Square-shaped trajectory in open and closed loop.}
 	\label{fig:sqr}
 \end{figure}
 
 \begin{figure}[ht!]
 	\centering
-	\subfigure[Open Loop Square \label{fig:clsquareq}]{\includegraphics[width=0.48\columnwidth]{images/square_open_quad.png}}
-    \subfigure[Closed Loop Square \label{fig:opensquareq}]{\includegraphics[width=0.48\columnwidth]{images/square_closed_quad.png}}
-	\caption{Square-Shaped Trajectory Experiments}
+	\subfigure[Open loop square. \label{fig:clsquareq}]{\includegraphics[width=0.48\columnwidth]{images/square_open_quad.png}}
+    \subfigure[Closed loop square. \label{fig:opensquareq}]{\includegraphics[width=0.48\columnwidth]{images/square_closed_quad.png}}
+	\caption{Square-shaped trajectory experiments.}
 	\label{fig:sqrquad}
 \end{figure}
 
 \begin{figure*}[tb!h]
 	\vspace{-5pt}
 	\centering
-	\subfigure[Planned U Trajectory. \label{fig:ex0}]{\includegraphics[width=0.32\textwidth]{images/DESIRE_U.png}}
-	\subfigure[Planned V Trajectory. \label{fig:ex1}]{\includegraphics[width=0.32\textwidth]{images/DESIRE_V.png}}
-	\subfigure[Planned A Trajectory. \label{fig:ex2}]{\includegraphics[width=0.32\textwidth]{images/DESIRE_A.png}}
-	\subfigure[Real U Trajectory. \label{fig:ex3}]{\includegraphics[width=0.32\textwidth]{images/FINAL_U.png}}
-	\subfigure[Real V Trajectory. \label{fig:ex4}]{\includegraphics[width=0.32\textwidth]{images/FINAL_V.png}}
-	\subfigure[Real A Trajectory. \label{fig:ex5}]{\includegraphics[width=0.32\textwidth]{images/FINAL_A.png}}
+	\subfigure[Planned U trajectory. \label{fig:ex0}]{\includegraphics[width=0.32\textwidth]{images/DESIRE_U.png}}
+	\subfigure[Planned V trajectory. \label{fig:ex1}]{\includegraphics[width=0.32\textwidth]{images/DESIRE_V.png}}
+	\subfigure[Planned A trajectory. \label{fig:ex2}]{\includegraphics[width=0.32\textwidth]{images/DESIRE_A.png}}
+	\subfigure[Real U trajectory. \label{fig:ex3}]{\includegraphics[width=0.32\textwidth]{images/FINAL_U.png}}
+	\subfigure[Real V trajectory. \label{fig:ex4}]{\includegraphics[width=0.32\textwidth]{images/FINAL_V.png}}
+	\subfigure[Real A trajectory. \label{fig:ex5}]{\includegraphics[width=0.32\textwidth]{images/FINAL_A.png}}
 	\vspace{-5pt}
-	\caption{UVA trajectory planning and execution}
+	\caption{U-V-A trajectory planning and execution.}
 	\label{fig:UVA}
 	\vspace{-15pt}
 \end{figure*}
